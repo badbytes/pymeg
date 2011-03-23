@@ -1,0 +1,12 @@
+cd data/clinicaltests/LR/
+from pdf2py import readwrite
+mrflipped = readwrite.readdata('LRmrflipped.pym')
+from mri import pydicom, viewmri, transform
+
+nas = [100, 0.0, 119] #in mm
+lpa = [175, 88, 105] 
+rpa = [31, 95, 100]
+
+from numpy import *
+points = array([[0.0, 0.0, 80.0]])
+[t,r]= transform.meg2meg(lpa,rpa,nas);t.T+dot(r, points.T)

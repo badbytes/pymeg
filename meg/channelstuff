@@ -1,0 +1,43 @@
+"channel maps"
+
+#xi=linspace(-.5,.5,67)
+#yi=linspace(-.5,.5,67)
+xi, yi = mgrid[-.5:.5:67j,-.5:.5:67j]
+
+chan = mio.loadmat('chan_xy.mat')
+
+chany=chan['y']
+chanx=chan['x']
+
+##contourf(Xi,Yi,Zi)
+##plot(chany,chanx, '.')
+##hot()
+##show()
+
+
+
+intx=chan['intx']
+inty=chan['inty']
+z = slices[:,100]
+zi = interp(xi,yi)
+tri = Triangulation(intx,inty)
+interp = tri.nn_interpolator(z)
+zi = interp(xi,yi)
+delaunayinterp.plot_data(xi2,yi2,zi)
+
+
+
+
+
+
+slices = pdf.GetSliceRangeMEGChannels(0, 1000)
+plot(slices[1,:])
+show()
+dmin=numpy.min(slices)
+dmax=numpy.max(slices)
+
+
+step=abs(dmin+dmax/2)
+for i in range(0,len(slices)):
+    plot(slices[i,:]+inc)
+    inc=step+inc

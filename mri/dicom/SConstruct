@@ -1,0 +1,42 @@
+#Makes 'dicom.so' so that in python we can go:
+#>>>import dicom
+#
+import os
+sources="""
+pydicomlib.cpp
+ClientConnection.cpp
+DataSet.cpp
+Tag.cpp
+UID.cpp
+Value.cpp
+VR.cpp
+"""
+
+libs=['dicom','boost_python-gcc-1_31','boost_date_time-gcc-1_31', 'socket']
+cpppath=list()
+libpath=list()
+cpppath.append('/home/morgan/Code')
+libpath.append('/home/morgan/Code/dicomlib')
+libpath.append('/home/morgan/Code/socket')
+
+
+env=Environment()
+
+if(env['PLATFORM']=='sunos'):#currently on octane we have our libraries in /home/morgan
+	cpppath.append('/opt/include/python2.3')
+	cpppath.append('/home/morgan/libraries/boost')
+	libpath.append('/home/morgan/libraries/boost/libs/python/build/bin-stage')
+	libpath.append('/home/morgan/libraries/boost/libs/date_time/build/bin-stage')
+
+
+#	libpath.append('/home/morgan/libraries/boost/bin/boost/libs/date_time/build/libboost_date_time.a/gcc/release')
+else:
+	cpppath.append('/usr/include/python2.3')
+	libpath.append('usr/local/boost/libs/python/build/bin/libboost_python.so/gcc/release/runtime-link-dynamic/shared-linkable-true')
+	libpath.append('/usr/local/boost/libs/date_time/build/bin/libboost_date_time.so/gcc/release/runtime-link-dynamic/shared-linkable-true')
+
+#env=Environment(CPPPATH=cpppath,LIBS=libs,LIBPATH=libpath)
+env=Environment(CPPPATH=cpppath,LIBS=libs,LIBPATH=libpath,ENV={'PATH' : os.environ['PATH']})
+env.SharedLibrary(target = 'dicom', source = sources.split(),SHLIBPREFIX="")
+
+

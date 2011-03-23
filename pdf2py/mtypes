@@ -1,0 +1,32 @@
+  mtype -- a string indicating the binary type to write.
+           The default is the type of data. If necessary a cast is made.
+           unsigned byte  : 'B', 'uchar', 'byte' 'unsigned char', 'int8',
+                            'integer*1'
+           character      : 'S1', 'char', 'char*1'
+           signed char    : 'b', 'schar', 'signed char'
+           short          : 'h', 'short', 'int16', 'integer*2'
+           unsigned short : 'H', 'ushort','uint16','unsigned short'
+           int            : 'i', 'int'
+           unsigned int   : 'I', 'uint32','uint','unsigned int'
+           int32           : 'u4', 'int32', 'integer*4'
+           float          : 'f', 'float', 'float32', 'real*4'
+           double         : 'd', 'double', 'float64', 'real*8'
+           complex float  : 'F', 'complex float', 'complex*8', 'complex64'
+           complex double : 'D', 'complex', 'complex double', 'complex*16',
+                            'complex128'
+
+
+
+char  	Character or small integer.  	1byte  	signed: -128 to 127
+unsigned: 0 to 255
+short int (short) 	Short Integer. 	2bytes 	signed: -32768 to 32767
+unsigned: 0 to 65535
+int 	Integer. 	4bytes 	signed: -2147483648 to 2147483647
+unsigned: 0 to 4294967295
+long int (long) 	Long integer. 	4bytes 	signed: -2147483648 to 2147483647
+unsigned: 0 to 4294967295
+bool 	Boolean value. It can take one of two values: true or false. 	1byte 	true or false
+float 	Floating point number. 	4bytes 	+/- 3.4e +/- 38 (~7 digits)
+double 	Double precision floating point number. 	8bytes 	+/- 1.7e +/- 308 (~15 digits)
+long double 	Long double precision floating point number. 	8bytes 	+/- 1.7e +/- 308 (~15 digits)
+wchar_t 	Wide character. 	2 or 4 bytes 	1 wide character

@@ -1,0 +1,10 @@
+[[collapsible show="show code" hide="collapse code"]]
+ [[code type="Python"]]
+ 
+ 
+ [[/code]]
+ [[/collapsible]]
+
+ [[collapsible show="show howto" hide="collapse howto"]]
+ 
+ [[/collapsible]]

@@ -1,0 +1,21 @@
+------
+[[collapsible show="show code" hide="collapse code"]]
+[[code type="Python"]]
+
+
+
+
+[[/code]]
+[[/collapsible]]
+
+[[collapsible show="show howto" hide="collapse howto"]]
+
+[[/collapsible]]
+
+------
+
+[[image mriviewer2.png size="medium"]]
+
+------
+
+[[iframe http://www.clinicalmeg.org/vids/pymriview.html width="100%" height="350" scrolling="yes"]]

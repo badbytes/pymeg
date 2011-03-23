@@ -1,0 +1,38 @@
+config_data.version = fread(fid, 1, 'uint16=>uint16');
+            site_name = char(fread(fid, 32, 'uchar'))';
+config_data.site_name = site_name(site_name>0);
+            dap_hostname = char(fread(fid, 16, 'uchar'))';
+config_data.dap_hostname = dap_hostname(dap_hostname>0);
+config_data.sys_type = fread(fid, 1, 'uint16=>uint16');
+config_data.sys_options = fread(fid, 1, 'uint32=>uint32');
+config_data.supply_freq = fread(fid, 1, 'uint16=>uint16');
+config_data.total_chans = fread(fid, 1, 'uint16=>uint16');
+config_data.system_fixed_gain = fread(fid, 1, 'float32=>float32');
+config_data.volts_per_bit = fread(fid, 1, 'float32=>float32');
+config_data.total_sensors = fread(fid, 1, 'uint16=>uint16');
+config_data.total_user_blocks = fread(fid, 1, 'uint16=>uint16');
+config_data.next_derived_channel_number = fread(fid, 1, 'uint16=>uint16');
+    fseek(fid, 2, 'cof');%alignment
+config_data.checksum = fread(fid, 1, 'int32=>int32');
+config_data.reserved = fread(fid, 32, 'uchar=>uchar')';
+
+
+  data -- the numpy array to write.
+  mtype -- a string indicating the binary type to write.
+           The default is the type of data. If necessary a cast is made.
+           unsigned byte  : 'B', 'uchar', 'byte' 'unsigned char', 'int8',
+                            'integer*1'
+           character      : 'S1', 'char', 'char*1'
+           signed char    : 'b', 'schar', 'signed char'
+           short          : 'h', 'short', 'int16', 'integer*2'
+           unsigned short : 'H', 'ushort','uint16','unsigned short'
+           int            : 'i', 'int'
+           unsigned int   : 'I', 'uint32','uint','unsigned int'
+           int32           : 'u4', 'int32', 'integer*4'
+           float          : 'f', 'float', 'float32', 'real*4'
+           double         : 'd', 'double', 'float64', 'real*8'
+           complex float  : 'F', 'complex float', 'complex*8', 'complex64'
+           complex double : 'D', 'complex', 'complex double', 'complex*16',
+                            'complex128'
+
+cb1silfdFD

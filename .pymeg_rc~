@@ -1,0 +1,9 @@
+export PYTHONPATH=$PYTHONPATH:/opt/msw/users/pymeg
+
+source ~/.bashrc
+cd /opt/msw/users/pymeg/gui
+#python /opt/msw/users/pymeg/gui/wxmsw.py
+python wxmsw.py &
+cd ~/
+
+

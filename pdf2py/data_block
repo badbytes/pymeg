@@ -1,0 +1,46 @@
+
+try:from scipy.io.numpyio import *
+except ImportError: from extra.numpyio import *
+from numpy import *
+from pdf2py import align, header
+import os
+
+
+class read:
+    def __init__(self, datapdf):
+        #fid=open(datapdf, "r") 
+        #align.check(fid);
+        hdr=header.read(datapdf)
+        total_chans=hdr.header_data.total_chans[0]
+        pnts_in_epoch=hdr.epoch_data[0].pts_in_epoch[0]
+        format=hdr.header_data.data_format[0]
+        fid=open(datapdf, "r") 
+        print 'fidtell', fid.tell()
+        
+        ####ONLY SET TO READ FIRST EPOCH
+        data=zeros([total_chans, pnts_in_epoch])
+        if format == 1: 
+            dataprecision='h'; 
+            time_slice_size = 2 * total_chans; 
+            data = int16(data);
+            print 'time_slice_size',time_slice_size
+        if format == 2: 
+            dataprecision='i'; 
+            time_slice_size = 4 * total_chans;
+        if format == 3: 
+            dataprecision='f'; 
+            time_slice_size = 4 * total_chans;
+        if format == 4: 
+            dataprecision='d'; 
+            time_slice_size = 8 * total_chans;
+        
+        
+        self.data_block = fread(fid, time_slice_size*pnts_in_epoch, dataprecision, dataprecision, 1);
+        self.data_block.reshape(self.data_block, 
+#%BTi Data Formats:
+
+'''SHORT   =    1;
+LONG    =   2;
+FLOAT   =   3;
+DOUBLE  =   4;'''
+
