@@ -19,9 +19,7 @@
 '''
 Requires the following...
 srate,timeaxes,data,chanlabels,
-
 '''
-
 import sys
 from gtk import gdk
 from numpy import * #fromstring, arange, int16, float, log10
@@ -39,7 +37,6 @@ from matplotlib.lines import Line2D
 from pdf2py import pdf
 from gui.gtk import contour as contour_gtk
 from gui.gtk import meg_assistant,event_process#,offset_correct
-
 
 try:
     import pygtk
@@ -147,7 +144,10 @@ class setup_gui:
         self.builder.get_object("spinbutton2").set_range(self.t[0],self.t[-1])
         self.builder.get_object("spinbutton2").set_value(self.t[0])
         self.builder.get_object("spinbutton3").set_range(self.t[0],self.t[-1])
-        self.builder.get_object("spinbutton3").set_value(self.t[-1])
+        if self.t[-1] - self.t[0] > 1: #alot of time, save time in plotting and set low
+            self.builder.get_object("spinbutton3").set_value(self.t[1000])
+        else:
+            self.builder.get_object("spinbutton3").set_value(self.t[-1])
 
     def preferences_open(self,widget):
         self.win_prefs = self.builder.get_object("window_prefs")
@@ -372,9 +372,6 @@ class setup_gui:
         self.space_data()
         self.redraw(None)
 
-
-
-
     def set_channel_groups(self,widget):
         print widget.get_label(), widget
         if widget.get_label() == 'meg' and widget.get_active() == True:
@@ -383,7 +380,6 @@ class setup_gui:
             self.View.get_selection().unselect_all()
         if widget.get_label() == 'Select All' and widget.get_active() == True:
             self.View.get_selection().select_all()
-
 
     def selections_tree(self,widget):
         try:
@@ -405,7 +401,6 @@ class setup_gui:
 
         except AttributeError:
             pass #window not initiated yet
-
 
     def event_selection_delete(self, widget):
         liststore,iter = self.SelView.get_selection().get_selected_rows()
@@ -489,8 +484,6 @@ class setup_gui:
         self.mc.fig.clf()
         self.mc.display(self.data[self.sel_ind,:],self.channels, subplot='on')
 
-
-
     def generate_testdata(self,widget):
         self.quick_load_pdf_script()
         #numpts = 100
@@ -541,7 +534,6 @@ class setup_gui:
         widget.hide()
         return True
 
-
     def load_data(self,widget):
         from gui.gtk import filechooser
         fn = filechooser.open()
@@ -586,7 +578,6 @@ class setup_gui:
             self.builder.get_object("messagedialog1").show()
             return -1
 
-
         self.data = data
         self.srate = srate
         self.chanlabels = chanlabels
@@ -604,8 +595,6 @@ class setup_gui:
         self.data2plot = self.data
         self.display_apply(None)
         self.callback()
-
-    
 
     def offset_correct(self,widget):
         print self.get_time_selection(widget)
@@ -632,13 +621,6 @@ class setup_gui:
             
         print('passing selection indices',self.sel_onset_ind)
         self.ed.set_selected_events_passed(None,self.data,self.sel_onset_ind,self.t)
-    
-        
-        
-
-
-
-
 
 if __name__ == "__main__":
     mainwindow = setup_gui()
