@@ -15,7 +15,7 @@
 #       along with this program; if not, write to the Free Software
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
-import sys
+import sys,os
 from pdf2py import pdf
 
 try:
@@ -34,7 +34,11 @@ class setup:
     def __init__(self, path=None,callback=None):
         self.callback=callback
         print callback
+        print('sysarg0',sys.argv[0])
+        gladepath = os.path.splitext(sys.argv[0])[0]
+        print 'gp',gladepath
         self.builder = gtk.Builder()
+        #self.builder.add_from_file(gladepath+".glade")
         self.builder.add_from_file("meg_assistant.glade")
         self.assistant = self.builder.get_object("assistant1")
 
@@ -48,7 +52,7 @@ class setup:
         self.builder.connect_signals(dic)
         self.builder.get_object("assistant1").show()
         self.load_file(path=path)
-        
+
     def hide_window(self,widget):
         self.builder.get_object("assistant1").hide()
 
@@ -57,9 +61,17 @@ class setup:
         print 'loading file'
         self.assistant.set_page_complete(self.assistant.get_nth_page(0), True)
         self.pdfdata = pdf.read(path)
-        self.builder.get_object("entry30").set_text(str(self.pdfdata.data.pnts_in_file[0]))
+        self.ne = self.pdfdata.hdr.header_data.total_epochs[0]
+        print 'ne',self.ne
+        if self.ne > 1: #only load value in epochs
+            self.builder.get_object("label32").set_text('First Epoch')
+            self.builder.get_object("label33").set_text('Last Epoch')
+            self.builder.get_object("entry29").set_text(str(0))
+            self.builder.get_object("entry30").set_text(str(self.ne))
+        else:
+            self.builder.get_object("entry30").set_text(str(self.pdfdata.data.pnts_in_file[0]))
         self.path = path
-        
+
     def read_data(self,path=None):
 
         chlabels = []
@@ -71,9 +83,16 @@ class setup:
         print 'chlabels', chlabels
         self.pdfdata = pdf.read(self.path)
         startpnt = int(self.builder.get_object("entry29").get_text())
-        endpnt = int(self.builder.get_object("entry30").get_text())
+        if self.ne > 1: #only load value in epoch increments
+            pntsinepoch = self.pdfdata.data.pnts_in_file/self.ne
+            endepoch = int(self.builder.get_object("entry30").get_text())
+            endpnt = pntsinepoch * endepoch
+
+        else:
+            endpnt = int(self.builder.get_object("entry30").get_text())
         self.pdfdata.data.setchannellabels(chlabels)
         self.pdfdata.data.getdata(startpnt,endpnt)
+        self.pdfdata.data.wintime = self.pdfdata.data.wintime[startpnt:endpnt]
         self.builder.get_object("assistant1").hide()
         self.callback()
         return self.pdfdata
@@ -96,8 +115,10 @@ class setup:
         print(self.chanlist, 'selected')
 
 if __name__ == "__main__":
-    path = '/home/danc/data/0611/0611piez/e,rfhp1.0Hz,ra,f50lp,o'
+    path = '/home/danc/python/data/0611/0611piez/e,rfhp1.0Hz,COH'
+    #path = '/home/danc/python/data/0611/0611SEF/e,rfhp1.0Hz,n,x,baha001-1SEF,f50lp'
+    #path = '/home/danc/data/0611/0611piez/e,rfhp1.0Hz,ra,f50lp,o'
     mainwindow = setup(path)
     mainwindow.assistant.show()
     gtk.main()
-    
+

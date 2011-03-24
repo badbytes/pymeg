@@ -144,10 +144,10 @@ class setup_gui:
         self.builder.get_object("spinbutton2").set_range(self.t[0],self.t[-1])
         self.builder.get_object("spinbutton2").set_value(self.t[0])
         self.builder.get_object("spinbutton3").set_range(self.t[0],self.t[-1])
-        if self.t[-1] - self.t[0] > 1: #alot of time, save time in plotting and set low
-            self.builder.get_object("spinbutton3").set_value(self.t[1000])
-        else:
-            self.builder.get_object("spinbutton3").set_value(self.t[-1])
+        #if self.t[-1] - self.t[0] > 1: #alot of time, save time in plotting and set low
+            #self.builder.get_object("spinbutton3").set_value(self.t[1000])
+        #else:
+        self.builder.get_object("spinbutton3").set_value(self.t[-1])
 
     def preferences_open(self,widget):
         self.win_prefs = self.builder.get_object("window_prefs")
@@ -268,25 +268,30 @@ class setup_gui:
         self.canvas.draw()
         ion()
 
+
     def zoomin_time(self,widget):
         startind = self.tstart;
         stopind = self.tstop-((self.tstop-self.tstart)/2)
         self.check_scale(startind,stopind)
+        self.redraw(None)
 
     def zoomout_time(self,widget):
         startind = self.tstart;
         stopind = self.tstop+((self.tstop-self.tstart)*2)
         self.check_scale(startind,stopind)
+        self.redraw(None)
 
     def page_forward(self,widget):
         startind = ((self.tstop-self.tstart)/2)+self.tstart;
         stopind = ((self.tstop-self.tstart)/2)+self.tstop;
         self.check_scale(startind,stopind)
+        self.redraw(None)
 
     def page_back(self,widget):
         startind = self.tstart-((self.tstop-self.tstart)/2);
         stopind = self.tstop-((self.tstop-self.tstart)/2);
         self.check_scale(startind,stopind)
+        self.redraw(None)
 
     def page_up(self,widget):
         self.curchannel = self.curchannel+self.numofch
@@ -306,7 +311,7 @@ class setup_gui:
         self.chanind[self.curchannel:self.curchannel+self.numofch]
         self.chanlabels2plot = \
         self.chanlabels[self.curchannel:self.curchannel+self.numofch]
-        
+
         st = float(self.builder.get_object("spinbutton2").get_value())
         ed = float(self.builder.get_object("spinbutton3").get_value())
         #print 'se',st,ed, self.t
@@ -334,7 +339,7 @@ class setup_gui:
         self.time = self.t[self.tstart:self.tstop]
         self.data2plot = self.data[self.tstart:self.tstop,self.chanind2plot]
         self.space_data()
-        self.redraw(None)
+        #self.redraw(None)
 
 
     def channel_tree(self,widget):
@@ -391,7 +396,7 @@ class setup_gui:
                 if self.SelView.get_columns() == []:
                     self.AddListColumn('Event Number', 0,self.SelView)
                     self.AddListColumn('Selection', 1,self.SelView)
-                
+
                 for k in range(0,len(self.selections)):
                     iter=self.selectionList.append([k,str(self.selections[k])])
                 #for i in
@@ -518,7 +523,7 @@ class setup_gui:
         #p.data.setchannellabels(['A178'])
         p.data.getdata(0,p.data.pnts_in_file)
         self.numchannels = size(p.data.data_block,1)
-        self.t = p.data.eventtime
+        self.t = p.data.wintime #eventtime
         self.data = p.data.data_block
         self.tstart = 0; self.tstop = len(self.t)
         self.time = copy(self.t[self.tstart:self.tstop])
@@ -548,11 +553,12 @@ class setup_gui:
     def load_data_callback(self):
         print 'DONE!'
         p = self.data_assist.pdfdata
-        eventtime = []
-        for i in range(1,p.data.numofepochs+1):
-            eventtime.extend(p.data.eventtime*i)
+        #eventtime = []
+        #for i in range(1,p.data.numofepochs+1):
+            #eventtime.extend(p.data.eventtime*i)
         self.data_handler(p.data.data_block,p.hdr.header_data.sample_period, \
-        eventtime,p.data.channels.labellist,p.data.channels.chanlocs)
+        p.data.wintime,p.data.channels.labellist,p.data.channels.chanlocs)
+
 
     def data_handler(self,data,srate,wintime,chanlabels,chanlocs, callback=None):
         '''
@@ -596,6 +602,9 @@ class setup_gui:
         self.display_apply(None)
         self.callback()
 
+    def callback(self):
+        pass
+
     def offset_correct(self,widget):
         print self.get_time_selection(widget)
         if self.get_time_selection(widget) == -1: #no selections
@@ -606,7 +615,7 @@ class setup_gui:
             return -1
         self.data = self.data - average(self.data[self.sel_ind,:],axis=0)
         self.display_apply(None)
-        
+
     def add_selections_to_event_process(self,widget):
         try:
             if self.ed.window.get_property('visible') == False:
@@ -618,7 +627,7 @@ class setup_gui:
         if self.get_time_selection(widget) == -1:
             print('no selections detected')
             return -1
-            
+
         print('passing selection indices',self.sel_onset_ind)
         self.ed.set_selected_events_passed(None,self.data,self.sel_onset_ind,self.t)
 

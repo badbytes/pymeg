@@ -43,11 +43,11 @@ class errorwin:
 
 
 if __name__ == "__main__":
-    mainwindow = errorwin()
-    mainwindow.dialog.show()
-    x = mainwindow.dialog.run()
-    print x
-    if x == -7:
-        gtk.destroy()
-        mainwindow.dialog.destroy()
+    mainwindow = errorwin('test')
+    #mainwindow.dialog.show()
+    #x = mainwindow.dialog.run()
+    #print x
+    #if x == -7:
+        #gtk.destroy()
+        #mainwindow.dialog.destroy()
     gtk.main()

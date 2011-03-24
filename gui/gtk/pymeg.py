@@ -29,7 +29,8 @@ from matplotlib.axes import Subplot
 from matplotlib.backends.backend_gtk import show
 
 from gui.gtk import filter, offset_correct, errordialog, preferences,\
-dipoledensity, coregister, timef, data_editor, event_process, parse_instance
+dipoledensity, coregister, timef, data_editor, event_process, parse_instance, \
+meg_assistant, errordialog
 from gui.gtk import contour as contour_gtk
 
 #from IPython.Shell import IPShellEmbed
@@ -71,6 +72,7 @@ class maingui:
         self.progressbar = self.builder.get_object("progressbar")
         self.datatree(self)
         self.resulttree(self)
+
         dic = {
             "on_menuLoadMEG_activate" : self.fileOpenMEG,
             "on_loadmri_activate" : self.fileOpenMRI,
@@ -84,8 +86,8 @@ class maingui:
             "on_treeview2_row_activated" : self.treeclicked,
             "on_treebutton1_clicked" : self.treegohome,
             "on_treebutton2_clicked" : self.treeuplevel,
-            "on_checkbutton_toggled" : self.assistadvance,
-            "on_assistant1_apply" : self.readdata,
+            "on_checkbutton_toggled" : self.meg_assist, #assistadvance,
+            #"on_assistant1_apply" : self.readdata,
             "on_aboutdialog1_hide" : self.abouthide,
             "on_treebutton3_clicked" : self.treeadd2workspace,
             "on_treeview2_buttonpress" : self.treeclicked,
@@ -183,53 +185,65 @@ class maingui:
     def abouthide(self,null,null2):
         self.builder.get_object('aboutdialog1').hide()
 
-    def assistadvance(self,widget):#,button):
-        self.chanlist = []
-        print('something')
-        for i in self.builder.get_object('table1'):
-            if i.get_active() == True:
+    def meg_assist(self):
+        #from gui.gtk import filechooser
+        #fn = filechooser.open()
 
-                self.chanlist.append(i.get_label())
-        if len(self.chanlist) > 0:
-            self.assistant.set_page_complete(self.assistant.get_nth_page(1), True)
-            self.assistant.set_page_complete(self.assistant.get_nth_page(2), True)
-        else:
-            self.assistant.set_page_complete(self.assistant.get_nth_page(1), False)
-        print(self.chanlist, 'selected')
+        self.data_assist = meg_assistant.setup(path = self.fn, callback=self.load_data_callback)
+    def load_data_callback(self):
+        print 'DONE!'
+        #p = self.data_assist.pdfdata
+        path = self.data_assist.pdfdata.data.filepath
+        self.datadict[path] = self.data_assist.pdfdata
+        self.readMEG()
 
-    def assistMEG(self):
-        def dothis():
-            print(1)
-        self.assistant = self.builder.get_object("assistant1")#.show()
-        self.assistant.show()
-        self.assistant.set_page_complete(self.assistant.get_nth_page(0), True)
+    #def assistadvance(self,widget):#,button):
+        #self.chanlist = []
+        #print('something')
+        #for i in self.builder.get_object('table1'):
+            #if i.get_active() == True:
+
+                #self.chanlist.append(i.get_label())
+        #if len(self.chanlist) > 0:
+            #self.assistant.set_page_complete(self.assistant.get_nth_page(1), True)
+            #self.assistant.set_page_complete(self.assistant.get_nth_page(2), True)
+        #else:
+            #self.assistant.set_page_complete(self.assistant.get_nth_page(1), False)
+        #print(self.chanlist, 'selected')
+
+    #def assistMEG(self):
+        #def dothis():
+            #print(1)
+        #self.assistant = self.builder.get_object("assistant1")#.show()
+        #self.assistant.show()
+        #self.assistant.set_page_complete(self.assistant.get_nth_page(0), True)
+        #path = self.fn
+        #self.datadict[path] = pdf.read(path)
+        #self.builder.get_object("entry30").set_text(str(self.datadict[path].data.pnts_in_file[0]))
+
+    def readMEG(self):
+        #self.builder.get_object("assistant1").hide()
         path = self.fn
-        self.datadict[path] = pdf.read(path)
-        self.builder.get_object("entry30").set_text(str(self.datadict[path].data.pnts_in_file[0]))
-
-    def readdata(self,widget):
-        self.builder.get_object("assistant1").hide()
-        path = self.fn
-        if self.parseddatadict.get(path, False) != False:
-            self.updatestatusbar('File exists in your workspace. Not loading')
-            return
+        #if self.parseddatadict.get(path, False) != False:
+            #self.updatestatusbar('File exists in your workspace. Not loading')
+            #return
         self.dataList.clear()
         self.parseinstance(self.datadict[path])
-        datatype = 'meg'
-        if datatype == 'meg':
-            self.datadict[path] = pdf.read(path)
-            self.parseddatadict[path] = self.parseddata.out
-            chindex = []
-            for c in self.chanlist:
-                print('c',c)
-                self.datadict[path].data.setchannels(c)
-                chindex.extend(self.datadict[path].data.channels.indexlist)
+        #datatype = 'meg'
+        #if datatype == 'meg':
+            #self.datadict[path] = pdf.read(path)
+            #self.parseddatadict[path] = self.parseddata.out
+            #chindex = []
+            #for c in self.chanlist:
+                #print('c',c)
+                #self.datadict[path].data.setchannels(c)
+                #chindex.extend(self.datadict[path].data.channels.indexlist)
 
-            int(self.builder.get_object("entry30").get_text())
-            self.datadict[path].data.getdata(int(self.builder.get_object("entry29").get_text()), \
-            int(self.builder.get_object("entry30").get_text()), chindex=chindex)
-            try: self.datadict[path].data.channels.getposition()
-            except: pass
+            #int(self.builder.get_object("entry30").get_text())
+            #self.datadict[path].data.getdata(int(self.builder.get_object("entry29").get_text()), \
+            #int(self.builder.get_object("entry30").get_text()), chindex=chindex)
+            #try: self.datadict[path].data.channels.getposition()
+            #except: pass
 
         self.refreshdatasummary()
 
@@ -302,12 +316,17 @@ class maingui:
         self.builder.get_object("filechooserdialog1").hide()
         self.updatestatusbar('loading file'+self.fn)
         #self.statusbar.push(self.statusbar_cid, 'loading file'+self.fn)
+        if self.parseddatadict.get(self.fn, False) != False:
+            errordialog.errorwin('File exists in your workspace. Not loading.')
+            self.updatestatusbar('File exists in your workspace. Not loading.')
+            return
 
         if self.filetype == 'MEG':
             print('filetype MEG')
             try:
                 pdf.read(self.fn)
-                self.assistMEG()
+                #self.assistMEG()
+                self.meg_assist()
             except AttributeError:
                 print('Not a MEG file')
 
