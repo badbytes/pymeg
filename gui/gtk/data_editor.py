@@ -19,7 +19,6 @@
 '''
 Requires the following...
 srate,timeaxes,data,chanlabels,
-
 '''
 
 import sys
@@ -39,7 +38,6 @@ from matplotlib.lines import Line2D
 from pdf2py import pdf
 from gui.gtk import contour as contour_gtk
 from gui.gtk import meg_assistant,event_process#,offset_correct
-
 
 try:
     import pygtk
@@ -372,9 +370,6 @@ class setup_gui:
         self.space_data()
         self.redraw(None)
 
-
-
-
     def set_channel_groups(self,widget):
         print widget.get_label(), widget
         if widget.get_label() == 'meg' and widget.get_active() == True:
@@ -383,7 +378,6 @@ class setup_gui:
             self.View.get_selection().unselect_all()
         if widget.get_label() == 'Select All' and widget.get_active() == True:
             self.View.get_selection().select_all()
-
 
     def selections_tree(self,widget):
         try:
@@ -405,7 +399,6 @@ class setup_gui:
 
         except AttributeError:
             pass #window not initiated yet
-
 
     def event_selection_delete(self, widget):
         liststore,iter = self.SelView.get_selection().get_selected_rows()
@@ -489,8 +482,6 @@ class setup_gui:
         self.mc.fig.clf()
         self.mc.display(self.data[self.sel_ind,:],self.channels, subplot='on')
 
-
-
     def generate_testdata(self,widget):
         self.quick_load_pdf_script()
         #numpts = 100
@@ -540,7 +531,6 @@ class setup_gui:
     def hideinsteadofdelete(self,widget, ev=None):
         widget.hide()
         return True
-
 
     def load_data(self,widget):
         from gui.gtk import filechooser
@@ -605,8 +595,6 @@ class setup_gui:
         self.display_apply(None)
         self.callback()
 
-    
-
     def offset_correct(self,widget):
         print self.get_time_selection(widget)
         if self.get_time_selection(widget) == -1: #no selections
@@ -632,13 +620,6 @@ class setup_gui:
             
         print('passing selection indices',self.sel_onset_ind)
         self.ed.set_selected_events_passed(None,self.data,self.sel_onset_ind,self.t)
-    
-        
-        
-
-
-
-
 
 if __name__ == "__main__":
     mainwindow = setup_gui()
