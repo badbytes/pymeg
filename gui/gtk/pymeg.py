@@ -821,8 +821,11 @@ class maingui:
     def epoch_data(self,widget):
         self.ed = event_process.setup_gui()
         self.ed.window.show()
-        self.ed.builder.get_object('filechooserbutton1').set_uri('file://'+self.selecteditem)
-        self.ed.builder.get_object('filechooserbutton1').set_sensitive(False)
+        #self.ed.builder.get_object('filechooserbutton1').set_uri('file://'+self.selecteditem)
+        #self.ed.builder.get_object('filechooserbutton1').get_uri()
+        print 'sending file:'+'file://'+self.selecteditem
+        self.ed.set_passed_filename(self.selecteditem)
+        #self.ed.builder.get_object('filechooserbutton1').set_sensitive(False)
         #self.ed.get_events_from_data(self.ed.builder.get_object('filechooserbutton1'))
         #self.datadict[path].results = self.datadict[path].__class__
 
@@ -839,6 +842,10 @@ class maingui:
             wintime = self.data_file_selected.data.wintime
             chanlabels = arange(0,size(self.treedata[self.selecteditem],1))
             chanlocs = arange(0,size(self.treedata[self.selecteditem],1))
+        except AttributeError:
+            self.errordialog\
+            ('No Data loaded yet.')
+
 
         self.de = data_editor.setup_gui()
         self.de.window.show()

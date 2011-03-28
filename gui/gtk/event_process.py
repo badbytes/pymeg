@@ -55,8 +55,16 @@ class setup_gui:
     def test(self,widget):
         pass #print 'test'
 
+    def set_passed_filename(self, filepathstring):
+        self.fnuri = 'file://'+filepathstring
+        #fixing oddity in set_uri, as char % needs to be set as %25 in filepath
+        self.fnuri = self.fnuri.replace('%','%25')
+        self.builder.get_object('filechooserbutton1').set_uri(self.fnuri)
+        print 'recieved passed filename'
+
     def get_trigger_events_from_data(self,widget):
         print('wid', widget)
+        print 't_uri', self.builder.get_object('filechooserbutton1').get_uri()
         print(widget.get_filename())
         try:
             self.p = pdf.read(widget.get_filename())
@@ -170,8 +178,12 @@ if __name__ == "__main__":
     mainwindow = setup_gui()
     mainwindow.window.show()
     fn = '/home/danc/programming/python/data/0611/0611piez/e,rfhp1.0Hz,COH'
-    fb = mainwindow.builder.get_object('filechooserbutton1')
-    fb.set_uri('file://'+fn)
+    fn = '/home/danc/vault/decrypted/programming/python/data/_data/0611piez/SupinePiez/07%2508%2504@09:33/1/e,rfhp1.0Hz,COH'
+    mainwindow.set_passed_filename(fn)
+    #fb = mainwindow.builder.get_object('filechooserbutton1')
+    #fb.set_uri('file://'+fn)
+
+    #print 'uri', fb.get_uri()
     #print 'uri', fb.get_uri()
     #mainwindow.get_events_from_data(mainwindow.builder.get_object('filechooserbutton1'))
     print('testing')
