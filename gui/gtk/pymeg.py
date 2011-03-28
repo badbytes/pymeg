@@ -276,6 +276,7 @@ class maingui:
     def fileOpenMEG(self,widget):
         self.builder.get_object("filechooserdialog1").show()
         self.filetype = 'MEG'
+        self.clear_filters()
 
     def fileOpenMRI(self,widget):
         fcd = self.builder.get_object("filechooserdialog1")
@@ -283,6 +284,7 @@ class maingui:
         filter.set_name("Nifti files")
         filter.add_pattern("*nii.gz")
         filter.add_pattern("*nii")
+        self.clear_filters()
         fcd.add_filter(filter)
         #self.builder.get_object("filechooserdialog1").show()
         fcd.show()
@@ -295,7 +297,7 @@ class maingui:
         filter.add_pattern("*.pym")
         filter.add_pattern("*.pymwf")
         filter.add_pattern("*.pymlf")
-
+        self.clear_filters()
         fcd.add_filter(filter)
         fcd.show()
         self.filetype = 'PYM'
@@ -306,10 +308,15 @@ class maingui:
         filter.set_name("Dipole Files")
         filter.add_pattern("*lA")
         filter.add_pattern("*.drf")
+        self.clear_filters()
         fcd.add_filter(filter)
         fcd.show()
         self.filetype = 'DIP'
 
+    def clear_filters(self):
+        fcd = self.builder.get_object("filechooserdialog1")
+        for i in fcd.list_filters():
+            fcd.remove_filter(i)
 
     def fileLoad(self,widget):
         self.fn = self.builder.get_object("filechooserdialog1").get_filename()
