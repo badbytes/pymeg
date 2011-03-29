@@ -19,7 +19,7 @@
 
 import sys
 from pdf2py import pdf
-from meg import trigger,event_logic,plot2dgtk
+from meg import trigger,event_logic,plot2dgtk,nearest
 
 try:
     import pygtk
@@ -48,6 +48,7 @@ class setup_gui:
             "showpopupmenu" : self.showpopupmenu,
             "on_get_event_list_activate" : self.show_event_list,
             "gtk_widget_hide" : self.hideinsteadofdelete,
+            "on_button_process_clicked" : self.epoch_data,
             }
 
         self.builder.connect_signals(dic)
@@ -70,9 +71,9 @@ class setup_gui:
             self.p = pdf.read(widget.get_filename())
             self.p.data.setchannels('trig')
             self.p.data.getdata(0, self.p.data.pnts_in_file)
-            self.data = self.p.data.data_block
-            self.wintime = self.p.data.wintime
-            u,n,nz = trigger.vals(self.data)
+            self.data = self.p.data.data_block #actual data array
+            self.wintime = self.p.data.wintime #timecourse
+            u,n,nz = trigger.vals(self.data) #u is the event value
             event_dict = event_logic.get_ind(u,self.data)
             self.event_tree(None,u,event_dict,treeview='treeview1')
         except TypeError:
@@ -142,8 +143,8 @@ class setup_gui:
 
         ind_dict = event_logic.get_ind(trig_int,self.data)
         print('indices dict',ind_dict)
-        result_ind = event_logic.ind_logic(ind_dict, timediff, self.wintime)
-        print(result_ind,'timediff',timediff)
+        self.result_ind = event_logic.ind_logic(ind_dict, timediff, self.wintime)
+        print(self.result_ind,'timediff',timediff)
 
     def plot_events(self,widget):
         plot2dgtk.makewin(self.data.T,self.wintime,plottype='imshow')
@@ -168,6 +169,21 @@ class setup_gui:
             self.AddListColumn('Time', 0, View, liststore)
             self.AddListColumn('Event Onset', 1, View, liststore)
             View.set_model(liststore)
+            
+    def epoch_data(self,widget):
+        print widget.get_label()
+        prestim_ms = float(self.builder.get_object("entry1").get_text())
+        poststim_ms = float(self.builder.get_object("entry2").get_text())
+        prestim_ind = nearest.nearest(self.wintime,prestim_ms)[0]
+        poststim_ind = nearest.nearest(self.wintime,poststim_ms)[0]
+        print prestim_ms,poststim_ms
+        
+        if widget.get_label() == 'ReEpoch':
+            print 'epoch'
+            
+            epoched = self.data[self.result_ind-prestim_ind:self.result_ind+poststim_ind]
+            print epoched.shape,'shape'
+            
 
     def hideinsteadofdelete(self,widget, ev=None):
         widget.hide()
