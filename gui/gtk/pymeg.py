@@ -77,7 +77,7 @@ class maingui:
             "on_loadmri_activate" : self.fileOpenMRI,
             "on_loadpythondata_activate" : self.fileOpenPYM,
             "on_loaddipolefile_activate" : self.fileOpenDIP,
-            "on_toolbutton1_clicked" : self.testhandler, #self.fileOpen,
+            "on_toolbutton1_clicked" : self.testhandler,
             "on_menuQuit_activate" : self.quit,
             "on_filedialogLoad_clicked" : self.fileLoad,
             "on_filedialogCancel_clicked" : self.fileCancel,
@@ -85,14 +85,13 @@ class maingui:
             "on_treeview2_row_activated" : self.treeclicked,
             "on_treebutton1_clicked" : self.treegohome,
             "on_treebutton2_clicked" : self.treeuplevel,
-            "on_checkbutton_toggled" : self.meg_assist, #assistadvance,
+            "on_checkbutton_toggled" : self.meg_assist,
             "on_aboutdialog1_hide" : self.abouthide,
             "on_treebutton3_clicked" : self.treeadd2workspace,
             "on_treeview2_buttonpress" : self.treeclicked,
             "itemselect" : self.itemselect,
             "on_toolbutton4_clicked" : self.add2plot,
             "on_buttonplot_activate" : self.plotdata,
-            "on_Add2Queue_clicked" : self.Add2Queue,
             "on_2Dplot_clicked" : self.plot2D,
             "on_addto3Dplot_clicked" : self.add2plot,
             "gtk_widget_hide" : self.hideinsteadofdelete,
@@ -125,13 +124,10 @@ class maingui:
         self.treelist = [] #appends list with newly clicked items from treeview
         self.treedict = {} #initialize the treeview dictionary.
         self.queue_store = gtk.ListStore(str)
+
         try: self.prefs = readwrite.readdata(os.getenv('HOME')+'/.pymeg.pym')
         except IOError: pass
         self.fill_combo_entries(None)
-
-    def testhandler(self, widget):
-        self.prnt(None)
-        self.timef_handler(None)
 
     def updatestatusbar(self,string):
         self.statusbar.push(self.statusbar_cid, string)
@@ -161,23 +157,6 @@ class maingui:
     def showplotwin(self, widget):
         self.builder.get_object('plotdialog').show()
 
-    #def testload(self, widget):
-        #print('clicked')
-        #fns = ['/home/danc/python/data/0611SEF/e,rfhp1.0Hz,n,x,baha001-1SEF,f50lp']#,'/home/danc/python/data/0611piez/SupinePiez/07%08%04@09:33/1/e,rfhp1.0Hz,ra,f50lp,o']
-        ##self.builder.get_object("entry1").set_text('it works')
-        ##self.statusbar.push(self.statusbar_cid, 'it works')
-        #for i in fns:
-            #print('i', i)
-            #self.fn = path = i
-            #self.datadict[path] = pdf.read(self.fn)
-            #self.datadict[path].data.setchannels('meg')
-            #self.datadict[path].data.getdata(0, self.datadict[path].data.pnts_in_file)
-            #self.chanlist = ['meg']
-            ##self.builder.get_object("entry2").set_text('0')
-            ##self.builder.get_object("entry3").set_text('100')
-            #self.readdata(self)
-
-        #self.datadict[path].results = self.datadict[path].__class__
 
     def abouthide(self,null,null2):
         self.builder.get_object('aboutdialog1').hide()
@@ -185,15 +164,20 @@ class maingui:
     def meg_assist(self):
         #from gui.gtk import filechooser
         #fn = filechooser.open()
+        pass
+        self.data_assist = meg_assistant.setup(path = self.fn, callback=self.load_megdata_callback)
 
-        self.data_assist = meg_assistant.setup(path = self.fn, callback=self.load_data_callback)
-    def load_data_callback(self):
+    def load_megdata_callback(self):
         print 'DONE!'
         #p = self.data_assist.pdfdata
         path = self.data_assist.pdfdata.data.filepath
         self.datadict[path] = self.data_assist.pdfdata
         self.readMEG()
 
+    def loadMRI(self,widget):
+        self.builder.get_object("filechooserdialog1").show()
+        from mri import img
+        self.mr = img.read(self.fn)
 
     def readMEG(self):
         path = self.fn
@@ -207,28 +191,28 @@ class maingui:
             print('appending model', i)
             iter = self.dataList.append([i, self.datadict[path]])
 
-        self.datadict[path].results = self.datadict[path].__class__ #make results instance
+        #self.datadict[path].results = self.datadict[path].__class__ #make results instance
 
     def refreshdatasummary(self):
         self.parseinstance(self.datadict[self.fn])
         self.parseddatadict[self.fn] = self.parseddata.out
-        try:
-            self.builder.get_object('label17').set_text(self.datadict[self.fn].data.filename)
-            self.builder.get_object('label18').set_text(self.datadict[self.fn].data.filepath)
-            self.builder.get_object('label20').set_text(str(1/self.datadict[self.fn].hdr.header_data.sample_period))
-        except AttributeError:
-            pass
-        try:
-            self.builder.get_object('label21').set_text(self.datadict[self.fn].filename)
-            self.builder.get_object('label23').set_text(self.datadict[self.fn].filename)
-        except AttributeError:
-            pass
+        #try:
+            #self.builder.get_object('label17').set_text(self.datadict[self.fn].data.filename)
+            #self.builder.get_object('label18').set_text(self.datadict[self.fn].data.filepath)
+            #self.builder.get_object('label20').set_text(str(1/self.datadict[self.fn].hdr.header_data.sample_period))
+        #except AttributeError:
+            #pass
+        #try:
+            #self.builder.get_object('label21').set_text(self.datadict[self.fn].filename)
+            #self.builder.get_object('label23').set_text(self.datadict[self.fn].filename)
+        #except AttributeError:
+            #pass
 
-        self.builder.get_object('treebutton3').set_sensitive(True)
+        #self.builder.get_object('treebutton3').set_sensitive(True)
 
     def fileOpenMEG(self,widget):
         self.builder.get_object("filechooserdialog1").show()
-        self.filetype = 'MEG'
+        self.filetype = '4DMEG'
         self.clear_filters()
 
     def fileOpenMRI(self,widget):
@@ -274,17 +258,15 @@ class maingui:
         self.fn = self.builder.get_object("filechooserdialog1").get_filename()
         self.builder.get_object("filechooserdialog1").hide()
         self.updatestatusbar('loading file'+self.fn)
-        #self.statusbar.push(self.statusbar_cid, 'loading file'+self.fn)
         if self.parseddatadict.get(self.fn, False) != False:
-            errordialog.errorwin('File exists in your workspace. Not loading.')
-            self.updatestatusbar('File exists in your workspace. Not loading.')
+            errordialog.errorwin('File exists in your workspace. Not reloading.')
+            self.updatestatusbar('File exists in your workspace. Not reloading.')
             return
 
-        if self.filetype == 'MEG':
+        if self.filetype == '4DMEG':
             print('filetype MEG')
             try:
                 pdf.read(self.fn)
-                #self.assistMEG()
                 self.meg_assist()
             except AttributeError:
                 print('Not a MEG file')
@@ -298,7 +280,7 @@ class maingui:
             self.treegohome(None)
 
         if self.filetype == 'PYM':
-            print('filetype PYM')
+            print('filetype PYTHON')
             from instantiate import pymeg
             p = pymeg.PYMEG()
             p.data = readwrite.readdata(self.fn)
@@ -308,7 +290,6 @@ class maingui:
 
         if self.filetype == 'DIP':
             print('filetype Dipole')
-
 
             class dipoledata():
                 datafile = array([self.fn])
@@ -350,7 +331,7 @@ class maingui:
     def quit(self, widget):
         sys.exit(0)
 
-    def memorystat(self,widget):
+    def memorystat(self,widget): #check and display memory status of machine
         if sys.platform.find('linux') != -1:
             memlist = subprocess.Popen('free',shell=True,stdout=subprocess.PIPE)
             stdout_list=memlist.communicate()[0].split('\n')
@@ -360,7 +341,7 @@ class maingui:
             print('updating memory')
             self.memorybar.set_fraction(mempercent)
 
-    def progressstat(self,widget):
+    def progressstat(self,widget): #set progress bar value
         self.builder.get_object("label3").set_text(self.progresslabel)
         self.progressbar.set_fraction(1)
 
@@ -372,7 +353,6 @@ class maingui:
 
     def resulttree(self,widget):
         self.View2 = self.builder.get_object("treeview1")
-
         self.AddListColumn('Variable', 0)
         self.AddListColumn('Data', 1)
         self.resultList = gtk.ListStore(str,str)
@@ -386,7 +366,7 @@ class maingui:
 
     def parseinstance(self,data):
         self.currentDataName = str(data)
-        print('current data string')#,self.currentDataName)
+        print('current data string')
         print 'verbose setting',self.prefs['VerboseTreeButton']
         if self.prefs['VerboseTreeButton'] == True:
             verbose=True
@@ -405,22 +385,21 @@ class maingui:
                 else:
                     iter = self.dataList.append([k,self.treedata[k]])
 
-    def refreshresults(self):
-        self.resultList.clear()
-        try:
-            self.parsedresults = parse_instance.run(self.datadict[self.fn].results)
-            for j in self.parsedresults.out.keys():
-                iter = self.resultList.append([j,self.parsedresults.out[j]])
-        except AttributeError: pass #maybe Nifti
+    #def refreshresults(self):
+        #self.resultList.clear()
+        #try:
+            #self.parsedresults = parse_instance.run(self.datadict[self.fn].results)
+            #for j in self.parsedresults.out.keys():
+                #iter = self.resultList.append([j,self.parsedresults.out[j]])
+        #except AttributeError: pass #maybe Nifti
 
     def treeclicked(self,b,c,d):
         print(b,c,d)
         model,rows = b.get_selection().get_selected()
         iter = self.dataList.get_iter(c[0])
         print('you selected', self.dataList.get_value(iter,0))#, self.dataList.get_value(iter,1))
-
         self.refreshdatasummary()
-        self.refreshresults()
+        #self.refreshresults()
 
         print('you selected position',c[0])
         print('length of tree', len(self.treedict))
@@ -478,8 +457,13 @@ class maingui:
             return
         print(self.data2parse,'------------------')
         self.dataList.clear()
-        self.parseinstance(self.data2parse)
-        self.treedata = self.parseddata.out
+        print 'type of data2parse:', type(self.data2parse)
+        if type(self.data2parse) == dict:
+        #self.parseinstance(self.data2parse)
+            self.treedata = self.data2parse#self.parseddata.out
+        else:
+            self.parseinstance(self.data2parse)
+            self.treedata = self.parseddata.out
         self.populatetree(self.treedata)
 
     def treeadd2workspace(self,widget):
@@ -560,20 +544,7 @@ class maingui:
         print('data', self.sel2plot)
         plotvtk.display(self.sel2plot, color = colordict, radius = sizedict)
 
-    def Add2Queue(self, widget):
-        try:
-            self.queue_store.append([self.selecteditem])
-            print('adding',self.selecteditem,'to queue')
-        except AttributeError:
-            self.queue_store = gtk.ListStore(str)
 
-        self.box.set_active(-1)
-        self.box.set_model(self.queue_store)   #this replaces the model set by Glade
-
-        try:
-            self.data_queue[self.selecteditem] = self.treedata[self.dataselected]
-        except AttributeError:
-            self.data_queue = {self.selecteditem : self.treedata[self.dataselected]}
 
     def plot2D(self, widget):
         try:
@@ -590,22 +561,33 @@ class maingui:
         print 'wid',widget.get_label()
         self.treedata[self.selecteditem].tftplot(widget.get_label())
 
-    def loadMRI(self,widget):
-        self.builder.get_object("filechooserdialog1").show()
-        from mri import img
-        self.mr = img.read(self.fn)
-
     def about(self,widget):
         print('t')
         aboutdialog = self.builder.get_object("aboutdialog1")
         aboutdialog.show()
 
+    def search_for_var(self,var):
+        print 'looking for var',eval('self.treedata[self.selecteditem].'+var)
+        print 'looking for var',eval('self.treedata[self.selecteditem].'+var)
+
+
     def filter_handler(self,widget):
         self.checkreq()
+        self.search_for_var(var='srate')
         self.fil = filter.filtwin()#.window.show()
-        self.fil.setupfilterwin(None, workspace_data=self.datadict[self.fn], \
-        data_selected=self.treedata[self.selecteditem])
-        self.updatestatusbar('Data Filtered')
+        self.fil.builder.get_object('FilterWindow').show()
+
+        #self.fil.setupfilterwin(None, workspace_data=self.datadict[self.fn], \
+        #data_selected=self.treedata[self.selecteditem])
+        try:
+            self.fil.setupfilterwin(None, \
+            data_selected=self.treedata[self.selecteditem]);
+            self.data_file_selected.filtered = 'complete later'
+        except IndexError:
+            print 'had a prob, bob'
+        #self.fil.setupfilterwin(None, workspace_data=self.data_file_selected,data_selected=self.treedata[self.selecteditem])
+        #
+        #self.updatestatusbar('Data Filtered')
 
     def offset_handler(self,widget):
         self.checkreq()
@@ -798,13 +780,53 @@ class maingui:
     def data_editor_callback(self):
         print 'Done'
 
+    def testhandler(self, widget):
+        self.prnt(None)
+        self.timef_handler(None)
+
+    def testload(self, widget):
+        print('clicked')
+        fns = ['/home/danc/python/data/0611/0611piez/e,rfhp1.0Hz,COH']
+        #fns = ['/home/danc/python/data/0611SEF/e,rfhp1.0Hz,n,x,baha001-1SEF,f50lp']#,'/home/danc/python/data/0611piez/SupinePiez/07%08%04@09:33/1/e,rfhp1.0Hz,ra,f50lp,o']
+        #self.builder.get_object("entry1").set_text('it works')
+        #self.statusbar.push(self.statusbar_cid, 'it works')
+        for i in fns:
+            print('i', i)
+            self.fn = path = i
+            self.datadict[path] = pdf.read(self.fn)
+            self.datadict[path].data.setchannels('meg')
+            self.datadict[path].data.getdata(0, self.datadict[path].data.pnts_in_file)
+            self.chanlist = ['meg']
+            #self.builder.get_object("entry2").set_text('0')
+            #self.builder.get_object("entry3").set_text('100')
+            #self.readdata(self)
+            self.readMEG()
+
+        self.datadict[path].results = self.datadict[path].__class__
 
 if __name__ == "__main__":
     mainwindow = maingui()
     mainwindow.window.show()
+    mainwindow.testload(None)
     i = 1
     #import code; code.interact(local=locals())
     exit
     gtk.main()
 
 
+
+
+    #def Add2Queue(self, widget):
+        #try:
+            #self.queue_store.append([self.selecteditem])
+            #print('adding',self.selecteditem,'to queue')
+        #except AttributeError:
+            #self.queue_store = gtk.ListStore(str)
+
+        #self.box.set_active(-1)
+        #self.box.set_model(self.queue_store)   #this replaces the model set by Glade
+
+        #try:
+            #self.data_queue[self.selecteditem] = self.treedata[self.dataselected]
+        #except AttributeError:
+            #self.data_queue = {self.selecteditem : self.treedata[self.dataselected]}

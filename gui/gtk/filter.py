@@ -47,16 +47,15 @@ class filtwin:
     def datahandler(data=None):
         self.data = data
 
-
-    def setupfilterwin(self, widget, workspace_data=None, data_selected=None):
+    #def setupfilterwin(self, widget, workspace_data=None, data_selected=None):
+    def setupfilterwin(self, widget, data_selected=None):
         print 'filter stuff'
-        self.workspace_data = workspace_data
+        #self.workspace_data = workspace_data
         self.data_selected = data_selected
-        self.hdr = workspace_data.data.hdr
-        self.builder.get_object('FilterWindow').show()
+        #self.hdr = workspace_data.data.hdr
         try:
-            self.builder.get_object('entry24').set_text(str(1/self.hdr.header_data.sample_period[0]))
-            #self.builder.get_object('entry24').set_text(str(1/self.datadict[self.fn].data.hdr.header_data.sample_period[0]))
+            srate = 1/data_selected.hdr.header_data.sample_period[0] #pdf2py.data.read instance
+            #self.builder.get_object('entry24').set_text(str(1/self.hdr.header_data.sample_period[0]))
         except AttributeError:
             print 'no header loaded'
         self.updatefiltbox(self)

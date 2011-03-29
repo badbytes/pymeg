@@ -9,7 +9,6 @@
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">normal</property>
     <property name="deletable">False</property>
-    <property name="opacity">0.90000000000000002</property>
     <property name="do_overwrite_confirmation">True</property>
     <property name="select_multiple">True</property>
     <signal name="close" handler="gtk_widget_hide"/>
@@ -1394,6 +1393,9 @@
     <signal name="apply" handler="on_assistant1_apply"/>
     <signal name="cancel" handler="gtk_widget_hide"/>
     <signal name="close" handler="gtk_widget_hide"/>
+    <child>
+      <placeholder/>
+    </child>
     <child>
       <placeholder/>
     </child>

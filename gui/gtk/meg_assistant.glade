@@ -6,9 +6,11 @@
     <property name="border_width">12</property>
     <property name="title" translatable="yes">MEG Data Load</property>
     <property name="window_position">center</property>
-    <property name="opacity">0.90000000000000002</property>
     <signal name="apply" handler="on_assistant1_apply"/>
     <signal name="cancel" handler="on_assistant1_cancel"/>
+    <child>
+      <placeholder/>
+    </child>
     <child>
       <placeholder/>
     </child>
