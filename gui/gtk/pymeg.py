@@ -22,8 +22,7 @@ import pymeg, sys, os, subprocess
 from pdf2py import pdf, readwrite,lA2array
 from numpy import shape, random, sort, array, append, size, arange, ndarray
 from meg import dipole,plotvtk,plot2dgtk,leadfield,signalspaceprojection,nearest
-from matplotlib import use
-use('GTK')
+from matplotlib import use;use('GTK')
 from matplotlib.figure import Figure
 from matplotlib.axes import Subplot
 from matplotlib.backends.backend_gtk import show
@@ -87,7 +86,6 @@ class maingui:
             "on_treebutton1_clicked" : self.treegohome,
             "on_treebutton2_clicked" : self.treeuplevel,
             "on_checkbutton_toggled" : self.meg_assist, #assistadvance,
-            #"on_assistant1_apply" : self.readdata,
             "on_aboutdialog1_hide" : self.abouthide,
             "on_treebutton3_clicked" : self.treeadd2workspace,
             "on_treeview2_buttonpress" : self.treeclicked,
@@ -144,7 +142,6 @@ class maingui:
             m = self.builder.get_object("menufunctions")
             print(widget, event)
             m.show_all()
-            #m.popup(None,None,None,1,0)
             m.popup(None,None,None,3,0)
 
     def data_editor_handler(self,widget):
@@ -197,54 +194,11 @@ class maingui:
         self.datadict[path] = self.data_assist.pdfdata
         self.readMEG()
 
-    #def assistadvance(self,widget):#,button):
-        #self.chanlist = []
-        #print('something')
-        #for i in self.builder.get_object('table1'):
-            #if i.get_active() == True:
-
-                #self.chanlist.append(i.get_label())
-        #if len(self.chanlist) > 0:
-            #self.assistant.set_page_complete(self.assistant.get_nth_page(1), True)
-            #self.assistant.set_page_complete(self.assistant.get_nth_page(2), True)
-        #else:
-            #self.assistant.set_page_complete(self.assistant.get_nth_page(1), False)
-        #print(self.chanlist, 'selected')
-
-    #def assistMEG(self):
-        #def dothis():
-            #print(1)
-        #self.assistant = self.builder.get_object("assistant1")#.show()
-        #self.assistant.show()
-        #self.assistant.set_page_complete(self.assistant.get_nth_page(0), True)
-        #path = self.fn
-        #self.datadict[path] = pdf.read(path)
-        #self.builder.get_object("entry30").set_text(str(self.datadict[path].data.pnts_in_file[0]))
 
     def readMEG(self):
-        #self.builder.get_object("assistant1").hide()
         path = self.fn
-        #if self.parseddatadict.get(path, False) != False:
-            #self.updatestatusbar('File exists in your workspace. Not loading')
-            #return
         self.dataList.clear()
         self.parseinstance(self.datadict[path])
-        #datatype = 'meg'
-        #if datatype == 'meg':
-            #self.datadict[path] = pdf.read(path)
-            #self.parseddatadict[path] = self.parseddata.out
-            #chindex = []
-            #for c in self.chanlist:
-                #print('c',c)
-                #self.datadict[path].data.setchannels(c)
-                #chindex.extend(self.datadict[path].data.channels.indexlist)
-
-            #int(self.builder.get_object("entry30").get_text())
-            #self.datadict[path].data.getdata(int(self.builder.get_object("entry29").get_text()), \
-            #int(self.builder.get_object("entry30").get_text()), chindex=chindex)
-            #try: self.datadict[path].data.channels.getposition()
-            #except: pass
-
         self.refreshdatasummary()
 
         print('datashape', shape(self.datadict[path].data.data_block))
@@ -253,8 +207,7 @@ class maingui:
             print('appending model', i)
             iter = self.dataList.append([i, self.datadict[path]])
 
-        #make results instance
-        self.datadict[path].results = self.datadict[path].__class__
+        self.datadict[path].results = self.datadict[path].__class__ #make results instance
 
     def refreshdatasummary(self):
         self.parseinstance(self.datadict[self.fn])
@@ -286,7 +239,6 @@ class maingui:
         filter.add_pattern("*nii")
         self.clear_filters()
         fcd.add_filter(filter)
-        #self.builder.get_object("filechooserdialog1").show()
         fcd.show()
         self.filetype = 'MRI'
 
@@ -350,10 +302,6 @@ class maingui:
             from instantiate import pymeg
             p = pymeg.PYMEG()
             p.data = readwrite.readdata(self.fn)
-            #self.datadict[self.fn] = readwrite.readdata(self.fn)
-            ##make a nested dict for use in adding results
-            #tmp = readwrite.readdata(self.fn)
-            #d = {os.path.basename(self.fn): tmp}
             self.datadict[self.fn] = p
             self.refreshdatasummary()
             self.treegohome(None)
@@ -821,13 +769,8 @@ class maingui:
     def epoch_data(self,widget):
         self.ed = event_process.setup_gui()
         self.ed.window.show()
-        #self.ed.builder.get_object('filechooserbutton1').set_uri('file://'+self.selecteditem)
-        #self.ed.builder.get_object('filechooserbutton1').get_uri()
         print 'sending file:'+'file://'+self.selecteditem
         self.ed.set_passed_filename(self.selecteditem)
-        #self.ed.builder.get_object('filechooserbutton1').set_sensitive(False)
-        #self.ed.get_events_from_data(self.ed.builder.get_object('filechooserbutton1'))
-        #self.datadict[path].results = self.datadict[path].__class__
 
     def data_editor(self, widget):
         try:
