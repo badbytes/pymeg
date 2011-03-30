@@ -467,37 +467,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkExpander" id="expander5">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <child>
-              <object class="GtkTreeView" id="treeview1">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="events">GDK_BUTTON_PRESS_MASK | GDK_STRUCTURE_MASK</property>
-                <property name="extension_events">all</property>
-                <property name="border_width">1</property>
-                <property name="model">liststore3</property>
-                <property name="reorderable">True</property>
-                <property name="search_column">0</property>
-                <property name="level_indentation">7</property>
-                <property name="rubber_banding">True</property>
-                <property name="enable_grid_lines">vertical</property>
-                <property name="enable_tree_lines">True</property>
-              </object>
-            </child>
-            <child type="label">
-              <object class="GtkLabel" id="label30">
-                <property name="visible">True</property>
-                <property name="label" translatable="yes">Results</property>
-                <property name="selectable">True</property>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="resize">False</property>
-            <property name="shrink">True</property>
-          </packing>
+          <placeholder/>
         </child>
       </object>
     </child>
@@ -1393,6 +1363,9 @@
     <signal name="apply" handler="on_assistant1_apply"/>
     <signal name="cancel" handler="gtk_widget_hide"/>
     <signal name="close" handler="gtk_widget_hide"/>
+    <child>
+      <placeholder/>
+    </child>
     <child>
       <placeholder/>
     </child>

@@ -45,7 +45,7 @@ class read():#(compute):
             if os.path.isfile(os.path.dirname(datapdf)+'/hs_file')==True:
                 print('found headshape file in same dir. Reading headshape')
                 self.hs=headshape.read(os.path.dirname(datapdf)+'/hs_file');
-            self.results = self.__class__
+            #self.results = self.__class__
 
         else: print('no file found')
 

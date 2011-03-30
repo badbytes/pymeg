@@ -70,7 +70,7 @@ class maingui:
         self.memorybar = self.builder.get_object("memorybar")
         self.progressbar = self.builder.get_object("progressbar")
         self.datatree(self)
-        self.resulttree(self)
+        #self.resulttree(self)
 
         dic = {
             "on_menuLoadMEG_activate" : self.fileOpenMEG,
@@ -172,6 +172,7 @@ class maingui:
         #p = self.data_assist.pdfdata
         path = self.data_assist.pdfdata.data.filepath
         self.datadict[path] = self.data_assist.pdfdata
+
         self.readMEG()
 
     def loadMRI(self,widget):
@@ -182,33 +183,25 @@ class maingui:
     def readMEG(self):
         path = self.fn
         self.dataList.clear()
+
+        #convert pdf object to dictonary
+
+
+
         self.parseinstance(self.datadict[path])
         self.refreshdatasummary()
-
-        print('datashape', shape(self.datadict[path].data.data_block))
 
         for i in self.parseddatadict:
             print('appending model', i)
             iter = self.dataList.append([i, self.datadict[path]])
 
         #self.datadict[path].results = self.datadict[path].__class__ #make results instance
+        #self.datadict[path].results = self.datadict[path].__class__ #make results instance
 
     def refreshdatasummary(self):
         self.parseinstance(self.datadict[self.fn])
+        self.datadict[self.fn] = self.parseddata.out
         self.parseddatadict[self.fn] = self.parseddata.out
-        #try:
-            #self.builder.get_object('label17').set_text(self.datadict[self.fn].data.filename)
-            #self.builder.get_object('label18').set_text(self.datadict[self.fn].data.filepath)
-            #self.builder.get_object('label20').set_text(str(1/self.datadict[self.fn].hdr.header_data.sample_period))
-        #except AttributeError:
-            #pass
-        #try:
-            #self.builder.get_object('label21').set_text(self.datadict[self.fn].filename)
-            #self.builder.get_object('label23').set_text(self.datadict[self.fn].filename)
-        #except AttributeError:
-            #pass
-
-        #self.builder.get_object('treebutton3').set_sensitive(True)
 
     def fileOpenMEG(self,widget):
         self.builder.get_object("filechooserdialog1").show()
@@ -281,10 +274,11 @@ class maingui:
 
         if self.filetype == 'PYM':
             print('filetype PYTHON')
-            from instantiate import pymeg
-            p = pymeg.PYMEG()
-            p.data = readwrite.readdata(self.fn)
-            self.datadict[self.fn] = p
+            #from instantiate import pymeg
+            #p = pymeg.PYMEG()
+            #p.data = readwrite.readdata(self.fn)
+            d = readwrite.readdata(self.fn)
+            self.datadict[self.fn] = d
             self.refreshdatasummary()
             self.treegohome(None)
 
@@ -348,15 +342,10 @@ class maingui:
     def datatree(self,widget):
         print('updating list')
         self.View = self.builder.get_object("treeview2")
-        self.dataList = gtk.ListStore(str,str)
-        self.View.set_model(self.dataList)
-
-    def resulttree(self,widget):
-        self.View2 = self.builder.get_object("treeview1")
         self.AddListColumn('Variable', 0)
         self.AddListColumn('Data', 1)
-        self.resultList = gtk.ListStore(str,str)
-        self.View2.set_model(self.resultList)
+        self.dataList = gtk.ListStore(str,str)
+        self.View.set_model(self.dataList)
 
     def AddListColumn(self, title, columnId):
         column = gtk.TreeViewColumn(title, gtk.CellRendererText(), text=columnId)
@@ -366,8 +355,6 @@ class maingui:
 
     def parseinstance(self,data):
         self.currentDataName = str(data)
-        print('current data string')
-        print 'verbose setting',self.prefs['VerboseTreeButton']
         if self.prefs['VerboseTreeButton'] == True:
             verbose=True
         else:
@@ -384,14 +371,6 @@ class maingui:
                     iter = self.dataList.append([k,'array shape'+str(shape(self.treedata[k]))])
                 else:
                     iter = self.dataList.append([k,self.treedata[k]])
-
-    #def refreshresults(self):
-        #self.resultList.clear()
-        #try:
-            #self.parsedresults = parse_instance.run(self.datadict[self.fn].results)
-            #for j in self.parsedresults.out.keys():
-                #iter = self.resultList.append([j,self.parsedresults.out[j]])
-        #except AttributeError: pass #maybe Nifti
 
     def treeclicked(self,b,c,d):
         print(b,c,d)
@@ -459,8 +438,8 @@ class maingui:
         self.dataList.clear()
         print 'type of data2parse:', type(self.data2parse)
         if type(self.data2parse) == dict:
-        #self.parseinstance(self.data2parse)
             self.treedata = self.data2parse#self.parseddata.out
+            print 'dict parse', self.data2parse
         else:
             self.parseinstance(self.data2parse)
             self.treedata = self.parseddata.out
@@ -554,7 +533,7 @@ class maingui:
             print('Plotting Random data')
             plot2dgtk.makewin(random.randn(10))
 
-    def tftplot(self,widget):
+    def tftplot(self,widget): #using the tft object module tftplot to display imshow.
         if self.checkreq() == -1:
             print('caught error')
             return
@@ -566,25 +545,64 @@ class maingui:
         aboutdialog = self.builder.get_object("aboutdialog1")
         aboutdialog.show()
 
-    def search_for_var(self,var):
-        print 'looking for var',eval('self.treedata[self.selecteditem].'+var)
-        print 'looking for var',eval('self.treedata[self.selecteditem].'+var)
+    def setup_helper(self,var,functionname):
+        '''This function is going to search in two places for a queried variable.
+        1st search is below what is selected, or within that instance/dictonary
+        2nd search is at the same level as the item selected ie all parents objects.
+        ex. var = 'srate';
+        if the item instance "data" is selected it will first search within the data object
+        and if not found will search at the same level ie all objects in the parent.
+        ...
+        This is meant to be helper function to find data,
+        so it doesn't have to be statically defined all the time.
+        '''
+        import copy
+        try:
+
+            var = eval('self.treedata[self.selecteditem].'+var)
+            self.workspace = self.treedata[self.selecteditem]
+            print 'found it as child'
+            print 'found ',var,'as child'
+        except:
+            try:
+                var = eval('self.treedata[var]')
+                self.workspace = self.treedata
+                print 'found ',var,'in parent'
+            except:
+                print "can't find ",var
+                return
+        #except AttributeError:
+        #    print 'unknown error'
+        #    return -1
+        print 'mod......',self.workspace.__module__
+        try:
+            if self.workspace.__module__ == 'pdf2py.data':
+                print 'module',self.workspace.__module__
+                #self.treedata[functionname] = copy.deepcopy(self.treedata[self.selecteditem])
+                #self.data_file_selected['functionname'] = copy.deepcopy(self.treedata[self.selecteditem])
+                self.data_file_selected['functionname'] = 1
+                self.target = self.treedata[self.selecteditem].data_block
+
+        except AttributeError:
+            self.target = self.treedata[self.selecteditem]
+
+        return var
 
 
     def filter_handler(self,widget):
         self.checkreq()
-        self.search_for_var(var='srate')
-        self.fil = filter.filtwin()#.window.show()
-        self.fil.builder.get_object('FilterWindow').show()
-
+        self.data_file_selected['functionname'] = 1
+        srate = self.setup_helper(var='srate',functionname='filter')[0]
+        self.fil = filter.filtwin()
         #self.fil.setupfilterwin(None, workspace_data=self.datadict[self.fn], \
         #data_selected=self.treedata[self.selecteditem])
         try:
-            self.fil.setupfilterwin(None, \
-            data_selected=self.treedata[self.selecteditem]);
-            self.data_file_selected.filtered = 'complete later'
-        except IndexError:
+            self.fil.setupfilterwin(None, self.workspace, self.target,srate)
+            #self.data_file_selected.filtered = 'complete later'
+        except KeyError:
             print 'had a prob, bob'
+            return -1
+        self.fil.builder.get_object('FilterWindow').show()
         #self.fil.setupfilterwin(None, workspace_data=self.data_file_selected,data_selected=self.treedata[self.selecteditem])
         #
         #self.updatestatusbar('Data Filtered')
@@ -802,7 +820,7 @@ class maingui:
             #self.readdata(self)
             self.readMEG()
 
-        self.datadict[path].results = self.datadict[path].__class__
+        #self.datadict[path].results = self.datadict[path].__class__
 
 if __name__ == "__main__":
     mainwindow = maingui()
