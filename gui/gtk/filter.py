@@ -47,17 +47,15 @@ class filtwin:
     def datahandler(data=None):
         self.data = data
 
-    def setupfilterwin(self, widget, workspace, data_selected, srate):
+    def setupfilterwin(self, widget, data, srate,callback=None):
         #def setupfilterwin(self, widget, data_selected=None, srate=None):
         print 'filter stuff',srate
-        self.workspace = workspace
-        self.data_selected = data_selected
+        #self.workspace = workspace
+        self.data_selected = data
+        self.callback = callback
 
-        #self.hdr = workspace_data.data.hdr
         try:
             self.builder.get_object('entry24').set_text(str(srate))
-            #1/data_selected.hdr.header_data.sample_period[0] #pdf2py.data.read instance
-            #self.builder.get_object('entry24').set_text(str(1/self.hdr.header_data.sample_period[0]))
         except AttributeError:
             print 'no supplied srate'
         self.updatefiltbox(self)
@@ -80,9 +78,10 @@ class filtwin:
         from meg import filtfilt
         srate = float(self.builder.get_object('entry24').get_text())
         order = int(self.builder.get_object('entry27').get_text())
+
         self.filter_results = filtfilt.calc(self.data_selected, srate, self.Wn, order, self.band)
-        #return self.filter_results
-        self.workspace.filtered = self.filter_results
+        print 'filtererd with, srate, Wn, order, band:',srate, self.Wn, order, self.band
+        self.callback(self.filter_results)
 
 
 if __name__ == "__main__":

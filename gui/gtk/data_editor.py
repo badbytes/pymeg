@@ -552,12 +552,10 @@ class setup_gui:
 
     def load_data_callback(self):
         print 'DONE!'
-        p = self.data_assist.pdfdata
-        #eventtime = []
-        #for i in range(1,p.data.numofepochs+1):
-            #eventtime.extend(p.data.eventtime*i)
+        p = self.data_assist.pdfdata #4D MEG file format
         self.data_handler(p.data.data_block,p.hdr.header_data.sample_period, \
         p.data.wintime,p.data.channels.labellist,p.data.channels.chanlocs)
+
 
 
     def data_handler(self,data,srate,wintime,chanlabels,chanlocs, callback=None):

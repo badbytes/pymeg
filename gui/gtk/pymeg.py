@@ -545,7 +545,7 @@ class maingui:
         aboutdialog = self.builder.get_object("aboutdialog1")
         aboutdialog.show()
 
-    def setup_helper(self,var,functionname):
+    def setup_helper(self,var,obj=None):
         '''This function is going to search in two places for a queried variable.
         1st search is below what is selected, or within that instance/dictonary
         2nd search is at the same level as the item selected ie all parents objects.
@@ -558,54 +558,57 @@ class maingui:
         '''
         import copy
         try:
+            var = eval('obj.'+var)
+            #var = eval('self.treedata[self.selecteditem].'+var)
+            #self.workspace = self.treedata[self.selecteditem]
 
-            var = eval('self.treedata[self.selecteditem].'+var)
-            self.workspace = self.treedata[self.selecteditem]
             print 'found it as child'
             print 'found ',var,'as child'
         except:
             try:
                 var = eval('self.treedata[var]')
-                self.workspace = self.treedata
+                #self.workspace = self.treedata
                 print 'found ',var,'in parent'
             except:
                 print "can't find ",var
-                return
+                return -1
         #except AttributeError:
         #    print 'unknown error'
         #    return -1
-        print 'mod......',self.workspace.__module__
+
         try:
-            if self.workspace.__module__ == 'pdf2py.data':
-                print 'module',self.workspace.__module__
-                #self.treedata[functionname] = copy.deepcopy(self.treedata[self.selecteditem])
-                #self.data_file_selected['functionname'] = copy.deepcopy(self.treedata[self.selecteditem])
-                self.data_file_selected['functionname'] = 1
-                self.target = self.treedata[self.selecteditem].data_block
+            print 'mod......',obj.__module__
+            if obj.__module__ == 'pdf2py.data':
+                self.target = obj.data_block
+                #print 'module',self.workspace.__module__
+                ##self.treedata[functionname] = copy.deepcopy(self.treedata[self.selecteditem])
+                ##self.data_file_selected['functionname'] = copy.deepcopy(self.treedata[self.selecteditem])
+                #self.target = self.treedata[self.selecteditem].data_block
 
         except AttributeError:
+            print 'trying 2nd obj'
             self.target = self.treedata[self.selecteditem]
 
         return var
 
 
     def filter_handler(self,widget):
+        def donefilt(results):
+            self.data_file_selected['filtered'].data_block = results
+        import copy
         self.checkreq()
-        self.data_file_selected['functionname'] = 1
-        srate = self.setup_helper(var='srate',functionname='filter')[0]
+        self.data_file_selected['filtered'] = copy.copy(self.treedata[self.selecteditem])
+        srate = self.setup_helper(var='srate',obj=self.data_file_selected['filtered'])[0]
         self.fil = filter.filtwin()
-        #self.fil.setupfilterwin(None, workspace_data=self.datadict[self.fn], \
-        #data_selected=self.treedata[self.selecteditem])
+        print 'target',self.target
+        print shape(self.target)
         try:
-            self.fil.setupfilterwin(None, self.workspace, self.target,srate)
-            #self.data_file_selected.filtered = 'complete later'
+            self.fil.setupfilterwin(None, self.target,srate,callback=donefilt)
         except KeyError:
             print 'had a prob, bob'
             return -1
         self.fil.builder.get_object('FilterWindow').show()
-        #self.fil.setupfilterwin(None, workspace_data=self.data_file_selected,data_selected=self.treedata[self.selecteditem])
-        #
-        #self.updatestatusbar('Data Filtered')
+
 
     def offset_handler(self,widget):
         self.checkreq()
@@ -773,21 +776,28 @@ class maingui:
         self.ed.set_passed_filename(self.selecteditem)
 
     def data_editor(self, widget):
-        try:
-            data = self.datadict[self.selecteditem].data.data_block
-            srate = self.datadict[self.selecteditem].hdr.header_data.sample_period
-            wintime = self.datadict[self.selecteditem].data.wintime
-            chanlabels = self.datadict[self.selecteditem].data.channels.labellist
-            chanlocs = self.datadict[self.selecteditem].data.channels.chanlocs
-        except KeyError:
-            data = self.treedata[self.selecteditem]
-            srate = self.data_file_selected.hdr.header_data.sample_period
-            wintime = self.data_file_selected.data.wintime
-            chanlabels = arange(0,size(self.treedata[self.selecteditem],1))
-            chanlocs = arange(0,size(self.treedata[self.selecteditem],1))
-        except AttributeError:
-            self.errordialog\
-            ('No Data loaded yet.')
+        srate = self.setup_helper(var='srate',obj=self.treedata[self.selecteditem])[0]
+        wintime = self.setup_helper(var='wintime',obj=self.treedata[self.selecteditem])
+        data = self.setup_helper(var='data_block',obj=self.treedata[self.selecteditem])
+        chanlabels = self.setup_helper(var='labellist',obj=self.treedata[self.selecteditem].channels)
+        chanlocs = self.setup_helper(var='chanlocs',obj=self.treedata[self.selecteditem].channels)
+
+
+        #try:
+            #data = self.datadict[self.selecteditem]['data'].data_block
+            #srate = self.datadict[self.selecteditem]['hdr'].header_data.sample_period
+            #wintime = self.datadict[self.selecteditem]['data'].wintime
+            #chanlabels = self.datadict[self.selecteditem]['data'].channels.labellist
+            #chanlocs = self.datadict[self.selecteditem]['data'].channels.chanlocs
+        #except KeyError:
+            #data = self.treedata[self.selecteditem]
+            #srate = self.data_file_selected.hdr.header_data.sample_period
+            #wintime = self.data_file_selected.data.wintime
+            #chanlabels = arange(0,size(self.treedata[self.selecteditem],1))
+            #chanlocs = arange(0,size(self.treedata[self.selecteditem],1))
+        #except AttributeError:
+            #self.errordialog\
+            #('No Data loaded yet.')
 
 
         self.de = data_editor.setup_gui()
@@ -805,9 +815,7 @@ class maingui:
     def testload(self, widget):
         print('clicked')
         fns = ['/home/danc/python/data/0611/0611piez/e,rfhp1.0Hz,COH']
-        #fns = ['/home/danc/python/data/0611SEF/e,rfhp1.0Hz,n,x,baha001-1SEF,f50lp']#,'/home/danc/python/data/0611piez/SupinePiez/07%08%04@09:33/1/e,rfhp1.0Hz,ra,f50lp,o']
-        #self.builder.get_object("entry1").set_text('it works')
-        #self.statusbar.push(self.statusbar_cid, 'it works')
+
         for i in fns:
             print('i', i)
             self.fn = path = i
@@ -815,11 +823,7 @@ class maingui:
             self.datadict[path].data.setchannels('meg')
             self.datadict[path].data.getdata(0, self.datadict[path].data.pnts_in_file)
             self.chanlist = ['meg']
-            #self.builder.get_object("entry2").set_text('0')
-            #self.builder.get_object("entry3").set_text('100')
-            #self.readdata(self)
             self.readMEG()
-
         #self.datadict[path].results = self.datadict[path].__class__
 
 if __name__ == "__main__":
