@@ -366,7 +366,7 @@ class maingui:
     def populatetree(self,treedata):
         self.treedata = treedata
         for k in self.treedata.keys():
-                    
+
             if type(self.treedata[k]) == list or type(self.treedata[k]) == dict:
                 if len(self.treedata[k]) > 50:
                     iter = self.dataList.append([k,'list shape'+str(shape(self.treedata[k]))])
@@ -377,10 +377,10 @@ class maingui:
                     iter = self.dataList.append([k,'array shape'+str(shape(self.treedata[k]))])
                 else:
                     iter = self.dataList.append([k,self.treedata[k]])
-            
+
             else:
                 iter = self.dataList.append([k,self.treedata[k]])
-                    
+
 
     def treeclicked(self,b,c,d):
         print(b,c,d)
@@ -583,7 +583,7 @@ class maingui:
                     return -1
 
         try:
-            
+
             if obj.__module__ == 'pdf2py.data':
                 print 'mod......',obj.__module__
                 self.target = obj.data_block
@@ -591,7 +591,7 @@ class maingui:
         except AttributeError:
             #print 'trying 2nd obj'
             self.target = self.treedata[self.selecteditem]
-            
+
 
         return var
 
@@ -742,9 +742,9 @@ class maingui:
             self.errordialog\
             ('No selections made yet. Load file in data editor,\
             and make selections. Then highlight selection with selector tool.')
-            
+
             return -1
-            
+
         for i in iter:
             print 'highlighted', liststore[i][1]
             self.de.get_time_selection(widget)
@@ -770,11 +770,17 @@ class maingui:
 
         ssp = signalspaceprojection.calc(data, weight=weights)
         self.data_file_selected['signal_projection']['ssp'] = ssp
-        self.data_file_selected['signal_projection']['channels'] = self.treedata[self.selecteditem].channels
+        self.data_file_selected['signal_projection']['channels'] = {} #self.treedata[self.selecteditem].channels
+        labels = []
+        for i in range(0,size(ssp,1):
+            labels.extend('SSP'+str(i))
+        self.data_file_selected['signal_projection']['channels'].labellist = labels
+        self.data_file_selected['signal_projection']['channels'].chanlocs = \
+        self.data_file_selected['signal_projection']['channels'].chanlocs[:,0:size(ssp,1)]
         self.data_file_selected['signal_projection']['data_block'] = ssp
         self.data_file_selected['signal_projection']['srate'] = self.treedata[self.selecteditem].srate
         self.data_file_selected['signal_projection']['wintime'] = self.treedata[self.selecteditem].wintime
-        
+
 
     def contour_plot(self,widget):
         try:
@@ -789,7 +795,7 @@ class maingui:
             self.mc.window.show()
 
         self.mc.fig.clf()
-        
+
         chanlocs = self.setup_helper(var='chanlocs',obj=self.treedata['channels'])
         self.mc.display(self.treedata[self.selecteditem],chanlocs, subplot='on')
 
@@ -801,14 +807,18 @@ class maingui:
         print 'sending file:'+'file://'+self.selecteditem
         self.ed.set_passed_filename(self.selecteditem)
 
-    def data_editor(self, widget):        
+    def data_editor(self, widget):
         try:
             srate = self.setup_helper(var='srate',obj=self.treedata[self.selecteditem])[0];print srate
             wintime = self.setup_helper(var='wintime',obj=self.treedata[self.selecteditem])
             data = self.setup_helper(var='data_block',obj=self.treedata[self.selecteditem])
             try:
-            chanlabels = self.setup_helper(var='labellist',obj=self.treedata[self.selecteditem].channels)
-            chanlocs = self.setup_helper(var='chanlocs',obj=self.treedata[self.selecteditem].channels)
+                chanlabels = self.setup_helper(var='labellist',obj=self.treedata[self.selecteditem].channels)
+                chanlocs = self.setup_helper(var='chanlocs',obj=self.treedata[self.selecteditem].channels)
+            except:
+                print 'Error in setup'
+                chanlabels = self.setup_helper(var='labellist',obj=self.treedata[self.selecteditem]['channels'])
+                chanlocs = self.setup_helper(var='chanlocs',obj=self.treedata[self.selecteditem]['channels'])
         except:
             print "Data Editor can't handle this type"
             print "Try selecting object <pdf2py.data.read>"
