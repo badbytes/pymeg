@@ -772,11 +772,12 @@ class maingui:
         self.data_file_selected['signal_projection']['ssp'] = ssp
         self.data_file_selected['signal_projection']['channels'] = {} #self.treedata[self.selecteditem].channels
         labels = []
-        for i in range(0,size(ssp,1):
-            labels.extend('SSP'+str(i))
-        self.data_file_selected['signal_projection']['channels'].labellist = labels
-        self.data_file_selected['signal_projection']['channels'].chanlocs = \
-        self.data_file_selected['signal_projection']['channels'].chanlocs[:,0:size(ssp,1)]
+        for i in range(0,size(ssp,1)):
+            labels.extend(['SigSP'+str(i)])
+        self.data_file_selected['signal_projection']['channels']['labellist'] = labels
+        self.data_file_selected['signal_projection']['channels']['chanlocs'] = \
+        self.treedata[self.selecteditem].channels.chanlocs[:,0:size(ssp,1)]
+        #self.data_file_selected['signal_projection']['channels'].chanlocs[:,0:size(ssp,1)]
         self.data_file_selected['signal_projection']['data_block'] = ssp
         self.data_file_selected['signal_projection']['srate'] = self.treedata[self.selecteditem].srate
         self.data_file_selected['signal_projection']['wintime'] = self.treedata[self.selecteditem].wintime
