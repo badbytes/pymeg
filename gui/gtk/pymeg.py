@@ -320,6 +320,8 @@ class maingui:
             readwrite.writedata(self.treedata[self.selecteditem], fcd.get_filename())
         except AttributeError:
             readwrite.writedata(self.datadict[self.selecteditem], fcd.get_filename())
+        except KeyError:
+            readwrite.writedata(self.data_file_selected, fcd.get_filename())
         fcd.hide()
 
     def quit(self, widget):
@@ -364,13 +366,21 @@ class maingui:
     def populatetree(self,treedata):
         self.treedata = treedata
         for k in self.treedata.keys():
-            if type(self.treedata[k]) != ndarray:
-                iter = self.dataList.append([k,self.treedata[k]])
-            else:
+                    
+            if type(self.treedata[k]) == list or type(self.treedata[k]) == dict:
                 if len(self.treedata[k]) > 50:
+                    iter = self.dataList.append([k,'list shape'+str(shape(self.treedata[k]))])
+                else:
+                    iter = self.dataList.append([k,self.treedata[k]])
+            elif type(self.treedata[k]) == ndarray:
+                if len(self.treedata[k].flatten()) > 50:
                     iter = self.dataList.append([k,'array shape'+str(shape(self.treedata[k]))])
                 else:
                     iter = self.dataList.append([k,self.treedata[k]])
+            
+            else:
+                iter = self.dataList.append([k,self.treedata[k]])
+                    
 
     def treeclicked(self,b,c,d):
         print(b,c,d)
@@ -557,37 +567,31 @@ class maingui:
         so it doesn't have to be statically defined all the time.
         '''
         import copy
+        print 'look for dependency',var
         try:
             var = eval('obj.'+var)
-            #var = eval('self.treedata[self.selecteditem].'+var)
-            #self.workspace = self.treedata[self.selecteditem]
-
-            print 'found it as child'
-            print 'found ',var,'as child'
-        except:
-            try:
-                var = eval('self.treedata[var]')
-                #self.workspace = self.treedata
-                print 'found ',var,'in parent'
+            print 'found as child'
+        except AttributeError:
+            try:var = obj[var]
             except:
-                print "can't find ",var
-                return -1
-        #except AttributeError:
-        #    print 'unknown error'
-        #    return -1
+                print 'looking in parent'
+                try:
+                    var = eval('self.treedata[var]')
+                    print 'found in parent'
+                except:
+                    print "can't find ",var
+                    return -1
 
         try:
-            print 'mod......',obj.__module__
+            
             if obj.__module__ == 'pdf2py.data':
+                print 'mod......',obj.__module__
                 self.target = obj.data_block
-                #print 'module',self.workspace.__module__
-                ##self.treedata[functionname] = copy.deepcopy(self.treedata[self.selecteditem])
-                ##self.data_file_selected['functionname'] = copy.deepcopy(self.treedata[self.selecteditem])
-                #self.target = self.treedata[self.selecteditem].data_block
 
         except AttributeError:
-            print 'trying 2nd obj'
+            #print 'trying 2nd obj'
             self.target = self.treedata[self.selecteditem]
+            
 
         return var
 
@@ -727,32 +731,50 @@ class maingui:
             print 'selection list', self.de.selections
             self.de.time
             liststore,iter = self.de.SelView.get_selection().get_selected_rows()
-            for i in iter:
-                print 'highlighted', liststore[i][1]
-                self.de.get_time_selection(widget)
-                print 'indices',self.de.sel_ind
-                data = self.de.data
-                self.data_file_selected.signal_weights = data[self.de.sel_ind]
+            #for i in iter:
+                #print 'highlighted', liststore[i][1]
+                #self.de.get_time_selection(widget)
+                #print 'indices',self.de.sel_ind
+                #data = self.de.data
+                #self.data_file_selected.signal_weights = data[self.de.sel_ind]
 
         except AttributeError:
             self.errordialog\
             ('No selections made yet. Load file in data editor,\
             and make selections. Then highlight selection with selector tool.')
+            
             return -1
+            
+        for i in iter:
+            print 'highlighted', liststore[i][1]
+            self.de.get_time_selection(widget)
+            print 'indices',self.de.sel_ind
+            data = self.de.data
+            self.data_file_selected['signal_projection'] = {}
+            self.data_file_selected['signal_projection']['signal_weights'] = data[self.de.sel_ind]
+            #self.data_file_selected['signal_projection']['wintime'] = data[self.de.sel_ind]
+            #self.data_file_selected['signal_weights'] = data[self.de.sel_ind]
 
     def signal_space_filter(self,widget):
-        self.signal_space_build_weights(widget)
+        if self.signal_space_build_weights(widget) == -1:
+            self.data_editor(None)
+            return -1
         print 'done!!'
-        weights = self.data_file_selected.signal_weights
+        weights = self.data_file_selected['signal_projection']['signal_weights']
         try:
-            data = self.treedata[self.selecteditem]
+            data = self.treedata[self.selecteditem].data_block
             print data
         except KeyError:
             data = self.de.data
             pass
 
         ssp = signalspaceprojection.calc(data, weight=weights)
-        self.data_file_selected.ssp = ssp
+        self.data_file_selected['signal_projection']['ssp'] = ssp
+        self.data_file_selected['signal_projection']['channels'] = self.treedata[self.selecteditem].channels
+        self.data_file_selected['signal_projection']['data_block'] = ssp
+        self.data_file_selected['signal_projection']['srate'] = self.treedata[self.selecteditem].srate
+        self.data_file_selected['signal_projection']['wintime'] = self.treedata[self.selecteditem].wintime
+        
 
     def contour_plot(self,widget):
         try:
@@ -767,20 +789,31 @@ class maingui:
             self.mc.window.show()
 
         self.mc.fig.clf()
-        self.mc.display(self.treedata[self.selecteditem],chanlocs = self.data_file_selected.data.channels.chanlocs, subplot='on')
+        
+        chanlocs = self.setup_helper(var='chanlocs',obj=self.treedata['channels'])
+        self.mc.display(self.treedata[self.selecteditem],chanlocs, subplot='on')
 
     def epoch_data(self,widget):
+        if os.path.isfile(self.selecteditem) == False:
+            return -1
         self.ed = event_process.setup_gui()
         self.ed.window.show()
         print 'sending file:'+'file://'+self.selecteditem
         self.ed.set_passed_filename(self.selecteditem)
 
-    def data_editor(self, widget):
-        srate = self.setup_helper(var='srate',obj=self.treedata[self.selecteditem])[0]
-        wintime = self.setup_helper(var='wintime',obj=self.treedata[self.selecteditem])
-        data = self.setup_helper(var='data_block',obj=self.treedata[self.selecteditem])
-        chanlabels = self.setup_helper(var='labellist',obj=self.treedata[self.selecteditem].channels)
-        chanlocs = self.setup_helper(var='chanlocs',obj=self.treedata[self.selecteditem].channels)
+    def data_editor(self, widget):        
+        try:
+            srate = self.setup_helper(var='srate',obj=self.treedata[self.selecteditem])[0];print srate
+            wintime = self.setup_helper(var='wintime',obj=self.treedata[self.selecteditem])
+            data = self.setup_helper(var='data_block',obj=self.treedata[self.selecteditem])
+            try:
+            chanlabels = self.setup_helper(var='labellist',obj=self.treedata[self.selecteditem].channels)
+            chanlocs = self.setup_helper(var='chanlocs',obj=self.treedata[self.selecteditem].channels)
+        except:
+            print "Data Editor can't handle this type"
+            print "Try selecting object <pdf2py.data.read>"
+            self.errordialog("Data Editor can't handle this type.Try selecting object <pdf2py.data.read> ");
+            return -1
 
 
         #try:
