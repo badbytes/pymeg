@@ -375,7 +375,7 @@ class maingui:
 
             else:
                 iter = self.dataList.append([k,self.treedata[k]])
-                
+
     def itemselect(self, widget):
         model,iter = self.builder.get_object("treeview2").get_selection().get_selected()
         print('you selected item:', self.dataList.get_value(iter,0))#, self.dataList.get_value(iter,1)
@@ -566,34 +566,62 @@ class maingui:
         This is meant to be helper function to find data,
         so it doesn't have to be statically defined all the time.
         '''
-        import copy
-        print 'look for dependency',var
-        try:
-            var = eval('obj.'+var)
-            print 'found as child'
-        except AttributeError:
-            try:var = obj[var]
-            except:
-                print 'looking in parent'
+        import copy, types, inspect
+        v = []
+        if type(var) == str:
+            var = [var] #make list
+
+
+        for ii in var:
+            print 'look for dependency',ii
+            if type(obj) == dict:
+                print 'dict search'
                 try:
-                    var = eval('self.treedata[var]')
-                    print 'found in parent'
+                    var = obj[ii]
+                    print 'found as child dict', ii
                 except:
-                    print "can't find ",var
-                    return -1
-
-        try:
-
-            if obj.__module__ == 'pdf2py.data':
-                print 'mod......',obj.__module__
-                self.target = obj.data_block
-
-        except AttributeError:
-            #print 'trying 2nd obj'
-            self.target = self.treedata[self.selecteditem]
+                    try:
+                        for i in obj:
+                            print 'i',i
+                            if type(i) == dict:
+                                print 'd',i
+                                if obj[i] == ii:
+                                    var = obj[ii][i]
+                                    print 'found', i
 
 
-        return var
+                            print i
+                            if obj[i] == ii:
+                                var = obj[i]
+                                print 'found', i
+                    except:
+                        print 'cant find instance', ii
+
+            if isinstance(obj, types.InstanceType):
+                print 'instance..'
+                try:
+                    var = eval('obj.'+ii)
+                    print 'found as child instance', ii
+                except:
+                    try:
+                        for i in inspect.getmembers(obj):
+                            #print i[0]
+                            if i[0] == ii:
+                                var = i[1]
+                                print 'found', i[0]
+                            if isinstance(i[1], types.InstanceType):
+                                #print 'dig'
+                                for j in inspect.getmembers(i[1]):
+                                    #print j[0]
+                                    if j[0] == ii:
+                                        var = j[1]
+                                        print 'found', j[0]
+                    except:
+                        print 'cant find instance', ii
+
+            v.extend([var]);
+
+        return v
 
 
     def filter_handler(self,widget):
@@ -710,19 +738,17 @@ class maingui:
     def coregister_handler(self,widget):
         self.cr = coregister.setup() #window
         self.cr.window.show()
-        
+
     def timef_handler(self,widget):
         self.tf = timef.setup() #window
+
         try: #tft on data instance
-            data = self.setup_helper(var='data_block',obj=self.treedata[self.selecteditem])
-            srate = self.setup_helper(var='srate',obj=self.treedata[self.selecteditem])[0]
-            frames = self.setup_helper(var='frames',obj=self.treedata[self.selecteditem])
-            trials = self.setup_helper(var='numofepochs',obj=self.treedata[self.selecteditem])[0]
-            eventtime = self.setup_helper(var='eventtime',obj=self.treedata[self.selecteditem])
-            channellabels = self.setup_helper(var='labellist',obj=self.treedata[self.selecteditem].channels)
-            self.tf.builder.get_object('filechooserbutton1').set_uri('file://'+self.selecteditem)
+            obj=self.treedata[self.selecteditem];
+            ret = (self.setup_helper(var=['data_block','labellist','srate','frames',
+            'numofepochs','eventtime'],obj=obj));
+            print len(ret), 'length'
             self.tf.builder.get_object('filechooserbutton1').set_sensitive(False)
-            self.tf.datahandler(self.data_file_selected,data,channellabels,srate,frames,trials,eventtime)
+            self.tf.datahandler(self.data_file_selected,ret[0],ret[1],ret[2][0],ret[3],ret[4][0],ret[5])
             self.tf.window.show()
         except: #tft on data variable selected
             self.tf.datahandler(self.data_file_selected,self.treedata[self.selecteditem])
@@ -730,39 +756,12 @@ class maingui:
             self.tf.builder.get_object('label12').set_text(str(self.selecteditem))
             print 'tft on data variable selected'
             self.tf.window.show()
-            
-    #def timef_handler(self,widget):
-        #self.tf = timef.setup() #window
-        #try: #tft on data file
-            #self.tf.builder.get_object('filechooserbutton1').set_uri('file://'+self.selecteditem)
-            #self.tf.builder.get_object('filechooserbutton1').set_sensitive(False)
-            #self.tf.datahandler(workspace_data=self.datadict[self.selecteditem])
-            #print 'tft on data file'
-            #self.tf.window.show()
-        #except:
-            #print 'data error'
-        #try: #tft on data variable selected
-            #self.tf.datahandler(workspace_data=self.data_file_selected,data_selected=self.treedata[self.selecteditem])
-            #self.tf.builder.get_object('filechooserbutton1').set_uri('file://'+self.selecteditem)
-            #self.tf.builder.get_object('label12').set_text(str(self.selecteditem))
-
-            #print 'tft on data variable selected'
-            #self.tf.window.show()
-        #except:
-            #print 'var error'
-
 
     def signal_space_build_weights(self,widget):
         try:
             print 'selection list', self.de.selections
             self.de.time
             liststore,iter = self.de.SelView.get_selection().get_selected_rows()
-            #for i in iter:
-                #print 'highlighted', liststore[i][1]
-                #self.de.get_time_selection(widget)
-                #print 'indices',self.de.sel_ind
-                #data = self.de.data
-                #self.data_file_selected.signal_weights = data[self.de.sel_ind]
 
         except AttributeError:
             self.errordialog\
@@ -778,8 +777,13 @@ class maingui:
             data = self.de.data
             self.data_file_selected['signal_projection'] = {}
             self.data_file_selected['signal_projection']['signal_weights'] = data[self.de.sel_ind]
-            #self.data_file_selected['signal_projection']['wintime'] = data[self.de.sel_ind]
-            #self.data_file_selected['signal_weights'] = data[self.de.sel_ind]
+
+    def save_results(self,workspace,var2save, data2save):
+        '''ex. workspace=self.data_file_selected['signal_projection']'''
+
+        workspace = {}; #clear workspace
+        for i in range(0, len(var2save)):
+            workspace[var2save[i]] = data2save[i]
 
     def signal_space_filter(self,widget):
         if self.signal_space_build_weights(widget) == -1:
@@ -803,7 +807,6 @@ class maingui:
         self.data_file_selected['signal_projection']['channels']['labellist'] = labels
         self.data_file_selected['signal_projection']['channels']['chanlocs'] = \
         self.treedata[self.selecteditem].channels.chanlocs[:,0:size(ssp,1)]
-        #self.data_file_selected['signal_projection']['channels'].chanlocs[:,0:size(ssp,1)]
         self.data_file_selected['signal_projection']['data_block'] = ssp
         self.data_file_selected['signal_projection']['srate'] = self.treedata[self.selecteditem].srate
         self.data_file_selected['signal_projection']['wintime'] = self.treedata[self.selecteditem].wintime
@@ -839,44 +842,20 @@ class maingui:
 
     def data_editor(self, widget):
         try:
-            srate = self.setup_helper(var='srate',obj=self.treedata[self.selecteditem])[0];print srate
-            wintime = self.setup_helper(var='wintime',obj=self.treedata[self.selecteditem])
-            data = self.setup_helper(var='data_block',obj=self.treedata[self.selecteditem])
-            try:
-                chanlabels = self.setup_helper(var='labellist',obj=self.treedata[self.selecteditem].channels)
-                chanlocs = self.setup_helper(var='chanlocs',obj=self.treedata[self.selecteditem].channels)
-            except:
-                print 'Error in setup'
-                chanlabels = self.setup_helper(var='labellist',obj=self.treedata[self.selecteditem]['channels'])
-                chanlocs = self.setup_helper(var='chanlocs',obj=self.treedata[self.selecteditem]['channels'])
+            obj=self.treedata[self.selecteditem];
+            r = (self.setup_helper(var=['data_block','srate','wintime',
+            'labellist','chanlocs'],obj=obj));
+            print len(r), 'length'
+
         except:
             print "Data Editor can't handle this type"
             print "Try selecting object <pdf2py.data.read>"
             self.errordialog("Data Editor can't handle this type.Try selecting object <pdf2py.data.read> ");
             return -1
 
-
-        #try:
-            #data = self.datadict[self.selecteditem]['data'].data_block
-            #srate = self.datadict[self.selecteditem]['hdr'].header_data.sample_period
-            #wintime = self.datadict[self.selecteditem]['data'].wintime
-            #chanlabels = self.datadict[self.selecteditem]['data'].channels.labellist
-            #chanlocs = self.datadict[self.selecteditem]['data'].channels.chanlocs
-        #except KeyError:
-            #data = self.treedata[self.selecteditem]
-            #srate = self.data_file_selected.hdr.header_data.sample_period
-            #wintime = self.data_file_selected.data.wintime
-            #chanlabels = arange(0,size(self.treedata[self.selecteditem],1))
-            #chanlocs = arange(0,size(self.treedata[self.selecteditem],1))
-        #except AttributeError:
-            #self.errordialog\
-            #('No Data loaded yet.')
-
-
         self.de = data_editor.setup_gui()
         self.de.window.show()
-        self.de.data_handler(data,srate,wintime,chanlabels,chanlocs,callback=self.data_editor_callback)
-
+        self.de.data_handler(r[0],r[1],r[2],r[3],r[4], callback=self.data_editor_callback)
 
     def data_editor_callback(self):
         print 'Done'
@@ -908,20 +887,3 @@ if __name__ == "__main__":
     exit
     gtk.main()
 
-
-
-
-    #def Add2Queue(self, widget):
-        #try:
-            #self.queue_store.append([self.selecteditem])
-            #print('adding',self.selecteditem,'to queue')
-        #except AttributeError:
-            #self.queue_store = gtk.ListStore(str)
-
-        #self.box.set_active(-1)
-        #self.box.set_model(self.queue_store)   #this replaces the model set by Glade
-
-        #try:
-            #self.data_queue[self.selecteditem] = self.treedata[self.dataselected]
-        #except AttributeError:
-            #self.data_queue = {self.selecteditem : self.treedata[self.dataselected]}
