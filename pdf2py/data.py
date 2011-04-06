@@ -113,6 +113,7 @@ class read(initialize):
         self.eventtime = self.wintime[0:self.epoch_size] - self.hdr.event_data[0].start_lat
         self.numofchannels = size(self.data_block,1)
         self.srate = 1/self.hdr.header_data.sample_period
+        self.frames = self.data_block.shape[0] / self.numofepochs[0]
 
     def setchannels(self, chtype):
         self.setchanneltype(chtype)

@@ -148,12 +148,6 @@ class maingui:
         widget.hide()
         return True
 
-    def itemselect(self, widget):
-        model,iter = self.builder.get_object("treeview2").get_selection().get_selected()
-        print('you selected item:', self.dataList.get_value(iter,0))#, self.dataList.get_value(iter,1)
-        self.selecteditem = self.dataList.get_value(iter,0)
-        self.dataselected = self.selecteditem
-
     def showplotwin(self, widget):
         self.builder.get_object('plotdialog').show()
 
@@ -267,8 +261,9 @@ class maingui:
         if self.filetype == 'MRI':
             print('filetype MRI')
             from mri import img
-            self.datadict[self.fn] = img.read(self.fn)
-            self.mr = self.datadict[self.fn] #make a copy for easy use later.
+            self.datadict[self.fn] = {'nifti':img.read(self.fn)}
+            #self.datadict[self.fn] = img.read(self.fn)
+            #self.mr = self.datadict[self.fn] #make a copy for easy use later.
             self.refreshdatasummary()
             self.treegohome(None)
 
@@ -380,7 +375,12 @@ class maingui:
 
             else:
                 iter = self.dataList.append([k,self.treedata[k]])
-
+                
+    def itemselect(self, widget):
+        model,iter = self.builder.get_object("treeview2").get_selection().get_selected()
+        print('you selected item:', self.dataList.get_value(iter,0))#, self.dataList.get_value(iter,1)
+        self.selecteditem = self.dataList.get_value(iter,0)
+        self.dataselected = self.selecteditem
 
     def treeclicked(self,b,c,d):
         print(b,c,d)
@@ -628,8 +628,10 @@ class maingui:
         from gui.gtk import grid
         self.gridwin = grid.gridwin()#.window.show()gridwin
         #self.gridwin.window
-        try: self.gridwin.mriwin(workspace_data=self.datadict[self.dataselected])
-        except AttributeError:
+        try:
+            self.gridwin.mriwin(workspace_data=self.data_file_selected)
+            #self.gridwin.mriwin(workspace_data=self.datadict[self.dataselected])
+        except AttributeError, KeyError:
             print('no data')
 
     def checkreq(self):
@@ -660,7 +662,11 @@ class maingui:
         try:
             self.mrimousepos = viewmri.display(self.treedata[self.selecteditem])
         except (AttributeError, KeyError):
-            self.mrimousepos = viewmri.display(self.datadict[self.dataselected])
+            try:
+                self.mrimousepos = viewmri.display(self.datadict[self.dataselected])
+            except AttributeError, KeyError:
+                print('Unknown data format')
+                self.errordialog('Unknown data format. Try selecting variable = nifti, or data array');
 
     def plot3DMRIhandle(self, widget):
         from mri import vtkview
@@ -704,26 +710,46 @@ class maingui:
     def coregister_handler(self,widget):
         self.cr = coregister.setup() #window
         self.cr.window.show()
-
+        
     def timef_handler(self,widget):
         self.tf = timef.setup() #window
-        try: #tft on data file
+        try: #tft on data instance
+            data = self.setup_helper(var='data_block',obj=self.treedata[self.selecteditem])
+            srate = self.setup_helper(var='srate',obj=self.treedata[self.selecteditem])[0]
+            frames = self.setup_helper(var='frames',obj=self.treedata[self.selecteditem])
+            trials = self.setup_helper(var='numofepochs',obj=self.treedata[self.selecteditem])[0]
+            eventtime = self.setup_helper(var='eventtime',obj=self.treedata[self.selecteditem])
+            channellabels = self.setup_helper(var='labellist',obj=self.treedata[self.selecteditem].channels)
             self.tf.builder.get_object('filechooserbutton1').set_uri('file://'+self.selecteditem)
             self.tf.builder.get_object('filechooserbutton1').set_sensitive(False)
-            self.tf.datahandler(workspace_data=self.datadict[self.selecteditem])
-            print 'tft on data file'
+            self.tf.datahandler(self.data_file_selected,data,channellabels,srate,frames,trials,eventtime)
             self.tf.window.show()
-        except:
-            print 'data error'
-        try: #tft on data variable selected
-            self.tf.datahandler(workspace_data=self.data_file_selected,data_selected=self.treedata[self.selecteditem])
-            self.tf.builder.get_object('filechooserbutton1').set_uri('file://'+self.selecteditem)
+        except: #tft on data variable selected
+            self.tf.datahandler(self.data_file_selected,self.treedata[self.selecteditem])
+            self.tf.builder.get_object('filechooserbutton1').set_sensitive(False)
             self.tf.builder.get_object('label12').set_text(str(self.selecteditem))
-
             print 'tft on data variable selected'
             self.tf.window.show()
-        except:
-            print 'var error'
+            
+    #def timef_handler(self,widget):
+        #self.tf = timef.setup() #window
+        #try: #tft on data file
+            #self.tf.builder.get_object('filechooserbutton1').set_uri('file://'+self.selecteditem)
+            #self.tf.builder.get_object('filechooserbutton1').set_sensitive(False)
+            #self.tf.datahandler(workspace_data=self.datadict[self.selecteditem])
+            #print 'tft on data file'
+            #self.tf.window.show()
+        #except:
+            #print 'data error'
+        #try: #tft on data variable selected
+            #self.tf.datahandler(workspace_data=self.data_file_selected,data_selected=self.treedata[self.selecteditem])
+            #self.tf.builder.get_object('filechooserbutton1').set_uri('file://'+self.selecteditem)
+            #self.tf.builder.get_object('label12').set_text(str(self.selecteditem))
+
+            #print 'tft on data variable selected'
+            #self.tf.window.show()
+        #except:
+            #print 'var error'
 
 
     def signal_space_build_weights(self,widget):
@@ -781,7 +807,10 @@ class maingui:
         self.data_file_selected['signal_projection']['data_block'] = ssp
         self.data_file_selected['signal_projection']['srate'] = self.treedata[self.selecteditem].srate
         self.data_file_selected['signal_projection']['wintime'] = self.treedata[self.selecteditem].wintime
-
+        self.data_file_selected['signal_projection']['eventtime'] = self.treedata[self.selecteditem].eventtime
+        self.data_file_selected['signal_projection']['frames'] = self.treedata[self.selecteditem].frames
+        self.data_file_selected['signal_projection']['srate'] = self.treedata[self.selecteditem].srate
+        self.data_file_selected['signal_projection']['numofepochs'] = self.treedata[self.selecteditem].numofepochs
 
     def contour_plot(self,widget):
         try:
