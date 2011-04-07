@@ -426,7 +426,7 @@ class setup_gui:
             m.show_all()
             m.popup(None,None,None,3,0)
 
-    def get_time_selection(self,widget):
+    def get_time_selection(self,widget,current=True):
         #print 'name',widget.get_parent().get_name()
         sel_ind = []
         sel_onset_ind = []
@@ -438,8 +438,8 @@ class setup_gui:
             nearest.nearest(self.t,arange(sels,sele,inc))
             sel_ind = nearest.nearest(self.t,arange(sels,sele,inc))
             return sel_ind
-
-        if widget.get_parent().get_name() == 'GtkMenu': #call from editor
+        #print 'parent',widget.get_title()
+        if widget.get_parent().get_name() == 'GtkMenu' and current == True: #call from editor menu
             print 'call from menu'
             try:
                 self.sel_ind = selection_to_ind(self.selections[-1][0],\

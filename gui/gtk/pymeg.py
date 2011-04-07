@@ -124,6 +124,8 @@ class maingui:
         self.treelist = [] #appends list with newly clicked items from treeview
         self.treedict = {} #initialize the treeview dictionary.
         self.queue_store = gtk.ListStore(str)
+        self.dataselected = [] #tree item currently selected
+        
 
         try: self.prefs = readwrite.readdata(os.getenv('HOME')+'/.pymeg.pym')
         except IOError: pass
@@ -166,7 +168,6 @@ class maingui:
         #p = self.data_assist.pdfdata
         path = self.data_assist.pdfdata.data.filepath
         self.datadict[path] = self.data_assist.pdfdata
-
         self.readMEG()
 
     def loadMRI(self,widget):
@@ -179,18 +180,12 @@ class maingui:
         self.dataList.clear()
 
         #convert pdf object to dictonary
-
-
-
         self.parseinstance(self.datadict[path])
         self.refreshdatasummary()
 
         for i in self.parseddatadict:
             print('appending model', i)
             iter = self.dataList.append([i, self.datadict[path]])
-
-        #self.datadict[path].results = self.datadict[path].__class__ #make results instance
-        #self.datadict[path].results = self.datadict[path].__class__ #make results instance
 
     def refreshdatasummary(self):
         self.parseinstance(self.datadict[self.fn])
@@ -582,15 +577,19 @@ class maingui:
                 except:
                     try:
                         for i in obj:
-                            print 'i',i
-                            if type(i) == dict:
-                                print 'd',i
-                                if obj[i] == ii:
-                                    var = obj[ii][i]
-                                    print 'found', i
+                            print 'i',i, type(obj[i])
+                            if type(obj[i]) == dict:
+                                try:
+                                    var = obj[i][ii]
+                                    print 'found',ii
+                                except: pass
+                                #print 'd',i
+                                #if obj[i][ii] == ii:
+                                    #var = obj[i][ii]
+                                    #print 'found', ii
 
 
-                            print i
+                            #print i
                             if obj[i] == ii:
                                 var = obj[i]
                                 print 'found', i
@@ -772,7 +771,7 @@ class maingui:
 
         for i in iter:
             print 'highlighted', liststore[i][1]
-            self.de.get_time_selection(widget)
+            self.de.get_time_selection(widget,current=False)
             print 'indices',self.de.sel_ind
             data = self.de.data
             self.data_file_selected['signal_projection'] = {}
