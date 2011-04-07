@@ -29,19 +29,22 @@ from mri import transform, sourcesolution2img
 
 try:
     import nifti
+    flag = 'pynifti'
 except ImportError:
     try:
-        from nibabel import nifti1 as nifti
+        import nibabel #import nifti1 as nifti
+        flag = 'nibabel'
     except:
         print 'Error Loading python nifti libraries'
 
-class loadimage():
+class loadimage_pynifti():
     def __init__(self, filepath):
         print 'reading',filepath
         self.nifti = NiftiImage(filepath)
         self.getfiducals()
 
     def getfiducals(self):
+
         if type(eval(self.nifti.description)[0]) == ndarray:
             self.lpa = eval(self.nifti.description)[0]
             self.rpa = eval(self.nifti.description)[1]
@@ -93,7 +96,6 @@ class loadimage():
         self.factor = dec
         self.ind = array(nonz)
 
-        #self.origimg = nim
         try:
 
             [t,r] = transform.meg2mri(self.lpa,self.rpa,self.nas)
@@ -118,9 +120,7 @@ class loadimage():
         self.lf = leadfield.calc(self.path2pdf, p.data.channels, self.scaledgrid*1000)
 
     def getcorrelationfit(self, weights):
-        #from meg import leadfield
         from meg import weightfit
-        #self.lf = leadfield.calc(self.path2pdf, p.data.channels, self.scaledgrid*1000)
         try:
             self.lf
         except:

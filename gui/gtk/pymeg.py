@@ -17,12 +17,13 @@
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
 '''Main GUI Window'''
-
+from matplotlib import use;use('GTK')
 import pymeg, sys, os, subprocess
 from pdf2py import pdf, readwrite,lA2array
 from numpy import shape, random, sort, array, append, size, arange, ndarray
 from meg import dipole,plotvtk,plot2dgtk,leadfield,signalspaceprojection,nearest
-from matplotlib import use;use('GTK')
+from mri import img_nibabel as img
+
 from matplotlib.figure import Figure
 from matplotlib.axes import Subplot
 from matplotlib.backends.backend_gtk import show
@@ -125,7 +126,7 @@ class maingui:
         self.treedict = {} #initialize the treeview dictionary.
         self.queue_store = gtk.ListStore(str)
         self.dataselected = [] #tree item currently selected
-        
+
 
         try: self.prefs = readwrite.readdata(os.getenv('HOME')+'/.pymeg.pym')
         except IOError: pass
@@ -172,7 +173,6 @@ class maingui:
 
     def loadMRI(self,widget):
         self.builder.get_object("filechooserdialog1").show()
-        from mri import img
         self.mr = img.read(self.fn)
 
     def readMEG(self):
@@ -255,8 +255,7 @@ class maingui:
 
         if self.filetype == 'MRI':
             print('filetype MRI')
-            from mri import img
-            self.datadict[self.fn] = {'nifti':img.read(self.fn)}
+            self.datadict[self.fn] = {'nifti':img.loadimage(self.fn)}
             #self.datadict[self.fn] = img.read(self.fn)
             #self.mr = self.datadict[self.fn] #make a copy for easy use later.
             self.refreshdatasummary()
@@ -779,17 +778,17 @@ class maingui:
 
     def save_results(self,workspace,var2save, data2save):
         '''ex. workspace=self.data_file_selected['signal_projection']'''
-
         workspace = {}; #clear workspace
         for i in range(0, len(var2save)):
             workspace[var2save[i]] = data2save[i]
 
     def signal_space_filter(self,widget):
+        sp = self.data_file_selected['signal_projection']
         if self.signal_space_build_weights(widget) == -1:
             self.data_editor(None)
             return -1
         print 'done!!'
-        weights = self.data_file_selected['signal_projection']['signal_weights']
+        weights = sp['signal_weights']
         try:
             data = self.treedata[self.selecteditem].data_block
             print data
@@ -798,21 +797,23 @@ class maingui:
             pass
 
         ssp = signalspaceprojection.calc(data, weight=weights)
-        self.data_file_selected['signal_projection']['ssp'] = ssp
-        self.data_file_selected['signal_projection']['channels'] = {} #self.treedata[self.selecteditem].channels
+
+
+        sp['ssp'] = ssp
+        sp['channels'] = {}
         labels = []
         for i in range(0,size(ssp,1)):
             labels.extend(['SigSP'+str(i)])
-        self.data_file_selected['signal_projection']['channels']['labellist'] = labels
-        self.data_file_selected['signal_projection']['channels']['chanlocs'] = \
+        sp['channels']['labellist'] = labels
+        sp['channels']['chanlocs'] = \
         self.treedata[self.selecteditem].channels.chanlocs[:,0:size(ssp,1)]
-        self.data_file_selected['signal_projection']['data_block'] = ssp
-        self.data_file_selected['signal_projection']['srate'] = self.treedata[self.selecteditem].srate
-        self.data_file_selected['signal_projection']['wintime'] = self.treedata[self.selecteditem].wintime
-        self.data_file_selected['signal_projection']['eventtime'] = self.treedata[self.selecteditem].eventtime
-        self.data_file_selected['signal_projection']['frames'] = self.treedata[self.selecteditem].frames
-        self.data_file_selected['signal_projection']['srate'] = self.treedata[self.selecteditem].srate
-        self.data_file_selected['signal_projection']['numofepochs'] = self.treedata[self.selecteditem].numofepochs
+        sp['data_block'] = ssp
+        sp['srate'] = self.treedata[self.selecteditem].srate
+        sp['wintime'] = self.treedata[self.selecteditem].wintime
+        sp['eventtime'] = self.treedata[self.selecteditem].eventtime
+        sp['frames'] = self.treedata[self.selecteditem].frames
+        sp['srate'] = self.treedata[self.selecteditem].srate
+        sp['numofepochs'] = self.treedata[self.selecteditem].numofepochs
 
     def contour_plot(self,widget):
         try:
