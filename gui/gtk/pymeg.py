@@ -30,7 +30,7 @@ from matplotlib.backends.backend_gtk import show
 
 from gui.gtk import filter, offset_correct, errordialog, preferences,\
 dipoledensity, coregister, timef, data_editor, event_process, parse_instance, \
-meg_assistant, errordialog
+meg_assistant, errordialog, viewmri
 from gui.gtk import contour as contour_gtk
 
 #from IPython.Shell import IPShellEmbed
@@ -571,7 +571,7 @@ class maingui:
             if type(obj) == dict:
                 print 'dict search'
                 try:
-                    var = obj[ii]
+                    out = obj[ii]
                     print 'found as child dict', ii
                 except:
                     try:
@@ -579,7 +579,7 @@ class maingui:
                             print 'i',i, type(obj[i])
                             if type(obj[i]) == dict:
                                 try:
-                                    var = obj[i][ii]
+                                    out = obj[i][ii]
                                     print 'found',ii
                                 except: pass
                                 #print 'd',i
@@ -590,7 +590,7 @@ class maingui:
 
                             #print i
                             if obj[i] == ii:
-                                var = obj[i]
+                                out = obj[i]
                                 print 'found', i
                     except:
                         print 'cant find instance', ii
@@ -598,26 +598,29 @@ class maingui:
             if isinstance(obj, types.InstanceType):
                 print 'instance..'
                 try:
-                    var = eval('obj.'+ii)
+                    out = eval('obj.'+ii)
                     print 'found as child instance', ii
                 except:
                     try:
                         for i in inspect.getmembers(obj):
                             #print i[0]
                             if i[0] == ii:
-                                var = i[1]
+                                out = i[1]
                                 print 'found', i[0]
                             if isinstance(i[1], types.InstanceType):
                                 #print 'dig'
                                 for j in inspect.getmembers(i[1]):
                                     #print j[0]
                                     if j[0] == ii:
-                                        var = j[1]
+                                        out = j[1]
                                         print 'found', j[0]
                     except:
                         print 'cant find instance', ii
 
-            v.extend([var]);
+            v.extend([out]);
+        if len(v) != len(var):
+            print 'missing items requested'
+            raise KeyError
 
         return v
 
@@ -684,12 +687,15 @@ class maingui:
         self.prefs = self.prefinit.prefs
 
     def plot2Dmri(self, widget):
-        from mri import viewmri
+        vm = viewmri.setup_gui()
+        print self.treedata[self.selecteditem].data
         try:
-            self.mrimousepos = viewmri.display(self.treedata[self.selecteditem])
-        except (AttributeError, KeyError):
+            self.mrimousepos = vm.display(self.treedata[self.selecteditem].data,pixdim=self.treedata[self.selecteditem].pixdim)
+            
+        except:# (AttributeError, KeyError):
             try:
-                self.mrimousepos = viewmri.display(self.datadict[self.dataselected])
+                self.mrimousepos = vm.display(self.treedata[self.selecteditem])#,pixdim=self.datadict[self.dataselected].pixdim)
+                vm.window.show()
             except AttributeError, KeyError:
                 print('Unknown data format')
                 self.errordialog('Unknown data format. Try selecting variable = nifti, or data array');
@@ -765,8 +771,8 @@ class maingui:
             self.errordialog\
             ('No selections made yet. Load file in data editor,\
             and make selections. Then highlight selection with selector tool.')
-
-            return -1
+            raise TypeError
+            
 
         for i in iter:
             print 'highlighted', liststore[i][1]
@@ -776,14 +782,19 @@ class maingui:
             self.data_file_selected['signal_projection'] = {}
             self.data_file_selected['signal_projection']['signal_weights'] = data[self.de.sel_ind]
 
-    def save_results(self,workspace,var2save, data2save):
-        '''ex. workspace=self.data_file_selected['signal_projection']'''
-        workspace = {}; #clear workspace
-        for i in range(0, len(var2save)):
-            workspace[var2save[i]] = data2save[i]
+    #def save_results(self,workspace,var2save, data2save):
+        #'''ex. workspace=self.data_file_selected['signal_projection']'''
+        #workspace = {}; #clear workspace
+        #for i in range(0, len(var2save)):
+            #workspace[var2save[i]] = data2save[i]
 
     def signal_space_filter(self,widget):
-        sp = self.data_file_selected['signal_projection']
+        try:
+            sp = self.data_file_selected['signal_projection']
+        except KeyError:
+            print "No weights built yet."
+            self.errordialog("No weights. Select data from data editor and use selector tool to highlight weight. ");
+            return -1
         if self.signal_space_build_weights(widget) == -1:
             self.data_editor(None)
             return -1
@@ -845,7 +856,7 @@ class maingui:
             obj=self.treedata[self.selecteditem];
             r = (self.setup_helper(var=['data_block','srate','wintime',
             'labellist','chanlocs'],obj=obj));
-            print len(r), 'length'
+            print len(r), 'length', r
 
         except:
             print "Data Editor can't handle this type"
@@ -854,8 +865,8 @@ class maingui:
             return -1
 
         self.de = data_editor.setup_gui()
-        self.de.window.show()
         self.de.data_handler(r[0],r[1],r[2],r[3],r[4], callback=self.data_editor_callback)
+        self.de.window.show()
 
     def data_editor_callback(self):
         print 'Done'

@@ -91,7 +91,7 @@ class setup_gui:
         self.create_csd_frame('none')
         self.space = 0
         #self.generate_testdata(None)
-        #self.preferences_open(None)
+        self.preferences_open(None)
 
     def printtest(self,widget):
         print 'something'

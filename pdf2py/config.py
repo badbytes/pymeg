@@ -58,7 +58,8 @@ class read:
         
         for i in range(0, self.data_total_user_blocks[0]):
             if self.user_block_data[i].user_block_data_hdr_type == 'B_COH_Points':
-                self.coil_locations = self.user_block_data[i].coil_locations   
+                self.coil_locations = self.user_block_data[i].coil_locations * .1
+            
         
         fid.close
 

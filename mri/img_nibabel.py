@@ -36,6 +36,9 @@ class loadimage():
         print 'reading',filepath
         self.nifti = nibabel.load(filepath)
         dirpath = os.path.dirname(filepath)
+        self.data = self.nifti.get_data()
+        h = self.nifti.get_header()
+        self.pixdim = h['pixdim'][0:3]
         if os.path.isfile(filepath+'.pym') == True:
             self.fiddata = readwrite.readdata(filepath+'.pym')
             self.getfiducals()

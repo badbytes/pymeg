@@ -107,15 +107,15 @@ class IndexTracker:
 
     def update1(self):
         self.im1.set_data(self.data[:,:,self.ind1])
-        self.im1.axes.figure.canvas.draw()
+        #self.im1.axes.figure.canvas.draw()
 
     def update2(self):
         self.im2.set_data(self.data[:,self.ind2,:].T)
-        self.im2.axes.figure.canvas.draw()
+        #self.im2.axes.figure.canvas.draw()
 
     def update3(self):
         self.im3.set_data(self.data[self.ind3,:,:].T)
-        self.im3.axes.figure.canvas.draw()
+        #self.im3.axes.figure.canvas.draw()
 
     def click(self,event, pixdim=None):
         self.events=event
@@ -201,7 +201,7 @@ class makewin():
         xlabel('Infererior (I->S 3rd dim)');ylabel('Right (R->L 2nd Dim)')
         coord = fig.add_subplot(224);axis('off')
         tracker = IndexTracker(mrdata, ax1, ax2, ax3, colormap, pixdim, overlay, coord)
-        fig.canvas.mpl_connect('scroll_event', tracker.onscroll)
+        #fig.canvas.mpl_connect('scroll_event', tracker.onscroll)
         cid = connect('button_press_event', tracker.click)
 
         print('something')
@@ -219,6 +219,7 @@ class makewin():
         ##vbox.pack_start(canvas)
         canvas.set_size_request(300,200)
         sw.add_with_viewport (canvas)
+        canvas.draw()
 
         #manager = get_current_fig_manager()
         ## you can also access the window or vbox attributes this way
