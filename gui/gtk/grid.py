@@ -27,8 +27,10 @@ try:
 except:
     print("GTK Not Availible")
     sys.exit(1)
-
-from mri import img, transform
+    
+from mri import img_nibabel as img
+#from mri import img, transform
+from mri import transform
 from numpy import array, ndarray, float
 from pdf2py import readwrite
 from meg import grid
@@ -55,22 +57,22 @@ class gridwin:
 
         self.builder.connect_signals(dic)
 
-        try:
-            self.prevdata = readwrite.readdata(os.getenv('HOME')+'/.pymegdata.pym')
-            print 'previous data', self.prevdata
-            self.builder.get_object("filechooserbutton1").set_uri('file://'+self.prevdata['brain.nii.gz'])
-            self.builder.get_object("filechooserbutton1").set_filename(self.prevdata['brain.nii.gz'])
-            self.mr = img.read(self.prevdata['brain.nii.gz'])
-            self.statusbar.push(self.statusbar_cid, 'Loading Previous MRI.')
-            if type(eval(self.mr.description)[0]) == ndarray: #coregegistered mri
-                self.builder.get_object("button1").set_sensitive(True)
-            else:
-                self.builder.get_object("button1").set_sensitive(False)
-        except IOError: #no last file
-            print 'no prev data'
-            self.prevdata = {}
-        except TypeError:
-            pass
+        #try:
+            #self.prevdata = readwrite.readdata(os.getenv('HOME')+'/.pymegdata.pym')
+            #print 'previous data', self.prevdata
+            #self.builder.get_object("filechooserbutton1").set_uri('file://'+self.prevdata['brain.nii.gz'])
+            #self.builder.get_object("filechooserbutton1").set_filename(self.prevdata['brain.nii.gz'])
+            #self.mr = img.loadimage(self.prevdata['brain.nii.gz'])
+            #self.statusbar.push(self.statusbar_cid, 'Loading Previous MRI.')
+            #if type(eval(self.mr.description)[0]) == ndarray: #coregegistered mri
+                #self.builder.get_object("button1").set_sensitive(True)
+            #else:
+                #self.builder.get_object("button1").set_sensitive(False)
+        #except IOError: #no last file
+            #print 'no prev data'
+            #self.prevdata = {}
+        #except TypeError:
+            #pass
 
     def coregister_handler(self, widget):
         self.cr = coregister.setup() #window
@@ -145,15 +147,15 @@ class gridwin:
 
         #manualtypeselected = h.get_focus_child().get_label()
         if manualtypeselected == 'Point':
-            self.workspace_data.results.grid = array(eval(self.builder.get_object("entry2").get_text()))
-            print 'grid',self.workspace_data.results.grid
+            self.workspace_data['grid']  = array(eval(self.builder.get_object("entry2").get_text()))
+            
         elif manualtypeselected == 'Cube':
-            self.workspace_data.results.grid = grid.cube(eval(self.builder.get_object("entry2").get_text()), \
+            self.workspace_data['grid'] = grid.cube(eval(self.builder.get_object("entry2").get_text()), \
             float(self.builder.get_object("entry3").get_text()), \
             float(self.builder.get_object("entry4").get_text()))
             print 'done cube'
         elif manualtypeselected == 'Sphere':
-            self.workspace_data.results.grid = grid.sphere(eval(self.builder.get_object("entry2").get_text()), \
+            self.workspace_data['grid'] = grid.sphere(eval(self.builder.get_object("entry2").get_text()), \
             float(self.builder.get_object("entry3").get_text()), \
             float(self.builder.get_object("entry4").get_text()))
             print 'done sphere'

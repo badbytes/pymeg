@@ -656,12 +656,12 @@ class maingui:
 
         from gui.gtk import grid
         self.gridwin = grid.gridwin()#.window.show()gridwin
-        #self.gridwin.window
         try:
             self.gridwin.mriwin(workspace_data=self.data_file_selected)
-            #self.gridwin.mriwin(workspace_data=self.datadict[self.dataselected])
         except AttributeError, KeyError:
             print('no data')
+            self.errordialog\
+            ('No data selected. Double Click a MEG filename')
 
     def checkreq(self):
         try: self.fn
@@ -709,10 +709,10 @@ class maingui:
                 print('caught error')
                 return
         try:
-            self.datadict[self.fn].grid
+            self.data_file_selected['grid']
         except AttributeError:
             print('grid not detected in results')
-            if self.selecteditem == 'grid':
+            if self.treedata[self.selecteditem] == 'grid':
                 print('using selected grid')
             else:
                 print('no grid detected. giving up.')
@@ -720,12 +720,14 @@ class maingui:
                 self.gridcalc(None)
                 return
 
-        self.lf = leadfield.calc(self.datadict[self.fn], self.datadict[self.fn].data.channels, \
-        self.datadict[self.fn].grid)
-        print('lf shape', self.datadict[self.fn].grid.shape)
+        self.lf = leadfield.calc(self.data_file_selected['data'].filename, self.data_file_selected['data'].channels, \
+        self.data_file_selected['grid'])
+        print('lf shape', self.data_file_selected['grid'].shape)
         print('saving leadfield in workspace')
-        self.datadict[self.fn].leadfield = self.lf
-
+        self.data_file_selected['leadfield'] = self.lf
+        self.data_file_selected['leadfield'].channels = self.data_file_selected['data'].channels
+        self.data_file_selected['leadfield'].leadfields_transposed = self.lf.lp.T
+        
     def dipoledensityhandle(self,widget):
         self.dd = dipoledensity.density() #window
 

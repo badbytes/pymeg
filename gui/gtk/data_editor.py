@@ -144,10 +144,13 @@ class setup_gui:
         self.builder.get_object("spinbutton2").set_range(self.t[0],self.t[-1])
         self.builder.get_object("spinbutton2").set_value(self.t[0])
         self.builder.get_object("spinbutton3").set_range(self.t[0],self.t[-1])
-        #if self.t[-1] - self.t[0] > 1: #alot of time, save time in plotting and set low
-            #self.builder.get_object("spinbutton3").set_value(self.t[1000])
-        #else:
-        self.builder.get_object("spinbutton3").set_value(self.t[-1])
+        if self.t[-1] - self.t[0] > 1: #alot of time, save time in plotting and set low
+            self.builder.get_object("spinbutton3").set_value(self.t[1000])
+            print '.....reducing time var'
+        else:
+            print '.....showing all time'
+            self.builder.get_object("spinbutton3").set_range(self.t[0],self.t[-1])
+        #self.builder.get_object("spinbutton3").set_value(self.t[-1])
 
     def preferences_open(self,widget):
         self.win_prefs = self.builder.get_object("window_prefs")
