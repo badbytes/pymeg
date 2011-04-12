@@ -12,7 +12,6 @@
         <property name="scrollable">True</property>
         <child>
           <object class="GtkVBox" id="vbox1">
-            <property name="visible">True</property>
             <property name="orientation">vertical</property>
             <child>
               <object class="GtkFileChooserButton" id="filechooserbutton2">
@@ -168,7 +167,7 @@
         </child>
         <child type="tab">
           <object class="GtkLabel" id="label1">
-            <property name="visible">True</property>
+            <property name="sensitive">False</property>
             <property name="label" translatable="yes">MRI Source Space</property>
           </object>
           <packing>
@@ -358,18 +357,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkHBox" id="hbox2">
-            <property name="visible">True</property>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-          </object>
-          <packing>
-            <property name="position">2</property>
-          </packing>
+          <placeholder/>
         </child>
         <child type="tab">
           <placeholder/>

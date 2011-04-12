@@ -32,9 +32,9 @@ except:
 class template:
     def __init__(self):
         self.builder = gtk.Builder()
-        self.builder.add_from_file("/home/danc/python/pymeg/gui/gtk/spinner2.glade")
-        spin = self.builder.get_object("spinner1")
-        spin.start()
+        self.builder.add_from_file("/home/danc/python/pymeg/gui/gtk/spinner.glade")
+        #spin = self.builder.get_object("spinner1")
+        #spin.start()
         #self.window = builder.add_objects_from_file("/home/danc/python/pymeg/gui/gtk/spinner.glade",['window2'])
         self.window = self.builder.get_object("window")
         #self.spin = self.builder.get_object("buttonbox1")
@@ -44,7 +44,7 @@ class template:
             }
 
         self.builder.connect_signals(dic)
-        
+
 
     def test(self,widget,null):
         print 'test'
@@ -57,12 +57,12 @@ class template:
 if __name__ == "__main__":
     mainwindow = template()
     mainwindow.window.show()
-    
+
     print 'started'
-    
+
     print 'testing'
     gtk.main()
     print 'done'
-    
+
     #time.sleep(5)
     #spin.stop()

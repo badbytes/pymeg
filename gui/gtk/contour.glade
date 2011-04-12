@@ -6,7 +6,6 @@
     <property name="width_request">500</property>
     <property name="height_request">400</property>
     <property name="title" translatable="yes">Contour Plot</property>
-    <property name="deletable">False</property>
     <signal name="destroy_event" handler="gtk_widget_hide"/>
     <signal name="delete_event" handler="gtk_widget_hide"/>
     <child>

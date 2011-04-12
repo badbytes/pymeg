@@ -70,31 +70,13 @@ class setup:
 
         print cycles,freqrange,padratio,timesout,frames,trials,srate,eventtime
         self.t = timef.initialize()
-        
+
         try:
             chind = self.chlabels.index(self.chan_sel);print 'chind',chind
             self.data2timef = self.data[:,chind]
         except:
             print 'assuming data passed.'
-        #try:
-            #chind = self.data_assist.pdfdata.data.channels.labellist.index(self.chan_sel)
-            #print 'chind',chind
-            #self.data2timef = self.data_assist.pdfdata.data.data_block[:,chind]
-        #except:
-            #print 'assuming data passed.'
-        #try:
-            #if self.data_selected == None: #not passing specific data
-                #try:
-                    #chind = self.workspace_data.data.channels.labellist.index(self.chan_sel)
-                    #self.data2timef = self.workspace_data.data.data_block[:,chind]
-                #except AttributeError:
-                    #pass
-            #else:
-                #print 'taking passed data'
-                #self.data2timef = self.data_selected[:,int(self.chan_sel)]
-                #print 'timef attempt'
-        #except AttributeError:
-            #print 'no data passed'
+
 
 
         print 'shape',self.data2timef.shape
@@ -104,49 +86,29 @@ class setup:
         if return_code == -2:
             self.errordialog('Too few points in data for that freq range. Load more points or increase the min freq.');
         try:
-            self.workspace_data['tft'] = self.t
+            pass
+            #self.workspace_data['tft'] = []
+            #self.workspace_data['tft'] = self.t
+            #print 'tft ws',self.workspace_data['tft']
         except AttributeError:
             self.builder.get_object('filechooserbutton2').set_uri(self.builder.get_object('filechooserbutton1').get_uri())
             self.builder.get_object('filechooserbutton2').show()
             self.builder.get_object('filechooserbutton2').set_state(True)
 
+        self.callback(self.t)
 
-    #def datahandler(self, workspace_data=None, data_selected=None):
-        ##print 'wd',workspace_data,data_selected
-        #self.workspace_data = workspace_data
-        #self.data_selected = data_selected
-        #self.check_data(None)
-        
-    def datahandler(self, workspace_data,data,chlabels=None,srate=None,frames=None,trials=None,eventtime=None):
-        #print 'wd',workspace_data,data_selected
-        #self.populate_combo(channellabels)
+
+    def datahandler(self,data,chlabels=None,srate=None,frames=None,trials=None,eventtime=None,callback=None):
+        if callback != None: self.callback = callback
+
+
         if chlabels == None:
             chlabels = arange(size(data,1))
         self.set_tft_info(srate,frames,eventtime,trials,chlabels)
         self.data = data
         self.chlabels = chlabels
-        self.workspace_data = workspace_data
-        
-            
-        #self.check_data(None)
+        #self.workspace_data = workspace_data
 
-    #def check_data(self,widget):
-        #print 'checking data'
-        #try:
-            #self.workspace_data
-        #except AttributeError:
-            #print 'data not passed'
-            #return
-        #if self.data_selected == None:
-            #self.workspace_data.data.channels.labellist
-            #self.populate_combo(data_list = \
-            #self.workspace_data.data.channels.labellist)
-            #self.set_pdf_info(pdf_data=self.workspace_data)
-        #else:
-            #print 'no channels', size(self.data_selected.shape),arange(size(self.data_selected,1))
-            #if size(self.data_selected.shape) != 1:
-                #self.populate_combo(data_list = arange(size(self.data_selected,1)))
-            #print 'pass'
 
     def read_data(self, widget): #load and read pdf from filechooser
         from time import sleep
@@ -159,10 +121,8 @@ class setup:
 
     def callback(self):
         print 'DONE!'
-        #self.populate_combo(data_list = \
-        #self.data_assist.pdfdata.data.channels.labellist)
         self.get_pdf_info(pdf_data=self.data_assist.pdfdata)
-        
+
     def get_pdf_info(self,pdf_data):
         self.data = pdf_data.data.data_block
         srate = pdf_data.data.srate[0]
@@ -171,8 +131,8 @@ class setup:
         trials = pdf_data.data.numofepochs[0]
         self.chlabels = pdf_data.data.channels.labellist
         self.set_tft_info(srate,frames,eventtime,trials,self.chlabels)
-        
-        
+
+
     def set_tft_info(self, srate,frames,eventtime,trials,chlabels):
         try:
             self.builder.get_object("entry6").set_text(str(frames))
@@ -182,18 +142,7 @@ class setup:
         except TypeError:
             pass
         self.populate_combo(chlabels)
-        
-    #def set_pdf_info(self, pdf_data=None):
-        #self.builder.get_object("entry6").set_text\
-        #(str(pdf_data.data.data_block.shape[0]\
-        #/pdf_data.data.numofepochs[0]))
-        #self.builder.get_object("entry7").set_text\
-        #(str(pdf_data.data.numofepochs[0]))
-        #self.builder.get_object("entry8").set_text\
-        #(str(1/pdf_data.hdr.header_data.sample_period[0]))
-        #self.builder.get_object("entry9").set_text\
-        #(str(abs(pdf_data.data.eventtime[0])*1000))
-        
+
     def populate_combo(self, data_list=None):
         print 'populating channel list'
         if data_list == None:

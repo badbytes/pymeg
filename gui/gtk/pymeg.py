@@ -393,20 +393,21 @@ class maingui:
             except AttributeError: self.treedict = {0 :self.treedata}
             except IndexError: self.treedict = {0 :self.treedata}
             self.builder.get_object('statusbar').push(self.builder.get_object("statusbar").get_context_id(''),self.dataList.get_value(iter,0))
-            self.builder.get_object('treebutton3').set_sensitive(False)
+
             self.data_file_selected = self.datadict[self.selecteditem]
+            self.data_filename_selected = self.selecteditem
             print 'Data File Selected:'#,self.data_file_selected
         else:
             print('lower lvl')
             try: self.treedict[self.treedict.keys()[-1]+1] = self.treedata[self.dataList.get_value(iter,0)]
             except AttributeError: self.treedict = {0 :self.treedata[self.dataList.get_value(iter,0)]}
-            self.builder.get_object('treebutton3').set_sensitive(False)
             self.data2parse = self.treedict[self.treedict.keys()[-1]]
             self.parseinstance(self.data2parse)
             self.treedata = self.parseddata.out
 
         self.dataList.clear()
         self.populatetree(self.treedata)
+        self.builder.get_object('treebutton2').set_sensitive(True)
 
     def deleteselected(self, widget):
         liststore,iter = self.View.get_selection().get_selected()
@@ -416,14 +417,15 @@ class maingui:
         self.parseddatadict.pop(self.selecteditem)
         self.treegohome(None)
 
-    def treegohome(self,widget):
+    def treegohome(self,widget,resave=False):
         print('going home')
-        self.treedict = {}
-        self.dataList.clear()
+        self.treedict = {};
+        self.dataList.clear();
         for i in self.parseddatadict:
             iter = self.dataList.append([i,type(self.parseddatadict[i])])#, 'Data File'])
-            print(i)
-        self.builder.get_object('treebutton3').set_sensitive(True)
+            print('data items...',i)
+        #self.builder.get_object('treebutton3').set_sensitive(True)
+        self.builder.get_object('treebutton2').set_sensitive(False)
 
     def treeuplevel(self,widget):
         print('stepping up a level')
@@ -658,10 +660,12 @@ class maingui:
         self.gridwin = grid.gridwin()#.window.show()gridwin
         try:
             self.gridwin.mriwin(workspace_data=self.data_file_selected)
+
         except AttributeError, KeyError:
             print('no data')
             self.errordialog\
             ('No data selected. Double Click a MEG filename')
+
 
     def checkreq(self):
         try: self.fn
@@ -691,7 +695,7 @@ class maingui:
         print self.treedata[self.selecteditem].data
         try:
             self.mrimousepos = vm.display(self.treedata[self.selecteditem].data,pixdim=self.treedata[self.selecteditem].pixdim)
-            
+
         except:# (AttributeError, KeyError):
             try:
                 self.mrimousepos = vm.display(self.treedata[self.selecteditem])#,pixdim=self.datadict[self.dataselected].pixdim)
@@ -727,7 +731,7 @@ class maingui:
         self.data_file_selected['leadfield'] = self.lf
         self.data_file_selected['leadfield'].channels = self.data_file_selected['data'].channels
         self.data_file_selected['leadfield'].leadfields_transposed = self.lf.lp.T
-        
+
     def dipoledensityhandle(self,widget):
         self.dd = dipoledensity.density() #window
 
@@ -746,22 +750,36 @@ class maingui:
         self.cr.window.show()
 
     def timef_handler(self,widget):
-        self.tf = timef.setup() #window
+        def donetft(results):
+            self.data_file_selected['tft'] = results
+            print self.data_file_selected['tft'].npoints
+            self.datadict[self.data_filename_selected] = self.data_file_selected
+            self.treegohome(None)
 
-        try: #tft on data instance
+        self.tf = timef.setup() #window
+        try:
             obj=self.treedata[self.selecteditem];
             ret = (self.setup_helper(var=['data_block','labellist','srate','frames',
             'numofepochs','eventtime'],obj=obj));
             print len(ret), 'length'
             self.tf.builder.get_object('filechooserbutton1').set_sensitive(False)
-            self.tf.datahandler(self.data_file_selected,ret[0],ret[1],ret[2][0],ret[3],ret[4][0],ret[5])
+            self.tf.datahandler(ret[0],ret[1],ret[2][0],ret[3],ret[4][0],ret[5],callback=donetft)
             self.tf.window.show()
+            print 'tft on data instance'
         except: #tft on data variable selected
-            self.tf.datahandler(self.data_file_selected,self.treedata[self.selecteditem])
-            self.tf.builder.get_object('filechooserbutton1').set_sensitive(False)
-            self.tf.builder.get_object('label12').set_text(str(self.selecteditem))
-            print 'tft on data variable selected'
-            self.tf.window.show()
+            try:
+
+                self.tf.datahandler(self.treedata[self.selecteditem],callback=donetft)
+                self.tf.builder.get_object('filechooserbutton1').set_sensitive(False)
+                self.tf.builder.get_object('label12').set_text(str(self.selecteditem))
+                print 'tft on data variable selected'
+                self.tf.window.show()
+                print 'tft on data var selected'
+            except KeyError:
+                self.errordialog\
+                ('Unknown data type. Type selecting Variable = data.')
+                raise TypeError
+
 
     def signal_space_build_weights(self,widget):
         try:
@@ -774,7 +792,7 @@ class maingui:
             ('No selections made yet. Load file in data editor,\
             and make selections. Then highlight selection with selector tool.')
             raise TypeError
-            
+
 
         for i in iter:
             print 'highlighted', liststore[i][1]
@@ -791,16 +809,17 @@ class maingui:
             #workspace[var2save[i]] = data2save[i]
 
     def signal_space_filter(self,widget):
-        try:
-            sp = self.data_file_selected['signal_projection']
-        except KeyError:
-            print "No weights built yet."
-            self.errordialog("No weights. Select data from data editor and use selector tool to highlight weight. ");
-            return -1
+
         if self.signal_space_build_weights(widget) == -1:
             self.data_editor(None)
             return -1
         print 'done!!'
+        try:
+            sp = self.data_file_selected['signal_projection']
+        except KeyError:
+            print "No weights built yet!!"
+            self.errordialog("No weights. Select data from data editor and use selector tool to highlight weight. ");
+            return -1
         weights = sp['signal_weights']
         try:
             data = self.treedata[self.selecteditem].data_block
@@ -819,7 +838,7 @@ class maingui:
             labels.extend(['SigSP'+str(i)])
         sp['channels']['labellist'] = labels
         sp['channels']['chanlocs'] = \
-        self.treedata[self.selecteditem].channels.chanlocs[:,0:size(ssp,1)]
+        array(self.treedata[self.selecteditem].channels.chanlocs[:,0:size(ssp,1)])
         sp['data_block'] = ssp
         sp['srate'] = self.treedata[self.selecteditem].srate
         sp['wintime'] = self.treedata[self.selecteditem].wintime

@@ -27,7 +27,7 @@ try:
 except:
     print("GTK Not Availible")
     sys.exit(1)
-    
+
 from mri import img_nibabel as img
 #from mri import img, transform
 from mri import transform
@@ -148,7 +148,7 @@ class gridwin:
         #manualtypeselected = h.get_focus_child().get_label()
         if manualtypeselected == 'Point':
             self.workspace_data['grid']  = array(eval(self.builder.get_object("entry2").get_text()))
-            
+            print 'done point'
         elif manualtypeselected == 'Cube':
             self.workspace_data['grid'] = grid.cube(eval(self.builder.get_object("entry2").get_text()), \
             float(self.builder.get_object("entry3").get_text()), \
@@ -159,6 +159,8 @@ class gridwin:
             float(self.builder.get_object("entry3").get_text()), \
             float(self.builder.get_object("entry4").get_text()))
             print 'done sphere'
+
+        self.window.hide()
 
 
 

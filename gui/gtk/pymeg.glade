@@ -87,8 +87,8 @@
 #       along with this program; if not, write to the Free Software
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.</property>
-    <signal name="response" handler="on_aboutdialog1_hide"/>
     <signal name="delete_event" handler="gtk_widget_hide"/>
+    <signal name="response" handler="on_aboutdialog1_hide"/>
     <child internal-child="vbox">
       <object class="GtkVBox" id="dialog-vbox3">
         <property name="visible">True</property>
@@ -154,106 +154,376 @@
     <signal name="destroy" handler="on_destroy"/>
     <signal name="delete_event" handler="gtk_widget_hide"/>
     <child>
-      <object class="GtkVPaned" id="vpaned2">
+      <object class="GtkVBox" id="vbox2">
         <property name="visible">True</property>
-        <property name="can_focus">True</property>
-        <property name="position">613</property>
-        <property name="position_set">True</property>
+        <property name="orientation">vertical</property>
         <child>
-          <object class="GtkVBox" id="vbox2">
+          <object class="GtkMenuBar" id="menubar1">
             <property name="visible">True</property>
-            <property name="orientation">vertical</property>
             <child>
-              <object class="GtkMenuBar" id="menubar1">
+              <object class="GtkMenuItem" id="menuitem3">
                 <property name="visible">True</property>
-                <child>
-                  <object class="GtkMenuItem" id="menuitem3">
+                <property name="label" translatable="yes">_File</property>
+                <property name="use_underline">True</property>
+                <child type="submenu">
+                  <object class="GtkMenu" id="menu4">
                     <property name="visible">True</property>
-                    <property name="label" translatable="yes">_File</property>
-                    <property name="use_underline">True</property>
-                    <child type="submenu">
-                      <object class="GtkMenu" id="menu4">
+                    <child>
+                      <object class="GtkMenuItem" id="loadmeg1">
                         <property name="visible">True</property>
-                        <child>
-                          <object class="GtkMenuItem" id="loadmeg1">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">Load MEG</property>
-                            <signal name="activate" handler="on_menuLoadMEG_activate"/>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkMenuItem" id="loadmri1">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">Load MRI</property>
-                            <signal name="activate" handler="on_loadmri_activate"/>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkMenuItem" id="loadpythondata1">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">Load Python Data</property>
-                            <signal name="activate" handler="on_loadpythondata_activate"/>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkMenuItem" id="loaddipolefile1">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">Load Dipole File</property>
-                            <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_loaddipolefile_activate"/>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkSeparatorMenuItem" id="separator3">
-                            <property name="visible">True</property>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkMenuItem" id="quit1">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">Quit</property>
-                            <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_menuQuit_activate"/>
-                          </object>
-                        </child>
+                        <property name="label" translatable="yes">Load MEG</property>
+                        <signal name="activate" handler="on_menuLoadMEG_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="loadmri1">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Load MRI</property>
+                        <signal name="activate" handler="on_loadmri_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="loadpythondata1">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Load Python Data</property>
+                        <signal name="activate" handler="on_loadpythondata_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="loaddipolefile1">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Load Dipole File</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_loaddipolefile_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparatorMenuItem" id="separator3">
+                        <property name="visible">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="quit1">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Quit</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_menuQuit_activate"/>
                       </object>
                     </child>
                   </object>
                 </child>
-                <child>
-                  <object class="GtkMenuItem" id="menuitem4">
+              </object>
+            </child>
+            <child>
+              <object class="GtkMenuItem" id="menuitem4">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">_Edit</property>
+                <property name="use_underline">True</property>
+                <child type="submenu">
+                  <object class="GtkMenu" id="menu6">
                     <property name="visible">True</property>
-                    <property name="label" translatable="yes">_Edit</property>
-                    <property name="use_underline">True</property>
-                    <child type="submenu">
-                      <object class="GtkMenu" id="menu6">
+                    <child>
+                      <object class="GtkMenuItem" id="imagemenuitem8">
                         <property name="visible">True</property>
-                        <child>
-                          <object class="GtkMenuItem" id="imagemenuitem8">
-                            <property name="visible">True</property>
-                            <property name="label" translatable="yes">Preferences</property>
-                            <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_menuPrefs_activate"/>
-                          </object>
-                        </child>
+                        <property name="label" translatable="yes">Preferences</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_menuPrefs_activate"/>
                       </object>
                     </child>
                   </object>
                 </child>
-                <child>
-                  <object class="GtkMenuItem" id="menuitem5">
+              </object>
+            </child>
+            <child>
+              <object class="GtkMenuItem" id="menuitem5">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">_Help</property>
+                <property name="use_underline">True</property>
+                <child type="submenu">
+                  <object class="GtkMenu" id="menu9">
                     <property name="visible">True</property>
-                    <property name="label" translatable="yes">_Help</property>
-                    <property name="use_underline">True</property>
-                    <child type="submenu">
-                      <object class="GtkMenu" id="menu9">
+                    <child>
+                      <object class="GtkMenuItem" id="imagemenuitem9">
                         <property name="visible">True</property>
-                        <child>
-                          <object class="GtkMenuItem" id="imagemenuitem9">
+                        <property name="label" translatable="yes">About PyMEG</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_menuAbout_activate"/>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkToolbar" id="toolbar2">
+            <property name="visible">True</property>
+            <property name="toolbar_style">both</property>
+            <property name="icon_size">5</property>
+            <property name="icon_size_set">True</property>
+            <child>
+              <object class="GtkToolButton" id="treebutton1">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">Refresh</property>
+                <property name="use_underline">True</property>
+                <property name="stock_id">gtk-refresh</property>
+                <signal name="clicked" handler="on_treebutton1_clicked"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToolButton" id="treebutton2">
+                <property name="visible">True</property>
+                <property name="sensitive">False</property>
+                <property name="label" translatable="yes">Up Level</property>
+                <property name="use_underline">True</property>
+                <property name="stock_id">gtk-go-up</property>
+                <signal name="clicked" handler="on_treebutton2_clicked"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkSeparatorToolItem" id="separator">
+                <property name="visible">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToolButton" id="treebutton3">
+                <property name="visible">True</property>
+                <property name="sensitive">False</property>
+                <property name="visible_horizontal">False</property>
+                <property name="visible_vertical">False</property>
+                <property name="label" translatable="yes">Add to Main</property>
+                <property name="use_underline">True</property>
+                <property name="stock_id">gtk-add</property>
+                <signal name="clicked" handler="on_treebutton3_clicked"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkMenuToolButton" id="Functions">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">Functions</property>
+                <property name="use_underline">True</property>
+                <property name="stock_id">gtk-execute</property>
+                <property name="menu">menufunctions</property>
+                <child>
+                  <object class="GtkMenu" id="menufunctions">
+                    <property name="visible">True</property>
+                    <child>
+                      <object class="GtkMenuItem" id="imagemenuitem4">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Filter</property>
+                        <signal name="activate" handler="on_menufilter_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="epoch_data">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Epoch Data</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_menu_epoch_data_activated"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="imagemenuitem3">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Offset Correct</property>
+                        <signal name="activate" handler="on_menuoffset_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="imagemenuitem6">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Calculate Grid</property>
+                        <signal name="activate" handler="on_imagemenuitem6_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="imagemenuitem7">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Leadfield Calc</property>
+                        <signal name="activate" handler="on_menuleadfield_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="timef">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Time Freq Transform</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_timef_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="sourcespaceprojection">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Source Space Projection</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_menu_source_space_filter_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="signalspaceprojection">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Signal Space Projection</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_menu_signal_space_filter_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparatorMenuItem" id="separator2">
+                        <property name="visible">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="dipoledensity">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Dipole Density</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_dipoledensity_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="coregister">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Coregister MRI</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_coregister_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparatorMenuItem" id="separator1">
+                        <property name="visible">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="plot_contour">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Contour Plot</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_menu_contour_plot_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="Plot1">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Plot</property>
+                        <property name="use_underline">True</property>
+                        <child type="submenu">
+                          <object class="GtkMenu" id="menu3">
                             <property name="visible">True</property>
-                            <property name="label" translatable="yes">About PyMEG</property>
-                            <property name="use_underline">True</property>
-                            <signal name="activate" handler="on_menuAbout_activate"/>
+                            <child>
+                              <object class="GtkMenuItem" id="2Dplot1">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">2D line plot</property>
+                                <signal name="activate" handler="on_2Dplot_clicked"/>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="mriplot">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Plot MRI</property>
+                        <property name="use_underline">True</property>
+                        <child type="submenu">
+                          <object class="GtkMenu" id="menu1">
+                            <property name="visible">True</property>
+                            <child>
+                              <object class="GtkMenuItem" id="2DMRI1">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">2D MRI plot</property>
+                                <signal name="activate" handler="on_2DMRI_activate"/>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkMenuItem" id="3DMRI1">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">3D MRI plot</property>
+                                <property name="use_underline">True</property>
+                                <signal name="activate" handler="on_3DMRI_activate"/>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="tftplot">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Plot TFT</property>
+                        <property name="use_underline">True</property>
+                        <child type="submenu">
+                          <object class="GtkMenu" id="menu2">
+                            <property name="visible">True</property>
+                            <child>
+                              <object class="GtkMenuItem" id="power">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">Power</property>
+                                <property name="use_underline">True</property>
+                                <signal name="activate" handler="on_tftplot_activate"/>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkMenuItem" id="logpower">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">Log Power</property>
+                                <property name="use_underline">True</property>
+                                <signal name="activate" handler="on_tftplot_activate"/>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkMenuItem" id="itc">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">Inter Trial Coherence</property>
+                                <property name="use_underline">True</property>
+                                <signal name="activate" handler="on_tftplot_activate"/>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkMenuItem" id="trialpower">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">Trial Power</property>
+                                <property name="use_underline">True</property>
+                                <signal name="activate" handler="on_tftplot_activate"/>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkMenuItem" id="trialphase">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">Trial Phase</property>
+                                <property name="use_underline">True</property>
+                                <signal name="activate" handler="on_tftplot_activate"/>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkMenuItem" id="evokedpower">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">Evoked Power</property>
+                                <property name="use_underline">True</property>
+                                <signal name="activate" handler="on_tftplot_activate"/>
+                              </object>
+                            </child>
                           </object>
                         </child>
                       </object>
@@ -263,228 +533,170 @@
               </object>
               <packing>
                 <property name="expand">False</property>
-                <property name="position">0</property>
+                <property name="homogeneous">True</property>
               </packing>
             </child>
             <child>
-              <object class="GtkToolbar" id="toolbar2">
+              <object class="GtkToolButton" id="addto3Dplot">
                 <property name="visible">True</property>
-                <property name="toolbar_style">both</property>
-                <property name="icon_size">5</property>
+                <property name="label" translatable="yes">3D Plot Add</property>
+                <property name="use_underline">True</property>
+                <property name="icon_widget">image2</property>
+                <signal name="clicked" handler="on_addto3Dplot_clicked"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToolButton" id="data_editor">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">Data Editor</property>
+                <property name="use_underline">True</property>
+                <property name="icon_widget">image1</property>
+                <signal name="clicked" handler="on_toolbar_data_editor_clicked"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToolButton" id="saveselecteditem">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">Save Item</property>
+                <property name="use_underline">True</property>
+                <property name="stock_id">gtk-save-as</property>
+                <signal name="clicked" handler="on_saveselecteditem_clicked"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToolButton" id="deleteselecteditem">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">Delete Item</property>
+                <property name="use_underline">True</property>
+                <property name="stock_id">gtk-delete</property>
+                <signal name="clicked" handler="on_deletedselecteditem_clicked"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkMenuToolButton" id="ItemAction">
+                <property name="visible">True</property>
+                <property name="visible_horizontal">False</property>
+                <property name="visible_vertical">False</property>
+                <property name="label" translatable="yes">Item Action</property>
+                <property name="stock_id">gtk-harddisk</property>
+                <property name="menu">menutreeitemactions</property>
                 <child>
-                  <object class="GtkToolButton" id="treebutton1">
+                  <object class="GtkMenu" id="menutreeitemactions">
                     <property name="visible">True</property>
-                    <property name="label" translatable="yes">Refresh</property>
-                    <property name="use_underline">True</property>
-                    <property name="stock_id">gtk-refresh</property>
-                    <signal name="clicked" handler="on_treebutton1_clicked"/>
+                    <child>
+                      <object class="GtkMenuItem" id="SaveSelectedItem">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Save Selected Item</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_saveselecteditem_clicked"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="DeleteSeletedItem">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Delete Seleted Item</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_deletedselecteditem_clicked"/>
+                      </object>
+                    </child>
                   </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="homogeneous">True</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkToolButton" id="treebutton2">
-                    <property name="visible">True</property>
-                    <property name="label" translatable="yes">Up Level</property>
-                    <property name="use_underline">True</property>
-                    <property name="stock_id">gtk-go-up</property>
-                    <signal name="clicked" handler="on_treebutton2_clicked"/>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="homogeneous">True</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkSeparatorToolItem" id="separator">
-                    <property name="visible">True</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="homogeneous">True</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkToolButton" id="treebutton3">
-                    <property name="visible">True</property>
-                    <property name="sensitive">False</property>
-                    <property name="visible_horizontal">False</property>
-                    <property name="visible_vertical">False</property>
-                    <property name="label" translatable="yes">Add to Main</property>
-                    <property name="use_underline">True</property>
-                    <property name="stock_id">gtk-add</property>
-                    <signal name="clicked" handler="on_treebutton3_clicked"/>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="homogeneous">True</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkMenuToolButton" id="Functions">
-                    <property name="visible">True</property>
-                    <property name="has_tooltip">True</property>
-                    <property name="label" translatable="yes">Functions</property>
-                    <property name="use_underline">True</property>
-                    <property name="stock_id">gtk-execute</property>
-                    <property name="menu">menufunctions</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="homogeneous">True</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkToolButton" id="addto3Dplot">
-                    <property name="visible">True</property>
-                    <property name="label" translatable="yes">3D Plot Add</property>
-                    <property name="use_underline">True</property>
-                    <property name="icon_widget">image2</property>
-                    <signal name="clicked" handler="on_addto3Dplot_clicked"/>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="homogeneous">True</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkToolButton" id="data_editor">
-                    <property name="visible">True</property>
-                    <property name="label" translatable="yes">Data Editor</property>
-                    <property name="use_underline">True</property>
-                    <property name="icon_widget">image1</property>
-                    <signal name="clicked" handler="on_toolbar_data_editor_clicked"/>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="homogeneous">True</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkToolButton" id="saveselecteditem">
-                    <property name="visible">True</property>
-                    <property name="label" translatable="yes">Save Item</property>
-                    <property name="use_underline">True</property>
-                    <property name="stock_id">gtk-save-as</property>
-                    <signal name="clicked" handler="on_saveselecteditem_clicked"/>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="homogeneous">True</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkToolButton" id="deleteselecteditem">
-                    <property name="visible">True</property>
-                    <property name="label" translatable="yes">Delete Item</property>
-                    <property name="use_underline">True</property>
-                    <property name="stock_id">gtk-delete</property>
-                    <signal name="clicked" handler="on_deletedselecteditem_clicked"/>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="homogeneous">True</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkMenuToolButton" id="ItemAction">
-                    <property name="visible">True</property>
-                    <property name="visible_horizontal">False</property>
-                    <property name="visible_vertical">False</property>
-                    <property name="label" translatable="yes">Item Action</property>
-                    <property name="stock_id">gtk-harddisk</property>
-                    <property name="menu">menutreeitemactions</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="homogeneous">True</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkToolButton" id="Add2Queue">
-                    <property name="visible">True</property>
-                    <property name="sensitive">False</property>
-                    <property name="visible_horizontal">False</property>
-                    <property name="visible_vertical">False</property>
-                    <property name="label" translatable="yes">Add To Queue</property>
-                    <property name="use_underline">True</property>
-                    <property name="stock_id">gtk-new</property>
-                    <signal name="clicked" handler="on_Add2Queue_clicked"/>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="homogeneous">True</property>
-                  </packing>
                 </child>
               </object>
               <packing>
                 <property name="expand">False</property>
-                <property name="position">1</property>
+                <property name="homogeneous">True</property>
               </packing>
             </child>
             <child>
-              <object class="GtkScrolledWindow" id="scrolledwindow3">
+              <object class="GtkToolButton" id="Add2Queue">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="hscrollbar_policy">automatic</property>
-                <property name="vscrollbar_policy">automatic</property>
-                <property name="shadow_type">in</property>
-                <child>
-                  <object class="GtkTreeView" id="treeview2">
-                    <property name="visible">True</property>
-                    <property name="app_paintable">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="events">GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_STRUCTURE_MASK</property>
-                    <property name="extension_events">all</property>
-                    <property name="border_width">1</property>
-                    <property name="model">liststore1</property>
-                    <property name="reorderable">True</property>
-                    <property name="rules_hint">True</property>
-                    <property name="search_column">2</property>
-                    <property name="level_indentation">8</property>
-                    <property name="rubber_banding">True</property>
-                    <property name="enable_grid_lines">vertical</property>
-                    <property name="enable_tree_lines">True</property>
-                    <signal name="button_press_event" handler="showpopupmenu"/>
-                    <signal name="button_press_event" handler=" on_treeview2_buttonpress"/>
-                    <signal name="move_cursor" handler="on_treeview2_move_cursor"/>
-                    <signal name="cursor_changed" handler="itemselect"/>
-                    <signal name="selection_received" handler="itemselect"/>
-                    <signal name="row_activated" handler="on_treeview2_row_activated"/>
-                    <signal name="selection_get" handler="itemselect"/>
-                  </object>
-                </child>
-              </object>
-              <packing>
-                <property name="position">2</property>
-              </packing>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
-            </child>
-            <child>
-              <object class="GtkStatusbar" id="statusbar">
-                <property name="visible">True</property>
-                <property name="spacing">2</property>
+                <property name="sensitive">False</property>
+                <property name="visible_horizontal">False</property>
+                <property name="visible_vertical">False</property>
+                <property name="label" translatable="yes">Add To Queue</property>
+                <property name="use_underline">True</property>
+                <property name="stock_id">gtk-new</property>
+                <signal name="clicked" handler="on_Add2Queue_clicked"/>
               </object>
               <packing>
                 <property name="expand">False</property>
-                <property name="position">5</property>
+                <property name="homogeneous">True</property>
               </packing>
             </child>
           </object>
           <packing>
-            <property name="resize">False</property>
-            <property name="shrink">True</property>
+            <property name="expand">False</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkScrolledWindow" id="scrolledwindow3">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="hscrollbar_policy">automatic</property>
+            <property name="vscrollbar_policy">automatic</property>
+            <property name="shadow_type">in</property>
+            <child>
+              <object class="GtkTreeView" id="treeview2">
+                <property name="visible">True</property>
+                <property name="app_paintable">True</property>
+                <property name="can_focus">True</property>
+                <property name="events">GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_STRUCTURE_MASK</property>
+                <property name="extension_events">all</property>
+                <property name="border_width">1</property>
+                <property name="model">liststore1</property>
+                <property name="reorderable">True</property>
+                <property name="rules_hint">True</property>
+                <property name="search_column">2</property>
+                <property name="level_indentation">8</property>
+                <property name="rubber_banding">True</property>
+                <property name="enable_grid_lines">vertical</property>
+                <property name="enable_tree_lines">True</property>
+                <signal name="button_press_event" handler="showpopupmenu"/>
+                <signal name="button_press_event" handler=" on_treeview2_buttonpress"/>
+                <signal name="cursor_changed" handler="itemselect"/>
+                <signal name="selection_get" handler="itemselect"/>
+                <signal name="row_activated" handler="on_treeview2_row_activated"/>
+                <signal name="move_cursor" handler="on_treeview2_move_cursor"/>
+                <signal name="selection_received" handler="itemselect"/>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="position">2</property>
           </packing>
         </child>
         <child>
           <placeholder/>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+        <child>
+          <object class="GtkStatusbar" id="statusbar">
+            <property name="visible">True</property>
+            <property name="spacing">2</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="position">5</property>
+          </packing>
         </child>
       </object>
     </child>
@@ -493,7 +705,6 @@
     <property name="border_width">5</property>
     <property name="title" translatable="yes">VTK Plot</property>
     <property name="type_hint">normal</property>
-    <property name="deletable">False</property>
     <property name="opacity">0.93999999999999995</property>
     <signal name="delete_event" handler="gtk_widget_hide"/>
     <child internal-child="vbox">
@@ -1290,8 +1501,8 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <signal name="clicked" handler="on_buttonplot_activate"/>
                 <signal name="activate" handler="on_buttonplot_activate"/>
+                <signal name="clicked" handler="on_buttonplot_activate"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -1335,8 +1546,8 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <signal name="clicked" handler="on_filedialogCancel_clicked"/>
                 <signal name="activate" handler="on_filedialogCancel_clicked"/>
+                <signal name="clicked" handler="on_filedialogCancel_clicked"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -1377,9 +1588,15 @@
     <property name="title" translatable="yes">MEG Data Load</property>
     <property name="window_position">mouse</property>
     <property name="opacity">0.90000000000000002</property>
+    <signal name="close" handler="gtk_widget_hide"/>
     <signal name="apply" handler="on_assistant1_apply"/>
     <signal name="cancel" handler="gtk_widget_hide"/>
-    <signal name="close" handler="gtk_widget_hide"/>
+    <child>
+      <placeholder/>
+    </child>
+    <child>
+      <placeholder/>
+    </child>
     <child>
       <placeholder/>
     </child>
@@ -1688,27 +1905,6 @@
       </packing>
     </child>
   </object>
-  <object class="GtkMenu" id="menutreeitemactions">
-    <property name="visible">True</property>
-    <child>
-      <object class="GtkMenuItem" id="SaveSelectedItem">
-        <property name="visible">True</property>
-        <property name="tooltip_text" translatable="yes">Save the item selected to your filesystem.</property>
-        <property name="label" translatable="yes">Save Selected Item</property>
-        <property name="use_underline">True</property>
-        <signal name="activate" handler="on_saveselecteditem_clicked"/>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="DeleteSeletedItem">
-        <property name="visible">True</property>
-        <property name="tooltip_text" translatable="yes">Remove selected from workspace.</property>
-        <property name="label" translatable="yes">Delete Seleted Item</property>
-        <property name="use_underline">True</property>
-        <signal name="activate" handler="on_deletedselecteditem_clicked"/>
-      </object>
-    </child>
-  </object>
   <object class="GtkMenu" id="popupmenu">
     <property name="visible">True</property>
     <child>
@@ -1728,222 +1924,19 @@
       </object>
     </child>
   </object>
-  <object class="GtkMenu" id="menufunctions">
-    <property name="visible">True</property>
-    <child>
-      <object class="GtkMenuItem" id="imagemenuitem4">
-        <property name="visible">True</property>
-        <property name="label" translatable="yes">Filter</property>
-        <signal name="activate" handler="on_menufilter_activate"/>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="epoch_data">
-        <property name="visible">True</property>
-        <property name="label" translatable="yes">Epoch Data</property>
-        <property name="use_underline">True</property>
-        <signal name="activate" handler="on_menu_epoch_data_activated"/>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="imagemenuitem3">
-        <property name="visible">True</property>
-        <property name="label" translatable="yes">Offset Correct</property>
-        <signal name="activate" handler="on_menuoffset_activate"/>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="imagemenuitem6">
-        <property name="visible">True</property>
-        <property name="label" translatable="yes">Calculate Grid</property>
-        <signal name="activate" handler="on_imagemenuitem6_activate"/>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="imagemenuitem7">
-        <property name="visible">True</property>
-        <property name="label" translatable="yes">Leadfield Calc</property>
-        <signal name="activate" handler="on_menuleadfield_activate"/>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="timef">
-        <property name="visible">True</property>
-        <property name="label" translatable="yes">Time Freq Transform</property>
-        <property name="use_underline">True</property>
-        <signal name="activate" handler="on_timef_activate"/>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="sourcespaceprojection">
-        <property name="visible">True</property>
-        <property name="label" translatable="yes">Source Space Projection</property>
-        <property name="use_underline">True</property>
-        <signal name="activate" handler="on_menu_source_space_filter_activate"/>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="signalspaceprojection">
-        <property name="visible">True</property>
-        <property name="label" translatable="yes">Signal Space Projection</property>
-        <property name="use_underline">True</property>
-        <signal name="activate" handler="on_menu_signal_space_filter_activate"/>
-      </object>
-    </child>
-    <child>
-      <object class="GtkSeparatorMenuItem" id="separator2">
-        <property name="visible">True</property>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="dipoledensity">
-        <property name="visible">True</property>
-        <property name="label" translatable="yes">Dipole Density</property>
-        <property name="use_underline">True</property>
-        <signal name="activate" handler="on_dipoledensity_activate"/>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="coregister">
-        <property name="visible">True</property>
-        <property name="label" translatable="yes">Coregister MRI</property>
-        <property name="use_underline">True</property>
-        <signal name="activate" handler="on_coregister_activate"/>
-      </object>
-    </child>
-    <child>
-      <object class="GtkSeparatorMenuItem" id="separator1">
-        <property name="visible">True</property>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="plot_contour">
-        <property name="visible">True</property>
-        <property name="label" translatable="yes">Contour Plot</property>
-        <property name="use_underline">True</property>
-        <signal name="activate" handler="on_menu_contour_plot_activate"/>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="Plot1">
-        <property name="visible">True</property>
-        <property name="label" translatable="yes">Plot</property>
-        <property name="use_underline">True</property>
-        <child type="submenu">
-          <object class="GtkMenu" id="menu3">
-            <property name="visible">True</property>
-            <child>
-              <object class="GtkMenuItem" id="2Dplot1">
-                <property name="visible">True</property>
-                <property name="label" translatable="yes">2D line plot</property>
-                <signal name="activate" handler="on_2Dplot_clicked"/>
-              </object>
-            </child>
-          </object>
-        </child>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="mriplot">
-        <property name="visible">True</property>
-        <property name="label" translatable="yes">Plot MRI</property>
-        <property name="use_underline">True</property>
-        <child type="submenu">
-          <object class="GtkMenu" id="menu1">
-            <property name="visible">True</property>
-            <child>
-              <object class="GtkMenuItem" id="2DMRI1">
-                <property name="visible">True</property>
-                <property name="label" translatable="yes">2D MRI plot</property>
-                <signal name="activate" handler="on_2DMRI_activate"/>
-              </object>
-            </child>
-            <child>
-              <object class="GtkMenuItem" id="3DMRI1">
-                <property name="visible">True</property>
-                <property name="label" translatable="yes">3D MRI plot</property>
-                <property name="use_underline">True</property>
-                <signal name="activate" handler="on_3DMRI_activate"/>
-              </object>
-            </child>
-          </object>
-        </child>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="tftplot">
-        <property name="visible">True</property>
-        <property name="label" translatable="yes">Plot TFT</property>
-        <property name="use_underline">True</property>
-        <child type="submenu">
-          <object class="GtkMenu" id="menu2">
-            <property name="visible">True</property>
-            <child>
-              <object class="GtkMenuItem" id="power">
-                <property name="visible">True</property>
-                <property name="label" translatable="yes">Power</property>
-                <property name="use_underline">True</property>
-                <signal name="activate" handler="on_tftplot_activate"/>
-              </object>
-            </child>
-            <child>
-              <object class="GtkMenuItem" id="logpower">
-                <property name="visible">True</property>
-                <property name="label" translatable="yes">Log Power</property>
-                <property name="use_underline">True</property>
-                <signal name="activate" handler="on_tftplot_activate"/>
-              </object>
-            </child>
-            <child>
-              <object class="GtkMenuItem" id="itc">
-                <property name="visible">True</property>
-                <property name="label" translatable="yes">Inter Trial Coherence</property>
-                <property name="use_underline">True</property>
-                <signal name="activate" handler="on_tftplot_activate"/>
-              </object>
-            </child>
-            <child>
-              <object class="GtkMenuItem" id="trialpower">
-                <property name="visible">True</property>
-                <property name="label" translatable="yes">Trial Power</property>
-                <property name="use_underline">True</property>
-                <signal name="activate" handler="on_tftplot_activate"/>
-              </object>
-            </child>
-            <child>
-              <object class="GtkMenuItem" id="trialphase">
-                <property name="visible">True</property>
-                <property name="label" translatable="yes">Trial Phase</property>
-                <property name="use_underline">True</property>
-                <signal name="activate" handler="on_tftplot_activate"/>
-              </object>
-            </child>
-            <child>
-              <object class="GtkMenuItem" id="evokedpower">
-                <property name="visible">True</property>
-                <property name="label" translatable="yes">Evoked Power</property>
-                <property name="use_underline">True</property>
-                <signal name="activate" handler="on_tftplot_activate"/>
-              </object>
-            </child>
-          </object>
-        </child>
-      </object>
-    </child>
-  </object>
   <object class="GtkAdjustment" id="adjustment1">
     <property name="upper">100</property>
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
     <property name="page_size">10</property>
   </object>
+  <object class="GtkImage" id="image2">
+    <property name="visible">True</property>
+    <property name="pixbuf">Dots.png</property>
+  </object>
   <object class="GtkImage" id="image1">
     <property name="visible">True</property>
     <property name="pixbuf">WaveformButtonSmall.png</property>
     <signal name="button_press_event" handler="on_menu_event"/>
-  </object>
-  <object class="GtkImage" id="image2">
-    <property name="visible">True</property>
-    <property name="pixbuf">Dots.png</property>
   </object>
 </interface>

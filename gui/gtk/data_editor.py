@@ -383,11 +383,29 @@ class setup_gui:
     def set_channel_groups(self,widget):
         print widget.get_label(), widget
         if widget.get_label() == 'meg' and widget.get_active() == True:
-            self.View.get_selection().select_range(0,2)
-        if widget.get_label() == 'Clear':
+            for i in range(0,len(self.chanlabels)):
+                if self.chanlabels[i].startswith('A'):
+                    self.View.get_selection().select_path(i)
+            #self.View.get_selection().select_range(0,2)
+        if widget.get_label() == 'De-Select All':
             self.View.get_selection().unselect_all()
         if widget.get_label() == 'Select All' and widget.get_active() == True:
             self.View.get_selection().select_all()
+        if widget.get_label() == 'reference' and widget.get_active() == True:
+            for i in range(0,len(self.chanlabels)):
+                if self.chanlabels[i].startswith('M') or self.chanlabels[i].startswith('G'):
+                    self.View.get_selection().select_path(i)
+        if widget.get_label() == 'trigger' and widget.get_active() == True:
+            for i in range(0,len(self.chanlabels)):
+                if self.chanlabels[i].startswith('TRIGG'):
+                    self.View.get_selection().select_path(i)
+        if widget.get_label() == 'response' and widget.get_active() == True:
+            for i in range(0,len(self.chanlabels)):
+                if self.chanlabels[i].startswith('RESP'):
+                    self.View.get_selection().select_path(i)
+
+
+
 
     def selections_tree(self,widget):
         try:
