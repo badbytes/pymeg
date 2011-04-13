@@ -407,6 +407,7 @@ Scroll mouse for spacing.</property>
                     <property name="invisible_char">&#x25CF;</property>
                     <property name="adjustment">adjustment2</property>
                     <property name="digits">2</property>
+                    <property name="numeric">True</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -456,27 +457,42 @@ Scroll mouse for spacing.</property>
               </packing>
             </child>
             <child>
-              <object class="GtkSpinButton" id="spinbutton4">
+              <object class="GtkLabel" id="label7">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes">Scale:</property>
+              </object>
+              <packing>
+                <property name="top_attach">3</property>
+                <property name="bottom_attach">4</property>
+                <property name="x_options"></property>
+                <property name="y_options"></property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="entry1">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="invisible_char">&#x25CF;</property>
-                <property name="adjustment">adjustment3</property>
-                <property name="digits">2</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
                 <property name="right_attach">2</property>
                 <property name="top_attach">2</property>
                 <property name="bottom_attach">3</property>
-                <property name="x_options"></property>
-                <property name="y_options">GTK_EXPAND</property>
               </packing>
             </child>
             <child>
-              <placeholder/>
-            </child>
-            <child>
-              <placeholder/>
+              <object class="GtkEntry" id="entry2">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="invisible_char">&#x25CF;</property>
+              </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="right_attach">2</property>
+                <property name="top_attach">3</property>
+                <property name="bottom_attach">4</property>
+              </packing>
             </child>
           </object>
         </child>
@@ -518,37 +534,10 @@ Scroll mouse for spacing.</property>
                 <property name="visible">True</property>
                 <property name="orientation">vertical</property>
                 <child>
-                  <object class="GtkCheckButton" id="checkbutton7">
-                    <property name="label" translatable="yes">Select All</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">False</property>
-                    <property name="use_underline">True</property>
-                    <property name="draw_indicator">True</property>
-                    <signal name="toggled" handler="set_channel_groups"/>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="padding">7</property>
-                    <property name="position">0</property>
-                  </packing>
+                  <placeholder/>
                 </child>
                 <child>
-                  <object class="GtkCheckButton" id="checkbutton8">
-                    <property name="label" translatable="yes">De-Select All</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">False</property>
-                    <property name="use_underline">True</property>
-                    <property name="draw_indicator">True</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="padding">7</property>
-                    <property name="position">1</property>
-                  </packing>
+                  <placeholder/>
                 </child>
                 <child>
                   <object class="GtkCheckButton" id="checkbutton1">
@@ -641,13 +630,37 @@ Scroll mouse for spacing.</property>
                   </packing>
                 </child>
                 <child>
-                  <placeholder/>
+                  <object class="GtkButton" id="button2">
+                    <property name="label" translatable="yes">Select All</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <signal name="clicked" handler="set_channel_groups"/>
+                  </object>
+                  <packing>
+                    <property name="position">8</property>
+                  </packing>
                 </child>
                 <child>
-                  <placeholder/>
+                  <object class="GtkButton" id="button9">
+                    <property name="label" translatable="yes">De-Select All</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <signal name="clicked" handler="set_channel_groups"/>
+                  </object>
+                  <packing>
+                    <property name="position">9</property>
+                  </packing>
                 </child>
                 <child>
-                  <placeholder/>
+                  <object class="GtkHSeparator" id="hseparator1">
+                    <property name="visible">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="position">10</property>
+                  </packing>
                 </child>
                 <child>
                   <object class="GtkButton" id="button1">
@@ -842,5 +855,17 @@ Selected Events</property>
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkAdjustment" id="adjustment4">
+    <property name="upper">100</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+    <property name="page_size">10</property>
+  </object>
+  <object class="GtkAdjustment" id="adjustment5">
+    <property name="upper">100</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+    <property name="page_size">10</property>
   </object>
 </interface>

@@ -149,8 +149,11 @@ class setup_gui:
             print '.....reducing time var'
         else:
             print '.....showing all time'
-            self.builder.get_object("spinbutton3").set_range(self.t[0],self.t[-1])
+            self.builder.get_object("spinbutton3").set_value(self.t[-1])
         #self.builder.get_object("spinbutton3").set_value(self.t[-1])
+        #self.builder.get_object("spinbutton5").set_value(self.scalefact)
+        self.builder.get_object("entry1").set_text(str(self.space))
+        self.builder.get_object("entry2").set_text(str(self.scalefact))
 
     def preferences_open(self,widget):
         self.win_prefs = self.builder.get_object("window_prefs")
@@ -164,17 +167,19 @@ class setup_gui:
         if event.direction == gdk.SCROLL_UP:
             direction = 1
             self.space = self.space + .5*self.scalefact
+            print 'sf',self.scalefact
         else:
             direction = -1
             self.space = self.space - .5*self.scalefact
+            print 'sf',self.scalefact
         if self.space < 0:
             self.space = 0
         print 'space', self.space
-        print (arange(0,size(self.data2plot,1))*(self.space))
+        #print (arange(0,size(self.data2plot,1))*(self.space))
         self.space_data()
         self.redraw(None)
 
-    def space_data(self):
+    def space_data(self,space=None):
         self.data2plot = self.data[self.tstart:self.tstop,self.chanind2plot]+\
         (arange(0,size(self.data[self.tstart:self.tstop,self.chanind2plot],1))*\
         (self.space))
@@ -317,6 +322,8 @@ class setup_gui:
 
         st = float(self.builder.get_object("spinbutton2").get_value())
         ed = float(self.builder.get_object("spinbutton3").get_value())
+        self.space = float(self.builder.get_object("entry1").get_text())
+        self.scalefact = float(self.builder.get_object("entry2").get_text())
         #print 'se',st,ed, self.t
         startind = nearest.nearest(self.t,st)[0]
         stopind = nearest.nearest(self.t,ed)[0]
@@ -381,27 +388,33 @@ class setup_gui:
         self.redraw(None)
 
     def set_channel_groups(self,widget):
+        l = self.View.get_model()
+        i = l.get_iter_first()
+        v = []
+        while ( i != None ):
+            v.append(l.get_value(i,1))
+            i = l.iter_next(i)
+
         print widget.get_label(), widget
         if widget.get_label() == 'meg' and widget.get_active() == True:
-            for i in range(0,len(self.chanlabels)):
-                if self.chanlabels[i].startswith('A'):
+            for i in range(0,len(v)):
+                if v[i].startswith('A'):
                     self.View.get_selection().select_path(i)
-            #self.View.get_selection().select_range(0,2)
         if widget.get_label() == 'De-Select All':
             self.View.get_selection().unselect_all()
-        if widget.get_label() == 'Select All' and widget.get_active() == True:
+        if widget.get_label() == 'Select All':
             self.View.get_selection().select_all()
         if widget.get_label() == 'reference' and widget.get_active() == True:
-            for i in range(0,len(self.chanlabels)):
-                if self.chanlabels[i].startswith('M') or self.chanlabels[i].startswith('G'):
+            for i in range(0,len(v)):
+                if v[i].startswith('M') or v[i].startswith('G'):
                     self.View.get_selection().select_path(i)
         if widget.get_label() == 'trigger' and widget.get_active() == True:
             for i in range(0,len(self.chanlabels)):
-                if self.chanlabels[i].startswith('TRIGG'):
+                if v[i].startswith('TRIGG'):
                     self.View.get_selection().select_path(i)
         if widget.get_label() == 'response' and widget.get_active() == True:
-            for i in range(0,len(self.chanlabels)):
-                if self.chanlabels[i].startswith('RESP'):
+            for i in range(0,len(v)):
+                if v[i].startswith('RESP'):
                     self.View.get_selection().select_path(i)
 
 
@@ -612,6 +625,7 @@ class setup_gui:
         self.numchannels = size(data,1)
         self.chanind = arange(self.numchannels)
         self.scalefact = (data.min()+data.max())/2
+        print 'scalefact', self.scalefact
         self.channels = chanlocs
         self.curchannel = 0
         self.tstart = 0; self.tstop = len(self.t)
