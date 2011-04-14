@@ -116,11 +116,12 @@ class read(initialize):
         self.frames = self.data_block.shape[0] / self.numofepochs[0]
 
     def setchannels(self, chtype):
+        '''chtype = = type of channel (meg | eeg | ref | trig | ext | derived | utility | shorted)'''
         self.setchanneltype(chtype)
 
     def setchanneltype(self, chtype):
-        from pdf2py import update_data_header
         '''chtype = = type of channel (meg | eeg | ref | trig | ext | derived | utility | shorted)'''
+        from pdf2py import update_data_header
         self.channels = channel_new.index(self.datapdf, chtype)
         update_data_header.cutchannels(self)
 

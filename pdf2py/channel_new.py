@@ -105,8 +105,8 @@ class index:
                 self.chanlocs = self.locs2D(self.labellist)#, self.indexlist)
         except AttributeError:
             pass
-            
-            
+
+
 
         self.reverseindex = []; sortedindex = sort(self.indexlist)
         for i in sortedindex: #reverse index
@@ -178,12 +178,14 @@ class index:
     def getchindexfromlabelsinhdr(self,labellist):
         '''channels should be in a list'''
         ch_hdr = self.chbuilder_hdr('chan_label', 'index')
+        self.ch_hdr = ch_hdr;
         indexlist = []; labellistnew = []
         for i in labellist:
             try:
                 indexlist.append(ch_hdr[i][0])
                 labellistnew.append(i)
-            except KeyError: pass
+            except KeyError:
+                print 'KeyError';pass
         return indexlist, labellistnew
 
     def getchindexfromtype(self,type):
@@ -199,13 +201,14 @@ class index:
                     if ch_cfg[i] == j:
                         typelist.append(i)
 
+
         sortedlabels = sorted(typelist)
         indexlist, labellist = self.getchindexfromlabelsinhdr(sortedlabels)
         return labellist, indexlist
 
     def getchindex2cfg(self, sortedlabels):
         ch_cfg = self.chbuilder_cfg('name', 'chan_no')
-        index2cfg = []; 
+        index2cfg = [];
 
     def locs2D(self, labellist):
         chfound=[];chnotfound=[]

@@ -216,7 +216,7 @@ class setup_gui:
             self.canvas.draw()
             self.specaxes.cla()
             NFFT = 1024
-            Fs = (1/self.srate)
+            Fs = self.srate #(1/self.srate)
             print NFFT,int(Fs),'d'
 
             self.specaxes.specgram(

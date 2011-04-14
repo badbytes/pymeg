@@ -22,7 +22,7 @@ pow,freq = fftmeg.calc(data,srate)
 fftd = fftmeg.calc(p.data.data_block,1/ p.hdr.header_data.sample_period, epochs=p.data.numofepochs)
 '''
 
-from numpy import linspace, shape, size, ceil, log2, zeros, mean, append, complex_, conjugate
+from numpy import linspace, shape, size, ceil, log2, zeros, mean, append, complex_, conjugate, imag
 from numpy.fft import *
 #from scipy import fft
 from pylab import figure,plot,show, array
@@ -37,30 +37,32 @@ class calc():
         print 'fft pnts per epoch',pnts
         print 'number of epochs = ',epochs
         t = linspace(0,pnts/srate,pnts ); # time in seconds
-        
+
         #t = t[:-1]
         Fs=srate;
         T=1/Fs;
-        
+
         L=len(t);
-        NFFT = 2**ceil(log2(abs(L)))
+        NFFT = int(2**ceil(log2(abs(L))))
         f = Fs/2*linspace(0, 1,NFFT/2);
-        
+
         if len(shape(data)) == 1: #its a 1D vector, make 2D
             data = array([data]).T
 
         pow = zeros([size(f),size(data,1)]); #create empty power array. Freq X Ch
-        powc = zeros([size(f),size(data,1)]); 
+        powc = zeros([size(f),size(data,1)]);
         comp = zeros([size(f),size(data,1)], complex_);
-
+        ipow = zeros([size(f),size(data,1)]);#, complex_);
 
         if size(data) > 4000000:
             print 'lots of pnts. might crash you sys.'
             print 'going to take care of that for you'
-        
-        div = ceil(size(data)/4000000.0)
+
+        div = int(ceil(size(data)/4000000.0))
+
         print 'number of channel groups',div
         chgrp = (size(data,1)/div)
+        print 'debug',div,pnts,chgrp,NFFT
         for g in range(0, div):
             print g,'of', div
 
@@ -69,13 +71,15 @@ class calc():
                 pow[:,g*chgrp:(g+1)*chgrp] = pow[:,g*chgrp:(g+1)*chgrp] + abs(Yi[0:NFFT/2]*2)
                 powc[:,g*chgrp:(g+1)*chgrp] = powc[:,g*chgrp:(g+1)*chgrp] +  conjugate(Yi[0:NFFT/2]*2) * (Yi[0:NFFT/2]*2)
                 comp[:,g*chgrp:(g+1)*chgrp] = comp[:,g*chgrp:(g+1)*chgrp] + (Yi[0:NFFT/2]*2)
-                
+                ipow[:,g*chgrp:(g+1)*chgrp] = pow[:,g*chgrp:(g+1)*chgrp] + imag(Yi[0:NFFT/2]*2)
+
+
                 if g == div-1: #last few channels
                     #print 'last group'
                     Yi = fft(data[e*pnts:(e+1)*pnts,g*chgrp:],n=NFFT, axis=0)/L;
                     pow[:,g*chgrp:] = pow[:,g*chgrp:] + abs(Yi[0:NFFT/2]*2)
                     powc[:,g*chgrp:(g+1)*chgrp] = powc[:,g*chgrp:] +  conjugate(Yi[0:NFFT/2]*2) * (Yi[0:NFFT/2]*2)
-                    comp[:,g*chgrp:] = comp[:,g*chgrp:] + (Yi[0:NFFT/2]*2)                
+                    comp[:,g*chgrp:] = comp[:,g*chgrp:] + (Yi[0:NFFT/2]*2)
 
         print 'number of channels processed',size(data,1)
         te = time() - ts
@@ -85,17 +89,18 @@ class calc():
         self.freq = f
         self.comp = comp
         self.powc = powc
+        self.ipow = ipow
         self.Yi = Yi
-        
+
         #return pow,f
     def ch2keep(self, ch2keep):
         self.pow = self.pow[:,ch2keep]
-        
+
 
 def nearest(array, target):
     '''ind = fftmeg.nearest(freqlist, 40)'''
     ind = []
-    
+
     for i in range(0,size(target)):
         if type(target) != list:
             target = [target]
