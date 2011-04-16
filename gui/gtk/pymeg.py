@@ -20,7 +20,7 @@
 from matplotlib import use;use('GTK')
 import pymeg, sys, os, subprocess
 from pdf2py import pdf, readwrite,lA2array
-from numpy import shape, random, sort, array, append, size, arange, ndarray
+from numpy import shape, random, sort, array, append, size, arange, ndarray,vstack
 from meg import dipole,plotvtk,plot2dgtk,leadfield,signalspaceprojection,nearest
 from mri import img_nibabel as img
 
@@ -356,7 +356,7 @@ class maingui:
         self.treedata = treedata
         for k in self.treedata.keys():
 
-            if type(self.treedata[k]) == list or type(self.treedata[k]) == dict:
+            if type(self.treedata[k]) == list:# or type(self.treedata[k]) == dict:
                 if len(self.treedata[k]) > 50:
                     iter = self.dataList.append([k,'list shape'+str(shape(self.treedata[k]))])
                 else:
@@ -366,7 +366,9 @@ class maingui:
                     iter = self.dataList.append([k,'array shape'+str(shape(self.treedata[k]))])
                 else:
                     iter = self.dataList.append([k,self.treedata[k]])
-
+            elif type(self.treedata[k]) == dict:
+                iter = self.dataList.append([k,'dict keys'+str(self.treedata[k].keys())])
+                
             else:
                 iter = self.dataList.append([k,self.treedata[k]])
 
@@ -822,10 +824,13 @@ class maingui:
             return -1
         weights = sp['signal_weights']
         try:
-            data = self.treedata[self.selecteditem].data_block
-            print data
+            data = self.setup_helper(var='data_block',obj=self.treedata[self.selecteditem])
+            #data = self.treedata[self.selecteditem].data_block
+            #print data
         except KeyError:
-            data = self.de.data
+            #data = self.de.data
+            print "No appropriate data found!!"
+            self.errordialog("Incorrect data selected");
             pass
 
         ssp = signalspaceprojection.calc(data, weight=weights)
@@ -865,12 +870,48 @@ class maingui:
         self.mc.display(self.treedata[self.selecteditem],chanlocs, subplot='on')
 
     def epoch_data(self,widget):
-        if os.path.isfile(self.selecteditem) == False:
+        def epoch_callback(startcut,endcut):
+            print 'ed callback', startcut,endcut
+            self.data_file_selected['epoched_data'] = {}
+            self.data_file_selected['epoched_data']['channels'] = {}
+            ed = self.data_file_selected['epoched_data']
+            se = self.treedata[self.selecteditem]
+            ed['srate'] = se.srate
+            ed['wintime'] = se.wintime
+            ed['eventtime'] = se.eventtime
+            ed['frames'] = se.frames
+            ed['srate'] = se.srate
+            ed['numofepochs'] = se.numofepochs
+            #ed['channels'] = se.channels
+            ed['channels']['labellist'] = se.channels.labellist
+            ed['channels']['chanlocs'] = se.channels.chanlocs
+            #tmp_data = zeros((startcut[1]:startcut[0],se.numofchannels,len(startcut)))
+            #tmp_data = array([])
+            
+            for i,j in zip(startcut,endcut):
+                try:
+                    print shape(tmp_data),shape(se.data_block[i:j])
+                    tmp_data = vstack((tmp_data,se.data_block[i:j]))
+                except UnboundLocalError:
+                    print 'error'
+                    tmp_data = se.data_block[i:j]
+                #tmp_data = append(tmp_data,se.data_block[i:j])
+                #print 'ts',shape(tmp_data)#,endcut[0]-startcut[0],se.numofchannels
+            
+            print 'tmpdatashape',shape(tmp_data)#.reshape((endcut[0]-startcut[0],len(startcut)))
+            ed['frames'] = endcut[0]-startcut[0]
+            ed['eventtime'] = se.eventtime[startcut[1]:startcut[0]]
+            ed['wintime'] = arange(0,se.wintime[ed['frames']]*len(startcut),se.wintime[1])
+            print 'size of wintime',len(ed['wintime'])
+            ed['data_block'] = tmp_data
+            
+        filepath = self.setup_helper(var='filepath',obj=self.treedata[self.selecteditem])[0]
+        if os.path.isfile(filepath) == False:
             return -1
         self.ed = event_process.setup_gui()
         self.ed.window.show()
-        print 'sending file:'+'file://'+self.selecteditem
-        self.ed.set_passed_filename(self.selecteditem)
+        print 'sending file:'+'file://'+filepath
+        self.ed.set_passed_filename(filepath,callback=epoch_callback)
 
     def data_editor(self, widget):
         try:

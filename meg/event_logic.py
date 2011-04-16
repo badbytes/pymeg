@@ -33,7 +33,7 @@ def get_ind(triggervals, data):
 #timediff = 100
 
 def ind_logic(ind_dict, timediff, timeseries):
-    result_ind = []
+    result_ind = [];finalind = []
     ts = timeseries
     for i in range(0,len(ind_dict.keys())):
         if i == 0:
@@ -42,22 +42,34 @@ def ind_logic(ind_dict, timediff, timeseries):
             print('cur key num',i)
             prime_timeind = ts[ind_dict[0]] #first ind array
             second_timeind = ts[ind_dict[i]] #every ind array including first
-            nind = nearest(prime_timeind,second_timeind)
-            for j in nind:
-                n1 = ts[prime_timeind[j]]
-                try: n2 = ts[second_timeind[j]]
+            nind = unique(nearest(prime_timeind,second_timeind))
+            rind = unique(nearest(second_timeind,prime_timeind))
+            print 'debug', prime_timeind,second_timeind,nind,rind
+            for j,k in zip(nind,rind):
+                n1 = prime_timeind[j]
+                #n2 = nearest(ts[second_timeind[j]]
+                print 'jk', j,k
+                try: n2 = second_timeind[k]
                 except IndexError: print('Error, so bailing');return unique(result_ind)
                 c = 0
+                print 'ns...',n1,n2
                 while n2 < n1: #look for second trigger to be equal or later than first
                     c = c + 1
-                    n2 = ts[second_timeind[j+c]] #make sure n2 index is after n1 and not just the closest.
+                    try:
+                        n2 = second_timeind[k+c] #make sure n2 index is after n1 and not just the closest.
+                        print 'n2',n2
+                    except IndexError:
+                        break
 
                     print 'looking at next ind'
-                if (timeseries[n2] - timeseries[n1]) <= timediff:
-                    #print 'adding', j
-                    result_ind.append(j)
+                if (n2 - n1) <= timediff and n2-n1 > 0:
+                    print 'diff',n2 - n1,timediff
+                    print 'adding', j
+                    finalind.append(result_ind[j])
+                else:
+                    pass;#result_ind = delete(result_ind,j)
 
-    return unique(result_ind)
+    return unique(finalind)
 
 
 

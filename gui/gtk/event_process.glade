@@ -68,8 +68,13 @@ Will result in a new epoch or average array.</property>
                   <object class="GtkButton" id="button1">
                     <property name="label" translatable="yes">Test Logic</property>
                     <property name="visible">True</property>
+                    <property name="sensitive">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <property name="tooltip_text" translatable="yes">Boolean logic operations on events.
+ex. TrigCode1&gt;TrigCode2,TimeDifference
+8192&gt;4216,10 means Look for 8192 followed
+by a 4216 with a 10 second window.</property>
                     <signal name="clicked" handler="on_button_test_logic_clicked"/>
                   </object>
                   <packing>
@@ -84,6 +89,7 @@ Will result in a new epoch or average array.</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <property name="tooltip_text" translatable="yes">Select and event to delete</property>
                     <signal name="clicked" handler="on_button_delete_clicked"/>
                   </object>
                   <packing>
@@ -118,7 +124,7 @@ Will result in a new epoch or average array.</property>
                   <object class="GtkLabel" id="label1">
                     <property name="visible">True</property>
                     <property name="label" translatable="yes">PreEvent
-   (ms)</property>
+   (sec)</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -130,7 +136,7 @@ Will result in a new epoch or average array.</property>
                   <object class="GtkLabel" id="label2">
                     <property name="visible">True</property>
                     <property name="label" translatable="yes">PostEvent
-    (ms)</property>
+    (sec)</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -158,6 +164,7 @@ Will result in a new epoch or average array.</property>
                     <property name="tooltip_text" translatable="yes">Enter Pre-Event duration</property>
                     <property name="invisible_char">&#x25CF;</property>
                     <property name="width_chars">30</property>
+                    <signal name="changed" handler="on_text_changed"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -173,6 +180,7 @@ Will result in a new epoch or average array.</property>
                     <property name="tooltip_text" translatable="yes">Enter Post-Event duration</property>
                     <property name="invisible_char">&#x25CF;</property>
                     <property name="width_chars">30</property>
+                    <signal name="changed" handler="on_text_changed"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -181,18 +189,7 @@ Will result in a new epoch or average array.</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkButton" id="button3">
-                    <property name="label" translatable="yes">Get Events</property>
-                    <property name="visible">True</property>
-                    <property name="sensitive">False</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="position">2</property>
-                  </packing>
+                  <placeholder/>
                 </child>
               </object>
               <packing>
@@ -207,8 +204,10 @@ Will result in a new epoch or average array.</property>
                   <object class="GtkButton" id="button4">
                     <property name="label" translatable="yes">ReEpoch</property>
                     <property name="visible">True</property>
+                    <property name="sensitive">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <property name="tooltip_text" translatable="yes">Cut the data into multiple chunks</property>
                     <signal name="clicked" handler="on_button_process_clicked"/>
                   </object>
                   <packing>
@@ -221,8 +220,10 @@ Will result in a new epoch or average array.</property>
                   <object class="GtkButton" id="button5">
                     <property name="label" translatable="yes">Average</property>
                     <property name="visible">True</property>
+                    <property name="sensitive">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <property name="tooltip_text" translatable="yes">Cut the data into multiple chunks that get averaged.</property>
                     <signal name="clicked" handler="on_button_process_clicked"/>
                   </object>
                   <packing>
@@ -244,16 +245,38 @@ Will result in a new epoch or average array.</property>
             <property name="position">2</property>
           </packing>
         </child>
+        <child>
+          <object class="GtkStatusbar" id="statusbar">
+            <property name="visible">True</property>
+            <property name="spacing">2</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="position">3</property>
+          </packing>
+        </child>
       </object>
     </child>
   </object>
   <object class="GtkWindow" id="window1">
     <property name="title" translatable="yes">Event Listing</property>
+    <property name="default_width">200</property>
+    <property name="default_height">300</property>
+    <signal name="delete_event" handler="gtk_widget_hide"/>
     <child>
-      <object class="GtkTreeView" id="treeview2">
+      <object class="GtkScrolledWindow" id="scrolledwindow1">
         <property name="visible">True</property>
         <property name="can_focus">True</property>
-        <property name="model">liststore1</property>
+        <property name="hscrollbar_policy">automatic</property>
+        <property name="vscrollbar_policy">automatic</property>
+        <child>
+          <object class="GtkTreeView" id="treeview2">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="model">liststore1</property>
+            <property name="search_column">0</property>
+          </object>
+        </child>
       </object>
     </child>
   </object>

@@ -20,12 +20,26 @@
 import vtk
 import Tkinter
 import sys
+from scipy import signal
+from numpy import arange,sqrt,reshape,transpose
 
 from vtk.tk.vtkTkRenderWindowInteractor import vtkTkRenderWindowInteractor
 switchdata = 'v1'
 
 
 def vtkrender(d1=None, d2=None):
+    
+    x = (arange(50.0)-25)/2.0
+    y = (arange(50.0)-25)/2.0
+    r = sqrt(x[:]**2+y**2)
+    z = 5.0*signal.special.j0(r)  # Bessel function of order 0
+    z1 = reshape(transpose(z), (-1,))
+    point_data = vtk.vtkPointData(vtk.vtkScalars(z1))
+    grid = vtk.vtkStructuredPoints((50,50, 1), (-12.5, -12.5, 0), (0.5, 0.5, 1))
+    data = vtk.VtkData(grid, point_data)
+    data.tofile('/tmp/test.vtk')
+    d1 = d2 = '/tmp/test.vtk'
+    
     #v2,v1,data1,data2 = inputs()
     if d1 == None:
         d1 = "/home/danc/E0058brain.vtk"

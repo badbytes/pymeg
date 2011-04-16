@@ -663,6 +663,7 @@ class setup_gui:
 
         print('passing selection indices',self.sel_onset_ind)
         self.ed.set_selected_events_passed(None,self.data,self.sel_onset_ind,self.t)
+        self.ed.builder.get_object("button1").set_sensitive(False)
 
 if __name__ == "__main__":
     mainwindow = setup_gui()
