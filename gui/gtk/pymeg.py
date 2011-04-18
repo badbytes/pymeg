@@ -165,7 +165,7 @@ class maingui:
         self.data_assist = meg_assistant.setup(path = self.fn, callback=self.load_megdata_callback)
 
     def load_megdata_callback(self):
-        print 'DONE!'
+        print('DONE!')
         #p = self.data_assist.pdfdata
         path = self.data_assist.pdfdata.data.filepath
         self.datadict[path] = self.data_assist.pdfdata
@@ -398,7 +398,7 @@ class maingui:
 
             self.data_file_selected = self.datadict[self.selecteditem]
             self.data_filename_selected = self.selecteditem
-            print 'Data File Selected:'#,self.data_file_selected
+            print('Data File Selected:')#,self.data_file_selected
         else:
             print('lower lvl')
             try: self.treedict[self.treedict.keys()[-1]+1] = self.treedata[self.dataList.get_value(iter,0)]
@@ -414,7 +414,6 @@ class maingui:
     def deleteselected(self, widget):
         liststore,iter = self.View.get_selection().get_selected()
         self.selectedvar = self.dataList.get_value(iter,0)
-        print self.selectedvar
         self.datadict.pop(self.selecteditem)
         self.parseddatadict.pop(self.selecteditem)
         self.treegohome(None)
@@ -444,10 +443,10 @@ class maingui:
             return
         print(self.data2parse,'------------------')
         self.dataList.clear()
-        print 'type of data2parse:', type(self.data2parse)
+        print('type of data2parse:', type(self.data2parse))
         if type(self.data2parse) == dict:
             self.treedata = self.data2parse#self.parseddata.out
-            print 'dict parse', self.data2parse
+            print('dict parse', self.data2parse)
         else:
             self.parseinstance(self.data2parse)
             self.treedata = self.parseddata.out
@@ -545,7 +544,7 @@ class maingui:
         if self.checkreq() == -1:
             print('caught error')
             return
-        print 'wid',widget.get_label()
+        print('wid',widget.get_label())
         self.treedata[self.selecteditem].tftplot(widget.get_label())
 
     def about(self,widget):
@@ -571,20 +570,20 @@ class maingui:
 
 
         for ii in var:
-            print 'look for dependency',ii
+            print('look for dependency',ii)
             if type(obj) == dict:
-                print 'dict search'
+                print('dict search')
                 try:
                     out = obj[ii]
-                    print 'found as child dict', ii
+                    print('found as child dict', ii)
                 except:
                     try:
                         for i in obj:
-                            print 'i',i, type(obj[i])
+                            print('i',i, type(obj[i]))
                             if type(obj[i]) == dict:
                                 try:
                                     out = obj[i][ii]
-                                    print 'found',ii
+                                    print('found',ii)
                                 except: pass
                                 #print 'd',i
                                 #if obj[i][ii] == ii:
@@ -595,35 +594,35 @@ class maingui:
                             #print i
                             if obj[i] == ii:
                                 out = obj[i]
-                                print 'found', i
+                                print('found', i)
                     except:
-                        print 'cant find instance', ii
+                        print('cant find instance', ii)
 
             if isinstance(obj, types.InstanceType):
-                print 'instance..'
+                print('instance..')
                 try:
                     out = eval('obj.'+ii)
-                    print 'found as child instance', ii
+                    print('found as child instance', ii)
                 except:
                     try:
                         for i in inspect.getmembers(obj):
                             #print i[0]
                             if i[0] == ii:
                                 out = i[1]
-                                print 'found', i[0]
+                                print('found', i[0])
                             if isinstance(i[1], types.InstanceType):
                                 #print 'dig'
                                 for j in inspect.getmembers(i[1]):
                                     #print j[0]
                                     if j[0] == ii:
                                         out = j[1]
-                                        print 'found', j[0]
+                                        print('found', j[0])
                     except:
-                        print 'cant find instance', ii
+                        print('cant find instance', ii)
 
             v.extend([out]);
         if len(v) != len(var):
-            print 'missing items requested'
+            print('missing items requested')
             raise KeyError
 
         return v
@@ -637,12 +636,12 @@ class maingui:
         self.data_file_selected['filtered'] = copy.copy(self.treedata[self.selecteditem])
         srate = self.setup_helper(var='srate',obj=self.data_file_selected['filtered'])[0]
         self.fil = filter.filtwin()
-        print 'target',self.target
-        print shape(self.target)
+        print('target',self.target)
+        print(shape(self.target))
         try:
             self.fil.setupfilterwin(None, self.target,srate,callback=donefilt)
         except KeyError:
-            print 'had a prob, bob'
+            print('had a prob, bob')
             return -1
         self.fil.builder.get_object('FilterWindow').show()
 
@@ -662,8 +661,7 @@ class maingui:
         self.gridwin = grid.gridwin()#.window.show()gridwin
         try:
             self.gridwin.mriwin(workspace_data=self.data_file_selected)
-
-        except AttributeError, KeyError:
+        except (AttributeError, KeyError):
             print('no data')
             self.errordialog\
             ('No data selected. Double Click a MEG filename')
@@ -694,7 +692,7 @@ class maingui:
 
     def plot2Dmri(self, widget):
         vm = viewmri.setup_gui()
-        print self.treedata[self.selecteditem].data
+        print(self.treedata[self.selecteditem].data)
         try:
             self.mrimousepos = vm.display(self.treedata[self.selecteditem].data,pixdim=self.treedata[self.selecteditem].pixdim)
 
@@ -702,7 +700,7 @@ class maingui:
             try:
                 self.mrimousepos = vm.display(self.treedata[self.selecteditem])#,pixdim=self.datadict[self.dataselected].pixdim)
                 vm.window.show()
-            except AttributeError, KeyError:
+            except (AttributeError, KeyError):
                 print('Unknown data format')
                 self.errordialog('Unknown data format. Try selecting variable = nifti, or data array');
 
@@ -754,7 +752,7 @@ class maingui:
     def timef_handler(self,widget):
         def donetft(results):
             self.data_file_selected['tft'] = results
-            print self.data_file_selected['tft'].npoints
+            print(self.data_file_selected['tft'].npoints)
             self.datadict[self.data_filename_selected] = self.data_file_selected
             self.treegohome(None)
 
@@ -763,20 +761,20 @@ class maingui:
             obj=self.treedata[self.selecteditem];
             ret = (self.setup_helper(var=['data_block','labellist','srate','frames',
             'numofepochs','eventtime'],obj=obj));
-            print len(ret), 'length'
+            print (len(ret), 'length')
             self.tf.builder.get_object('filechooserbutton1').set_sensitive(False)
             self.tf.datahandler(ret[0],ret[1],ret[2][0],ret[3],ret[4][0],ret[5],callback=donetft)
             self.tf.window.show()
-            print 'tft on data instance'
+            print('tft on data instance')
         except: #tft on data variable selected
             try:
 
                 self.tf.datahandler(self.treedata[self.selecteditem],callback=donetft)
                 self.tf.builder.get_object('filechooserbutton1').set_sensitive(False)
                 self.tf.builder.get_object('label12').set_text(str(self.selecteditem))
-                print 'tft on data variable selected'
+                print ('tft on data variable selected')
                 self.tf.window.show()
-                print 'tft on data var selected'
+                print ('tft on data var selected')
             except KeyError:
                 self.errordialog\
                 ('Unknown data type. Type selecting Variable = data.')
@@ -785,7 +783,7 @@ class maingui:
 
     def signal_space_build_weights(self,widget):
         try:
-            print 'selection list', self.de.selections
+            print ('selection list', self.de.selections)
             self.de.time
             liststore,iter = self.de.SelView.get_selection().get_selected_rows()
 
@@ -797,9 +795,9 @@ class maingui:
 
 
         for i in iter:
-            print 'highlighted', liststore[i][1]
+            print ('highlighted', liststore[i][1])
             self.de.get_time_selection(widget,current=False)
-            print 'indices',self.de.sel_ind
+            print ('indices',self.de.sel_ind)
             data = self.de.data
             self.data_file_selected['signal_projection'] = {}
             self.data_file_selected['signal_projection']['signal_weights'] = data[self.de.sel_ind]
@@ -815,11 +813,11 @@ class maingui:
         if self.signal_space_build_weights(widget) == -1:
             self.data_editor(None)
             return -1
-        print 'done!!'
+        print ('done!!')
         try:
             sp = self.data_file_selected['signal_projection']
         except KeyError:
-            print "No weights built yet!!"
+            print ("No weights built yet!!")
             self.errordialog("No weights. Select data from data editor and use selector tool to highlight weight. ");
             return -1
         weights = sp['signal_weights']
@@ -829,7 +827,7 @@ class maingui:
             #print data
         except KeyError:
             #data = self.de.data
-            print "No appropriate data found!!"
+            print ("No appropriate data found!!")
             self.errordialog("Incorrect data selected");
             pass
 
@@ -854,13 +852,13 @@ class maingui:
 
     def contour_plot(self,widget):
         try:
-            print 'state',self.mc.window.get_property('visible')
+            print ('state',self.mc.window.get_property('visible'))
             if self.mc.window.get_property('visible') == False:
                 #someone closed the window
                 self.mc.window.show()
-            print 'done replotting'
+            print ('done replotting')
         except AttributeError: #first call. setup
-            print 'first plot'
+            print ('first plot')
             self.mc = contour_gtk.setup_gui()
             self.mc.window.show()
 
@@ -871,7 +869,7 @@ class maingui:
 
     def epoch_data(self,widget):
         def epoch_callback(startcut,endcut):
-            print 'ed callback', startcut,endcut
+            print ('ed callback', startcut,endcut)
             self.data_file_selected['epoched_data'] = {}
             self.data_file_selected['epoched_data']['channels'] = {}
             ed = self.data_file_selected['epoched_data']
@@ -890,19 +888,19 @@ class maingui:
             
             for i,j in zip(startcut,endcut):
                 try:
-                    print shape(tmp_data),shape(se.data_block[i:j])
+                    print (shape(tmp_data),shape(se.data_block[i:j]))
                     tmp_data = vstack((tmp_data,se.data_block[i:j]))
                 except UnboundLocalError:
-                    print 'error'
+                    print ('error')
                     tmp_data = se.data_block[i:j]
                 #tmp_data = append(tmp_data,se.data_block[i:j])
                 #print 'ts',shape(tmp_data)#,endcut[0]-startcut[0],se.numofchannels
             
-            print 'tmpdatashape',shape(tmp_data)#.reshape((endcut[0]-startcut[0],len(startcut)))
+            print ('tmpdatashape',shape(tmp_data))#.reshape((endcut[0]-startcut[0],len(startcut)))
             ed['frames'] = endcut[0]-startcut[0]
             ed['eventtime'] = se.eventtime[startcut[1]:startcut[0]]
             ed['wintime'] = arange(0,se.wintime[ed['frames']]*len(startcut),se.wintime[1])
-            print 'size of wintime',len(ed['wintime'])
+            print ('size of wintime',len(ed['wintime']))
             ed['data_block'] = tmp_data
             
         filepath = self.setup_helper(var='filepath',obj=self.treedata[self.selecteditem])[0]
@@ -910,7 +908,7 @@ class maingui:
             return -1
         self.ed = event_process.setup_gui()
         self.ed.window.show()
-        print 'sending file:'+'file://'+filepath
+        print ('sending file:'+'file://'+filepath)
         self.ed.set_passed_filename(filepath,callback=epoch_callback)
 
     def data_editor(self, widget):
@@ -918,11 +916,11 @@ class maingui:
             obj=self.treedata[self.selecteditem];
             r = (self.setup_helper(var=['data_block','srate','wintime',
             'labellist','chanlocs'],obj=obj));
-            print len(r), 'length', r
+            print (len(r), 'length', r)
 
         except:
-            print "Data Editor can't handle this type"
-            print "Try selecting object <pdf2py.data.read>"
+            print ("Data Editor can't handle this type")
+            print ("Try selecting object <pdf2py.data.read>")
             self.errordialog("Data Editor can't handle this type.Try selecting object <pdf2py.data.read> ");
             return -1
 
@@ -931,7 +929,7 @@ class maingui:
         self.de.window.show()
 
     def data_editor_callback(self):
-        print 'Done'
+        print ('Done')
 
     def testhandler(self, widget):
         self.prnt(None)
