@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python2
 """
 demonstrate adding a FigureCanvasGTK/GTKAgg widget to a gtk.ScrolledWindow
 """

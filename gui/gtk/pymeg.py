@@ -1,3 +1,5 @@
+#!/usr/bin/python2
+
 #       pymeg.py
 #
 #       Copyright 2010 dan collins <danc@badbytes.net>
@@ -16,11 +18,16 @@
 #       along with this program; if not, write to the Free Software
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
+
 '''Main GUI Window'''
+import sys
+if sys.version > '2.9':
+    print ('Wrong Python Version !!!')
+    sys.exit(1)
 from matplotlib import use;use('GTK')
 import pymeg, sys, os, subprocess
 from pdf2py import pdf, readwrite,lA2array
-from numpy import shape, random, sort, array, append, size, arange, ndarray,vstack
+from numpy import shape, random, sort, array, append, size, arange, ndarray,vstack,mean
 from meg import dipole,plotvtk,plot2dgtk,leadfield,signalspaceprojection,nearest
 from mri import img_nibabel as img
 
@@ -112,10 +119,11 @@ class maingui:
             "showpopupmenu" : self.showpopupmenu ,
             "on_tftplot_activate" : self.tftplot,
             "on_timef_activate" : self.timef_handler ,
-            "on_toolbar_data_editor_clicked" : self.data_editor,
+            "on_data_editor_clicked" : self.data_editor,
             "on_menu_signal_space_filter_activate" : self.signal_space_filter,
             "on_menu_contour_plot_activate" : self.contour_plot,
             "on_menu_epoch_data_activated" : self.epoch_data,
+            "on_test" : self.test,
         }
 
         self.builder.connect_signals(dic)
@@ -131,6 +139,12 @@ class maingui:
         try: self.prefs = readwrite.readdata(os.getenv('HOME')+'/.pymeg.pym')
         except IOError: pass
         self.fill_combo_entries(None)
+        
+    def test(self,widget):
+        print 'tested'
+        menu = self.builder.get_object("menufunctions")
+        menu.show_all(); menu.hide()
+        menu.set_tearoff_state(True)
 
     def updatestatusbar(self,string):
         self.statusbar.push(self.statusbar_cid, string)
@@ -441,12 +455,12 @@ class maingui:
         except IndexError:
             self.treegohome(self)
             return
-        print(self.data2parse,'------------------')
+        #print(self.data2parse,'------------------')
         self.dataList.clear()
         print('type of data2parse:', type(self.data2parse))
         if type(self.data2parse) == dict:
             self.treedata = self.data2parse#self.parseddata.out
-            print('dict parse', self.data2parse)
+            #print('dict parse', self.data2parse)
         else:
             self.parseinstance(self.data2parse)
             self.treedata = self.parseddata.out
@@ -564,7 +578,8 @@ class maingui:
         so it doesn't have to be statically defined all the time.
         '''
         import copy, types, inspect
-        v = []
+        #v = [];
+        v = {}
         if type(var) == str:
             var = [var] #make list
 
@@ -585,13 +600,7 @@ class maingui:
                                     out = obj[i][ii]
                                     print('found',ii)
                                 except: pass
-                                #print 'd',i
-                                #if obj[i][ii] == ii:
-                                    #var = obj[i][ii]
-                                    #print 'found', ii
 
-
-                            #print i
                             if obj[i] == ii:
                                 out = obj[i]
                                 print('found', i)
@@ -606,21 +615,19 @@ class maingui:
                 except:
                     try:
                         for i in inspect.getmembers(obj):
-                            #print i[0]
                             if i[0] == ii:
                                 out = i[1]
                                 print('found', i[0])
                             if isinstance(i[1], types.InstanceType):
-                                #print 'dig'
                                 for j in inspect.getmembers(i[1]):
-                                    #print j[0]
                                     if j[0] == ii:
                                         out = j[1]
                                         print('found', j[0])
                     except:
                         print('cant find instance', ii)
 
-            v.extend([out]);
+            #v.extend([out]);
+            v[ii] = out
         if len(v) != len(var):
             print('missing items requested')
             raise KeyError
@@ -698,7 +705,7 @@ class maingui:
 
         except:# (AttributeError, KeyError):
             try:
-                self.mrimousepos = vm.display(self.treedata[self.selecteditem])#,pixdim=self.datadict[self.dataselected].pixdim)
+                self.mrimousepos = vm.display(self.treedata[self.selecteditem])
                 vm.window.show()
             except (AttributeError, KeyError):
                 print('Unknown data format')
@@ -802,12 +809,6 @@ class maingui:
             self.data_file_selected['signal_projection'] = {}
             self.data_file_selected['signal_projection']['signal_weights'] = data[self.de.sel_ind]
 
-    #def save_results(self,workspace,var2save, data2save):
-        #'''ex. workspace=self.data_file_selected['signal_projection']'''
-        #workspace = {}; #clear workspace
-        #for i in range(0, len(var2save)):
-            #workspace[var2save[i]] = data2save[i]
-
     def signal_space_filter(self,widget):
 
         if self.signal_space_build_weights(widget) == -1:
@@ -823,10 +824,7 @@ class maingui:
         weights = sp['signal_weights']
         try:
             data = self.setup_helper(var='data_block',obj=self.treedata[self.selecteditem])
-            #data = self.treedata[self.selecteditem].data_block
-            #print data
         except KeyError:
-            #data = self.de.data
             print ("No appropriate data found!!")
             self.errordialog("Incorrect data selected");
             pass
@@ -867,43 +865,53 @@ class maingui:
         chanlocs = self.setup_helper(var='chanlocs',obj=self.treedata['channels'])
         self.mc.display(self.treedata[self.selecteditem],chanlocs, subplot='on')
 
+    def result_helper(self,newobj,var):
+        for i in var.keys():
+            newobj[i] = var[i]
+        return newobj
+        
+
     def epoch_data(self,widget):
-        def epoch_callback(startcut,endcut):
-            print ('ed callback', startcut,endcut)
-            self.data_file_selected['epoched_data'] = {}
-            self.data_file_selected['epoched_data']['channels'] = {}
-            ed = self.data_file_selected['epoched_data']
-            se = self.treedata[self.selecteditem]
-            ed['srate'] = se.srate
-            ed['wintime'] = se.wintime
-            ed['eventtime'] = se.eventtime
-            ed['frames'] = se.frames
-            ed['srate'] = se.srate
-            ed['numofepochs'] = se.numofepochs
-            #ed['channels'] = se.channels
-            ed['channels']['labellist'] = se.channels.labellist
-            ed['channels']['chanlocs'] = se.channels.chanlocs
-            #tmp_data = zeros((startcut[1]:startcut[0],se.numofchannels,len(startcut)))
-            #tmp_data = array([])
+        def epoch_callback(widget,startcut,endcut):
+            self.datadict[self.data_filename_selected] = self.data_file_selected
+            obj = self.treedata[self.selecteditem]
+            var = ['channels','srate','numofepochs','labellist',
+            'chanlocs','frames','eventtime','wintime']
+            r = (self.setup_helper(var,obj=obj));
+            data_block = (self.setup_helper(['data_block'],obj=obj))['data_block']
+            ed = self.data_file_selected['epoched_data'] = {}
+            self.result_helper(ed,r)
             
+            print ('cutsize',startcut[0],startcut[1])
+            ed['frames'] = endcut[0]-startcut[0]
+            ed['eventtime'] = r['eventtime'][startcut[0]:endcut[0]]
+            print 'eventtime', len(ed['eventtime'])
+            ed['wintime'] = arange(0,r['wintime'][ed['frames']]*len(startcut),r['wintime'][1])
+            print ('size of wintime',len(ed['wintime']))
+            
+            
+            print 'Epoching file.'
             for i,j in zip(startcut,endcut):
                 try:
-                    print (shape(tmp_data),shape(se.data_block[i:j]))
-                    tmp_data = vstack((tmp_data,se.data_block[i:j]))
+                    print (shape(tmp_data),shape(data_block[i:j]))
+                    tmp_data = vstack((tmp_data,data_block[i:j]))
                 except UnboundLocalError:
-                    print ('error')
-                    tmp_data = se.data_block[i:j]
-                #tmp_data = append(tmp_data,se.data_block[i:j])
-                #print 'ts',shape(tmp_data)#,endcut[0]-startcut[0],se.numofchannels
-            
-            print ('tmpdatashape',shape(tmp_data))#.reshape((endcut[0]-startcut[0],len(startcut)))
-            ed['frames'] = endcut[0]-startcut[0]
-            ed['eventtime'] = se.eventtime[startcut[1]:startcut[0]]
-            ed['wintime'] = arange(0,se.wintime[ed['frames']]*len(startcut),se.wintime[1])
-            print ('size of wintime',len(ed['wintime']))
+                    print ('first epoch')
+                    tmp_data = data_block[i:j]
+                    print (shape(tmp_data),shape(data_block[i:j]))
+            print 'widgetname',widget.get_label()
+                    
+            if widget.get_label() == 'Average':
+                print 'Trying to average'
+                tmp_data = mean(tmp_data.reshape((ed['frames'],len(startcut),size(ed['chanlocs'],1)),order='F'),axis=1)
+                ed['wintime'] = arange(0,r['wintime'][ed['frames']],r['wintime'][1])
+                
+            print ('tmpdatashape',shape(tmp_data))
+
             ed['data_block'] = tmp_data
+            self.treegohome(None)
             
-        filepath = self.setup_helper(var='filepath',obj=self.treedata[self.selecteditem])[0]
+        filepath = self.setup_helper(var='filepath',obj=self.treedata[self.selecteditem])['filepath']
         if os.path.isfile(filepath) == False:
             return -1
         self.ed = event_process.setup_gui()
@@ -916,7 +924,8 @@ class maingui:
             obj=self.treedata[self.selecteditem];
             r = (self.setup_helper(var=['data_block','srate','wintime',
             'labellist','chanlocs'],obj=obj));
-            print (len(r), 'length', r)
+            print (len(r))
+            print r.keys()
 
         except:
             print ("Data Editor can't handle this type")
@@ -924,9 +933,13 @@ class maingui:
             self.errordialog("Data Editor can't handle this type.Try selecting object <pdf2py.data.read> ");
             return -1
 
-        self.de = data_editor.setup_gui()
-        self.de.data_handler(r[0],r[1],r[2],r[3],r[4], callback=self.data_editor_callback)
-        self.de.window.show()
+        try:
+            self.de = data_editor.setup_gui()
+            #self.de.data_handler(r[0],r[1],r[2],r[3],r[4], callback=self.data_editor_callback)
+            self.de.data_handler(input_dict=r, callback=self.data_editor_callback)
+            self.de.window.show()
+        except RuntimeError:
+            self.errordialog("Can't do that Dave");
 
     def data_editor_callback(self):
         print ('Done')
@@ -953,6 +966,7 @@ if __name__ == "__main__":
     mainwindow = maingui()
     mainwindow.window.show()
     mainwindow.testload(None)
+    
     i = 1
     #import code; code.interact(local=locals())
     exit

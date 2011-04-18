@@ -1,3 +1,4 @@
+#!/usr/bin/python2
 #
 #       Copyright 2010 dan collins <danc@badbytes.net>
 #
@@ -54,6 +55,7 @@ class setup_gui:
             }
 
         self.builder.connect_signals(dic)
+        self.updatestatusbar('Test logic of event prior to epoching/averaging')
         
         
     def updatestatusbar(self,string):
@@ -73,7 +75,7 @@ class setup_gui:
     def set_passed_filename(self, filepathstring, callback=None):
         self.callback = callback
         self.fnuri = 'file://'+filepathstring
-        #fixing oddity in set_uri, as char % needs to be set as %25 in filepath
+        ###fixing oddity in set_uri, as char % needs to be set as %25 in filepath
         self.fnuri = self.fnuri.replace('%','%25')
         self.builder.get_object('filechooserbutton1').set_uri(self.fnuri)
         print 'recieved passed filename'
@@ -147,7 +149,7 @@ class setup_gui:
         #viewtype.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
 
     def parse_logic(self,widget):
-        #8192>4216,300ms
+        '''8192>4216,300ms'''
         liststore,iter = self.View.get_selection().get_selected_rows()
         logic = liststore[iter[0][0]][3]
         trig_vals = logic.split(',')[0].split('>')
@@ -169,8 +171,6 @@ class setup_gui:
         print(self.result_ind,'timediff',timediff)
         self.updatestatusbar('Logic Result: '+str(len(self.result_ind))+' events passed conditions')
         self.check_status(None)
-        #self.builder.get_object('button4').set_sensitive(True)
-        #self.builder.get_object('button5').set_sensitive(True)
         
 
     def plot_events(self,widget):
@@ -212,14 +212,14 @@ class setup_gui:
         poststim_ind = nearest.nearest(self.wintime,poststim_sec)[0]
         #print prestim_ms,poststim_ms
         
-        if widget.get_label() == 'ReEpoch':
-            print 'epoch'
-            startcut = self.result_ind-prestim_ind
-            endcut = self.result_ind+poststim_ind
-            self.callback(startcut,endcut)
-            return
-            epoched = self.data[self.result_ind-prestim_ind:self.result_ind+poststim_ind]
-            print epoched.shape,'shape'
+        #if widget.get_label() == 'ReEpoch':
+        print 'epoch'
+        startcut = self.result_ind-prestim_ind
+        endcut = self.result_ind+poststim_ind
+        self.callback(widget,startcut,endcut)
+        return
+        epoched = self.data[self.result_ind-prestim_ind:self.result_ind+poststim_ind]
+        print epoched.shape,'shape'
             
 
     def hideinsteadofdelete(self,widget, ev=None):

@@ -1,3 +1,4 @@
+#!/usr/bin/python2
 #!/usr/bin/env python
 
 # example filechooser.py

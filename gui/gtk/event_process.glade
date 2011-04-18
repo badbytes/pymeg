@@ -25,7 +25,7 @@ and allows for the re-epoching of data.
 Will result in a new epoch or average array.</property>
     <property name="title" translatable="yes">Event Processing</property>
     <property name="window_position">mouse</property>
-    <property name="icon">Dots.png</property>
+    <property name="icon">boolean.jpg</property>
     <signal name="delete_event" handler="gtk_widget_hide"/>
     <child>
       <object class="GtkVBox" id="vbox1">
@@ -75,6 +75,7 @@ Will result in a new epoch or average array.</property>
 ex. TrigCode1&gt;TrigCode2,TimeDifference
 8192&gt;4216,10 means Look for 8192 followed
 by a 4216 with a 10 second window.</property>
+                    <property name="use_underline">True</property>
                     <signal name="clicked" handler="on_button_test_logic_clicked"/>
                   </object>
                   <packing>
@@ -298,5 +299,9 @@ by a 4216 with a 10 second window.</property>
         <signal name="activate" handler="on_menu_plot_events_activate"/>
       </object>
     </child>
+  </object>
+  <object class="GtkImage" id="image1">
+    <property name="visible">True</property>
+    <property name="stock">gtk-missing-image</property>
   </object>
 </interface>

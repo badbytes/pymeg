@@ -35,7 +35,7 @@
   </object>
   <object class="GtkWindow" id="windowTreeview">
     <property name="width_request">700</property>
-    <property name="height_request">300</property>
+    <property name="height_request">400</property>
     <property name="border_width">4</property>
     <property name="title" translatable="yes">PyMEG</property>
     <property name="window_position">mouse</property>
@@ -43,7 +43,6 @@
     <property name="icon">fityk.png</property>
     <property name="icon_name">applications-science</property>
     <property name="deletable">False</property>
-    <signal name="destroy" handler="on_destroy"/>
     <signal name="delete_event" handler="gtk_widget_hide"/>
     <child>
       <object class="GtkVBox" id="vbox2">
@@ -91,6 +90,19 @@
                     </child>
                     <child>
                       <object class="GtkSeparatorMenuItem" id="separator3">
+                        <property name="visible">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="savefile">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Save File</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_saveselecteditem_clicked"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparatorMenuItem" id="&lt;separator&gt;">
                         <property name="visible">True</property>
                       </object>
                     </child>
@@ -156,7 +168,7 @@
           <object class="GtkToolbar" id="toolbar2">
             <property name="visible">True</property>
             <property name="toolbar_style">both</property>
-            <property name="icon_size">5</property>
+            <property name="icon_size">4</property>
             <property name="icon_size_set">True</property>
             <child>
               <object class="GtkToolButton" id="treebutton1">
@@ -214,12 +226,14 @@
               <object class="GtkMenuToolButton" id="Functions">
                 <property name="visible">True</property>
                 <property name="label" translatable="yes">Functions</property>
-                <property name="use_underline">True</property>
                 <property name="stock_id">gtk-execute</property>
                 <property name="menu">menufunctions</property>
+                <signal name="clicked" handler="on_test"/>
                 <child>
                   <object class="GtkMenu" id="menufunctions">
                     <property name="visible">True</property>
+                    <property name="resize_mode">immediate</property>
+                    <property name="tearoff_title">Function Menu</property>
                     <child>
                       <object class="GtkMenuItem" id="imagemenuitem4">
                         <property name="visible">True</property>
@@ -269,7 +283,6 @@
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Source Space Projection</property>
                         <property name="use_underline">True</property>
-                        <signal name="activate" handler="on_menu_source_space_filter_activate"/>
                       </object>
                     </child>
                     <child>
@@ -282,6 +295,19 @@
                     </child>
                     <child>
                       <object class="GtkSeparatorMenuItem" id="separator2">
+                        <property name="visible">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="dataeditormenu">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Data Editor</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_data_editor_clicked"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparatorMenuItem" id="&lt;separator&gt;2">
                         <property name="visible">True</property>
                       </object>
                     </child>
@@ -425,7 +451,6 @@
               </object>
               <packing>
                 <property name="expand">False</property>
-                <property name="homogeneous">True</property>
               </packing>
             </child>
             <child>
@@ -447,7 +472,7 @@
                 <property name="label" translatable="yes">Data Editor</property>
                 <property name="use_underline">True</property>
                 <property name="icon_widget">image1</property>
-                <signal name="clicked" handler="on_toolbar_data_editor_clicked"/>
+                <signal name="clicked" handler="on_data_editor_clicked"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -524,7 +549,6 @@
                 <property name="label" translatable="yes">Add To Queue</property>
                 <property name="use_underline">True</property>
                 <property name="stock_id">gtk-new</property>
-                <signal name="clicked" handler="on_Add2Queue_clicked"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -561,11 +585,9 @@
                 <property name="enable_grid_lines">vertical</property>
                 <property name="enable_tree_lines">True</property>
                 <signal name="button_press_event" handler="showpopupmenu"/>
-                <signal name="button_press_event" handler=" on_treeview2_buttonpress"/>
                 <signal name="cursor_changed" handler="itemselect"/>
                 <signal name="selection_get" handler="itemselect"/>
                 <signal name="row_activated" handler="on_treeview2_row_activated"/>
-                <signal name="move_cursor" handler="on_treeview2_move_cursor"/>
                 <signal name="selection_received" handler="itemselect"/>
               </object>
             </child>
@@ -1481,107 +1503,7 @@
     <property name="window_position">mouse</property>
     <property name="opacity">0.90000000000000002</property>
     <signal name="close" handler="gtk_widget_hide"/>
-    <signal name="apply" handler="on_assistant1_apply"/>
     <signal name="cancel" handler="gtk_widget_hide"/>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
     <child>
       <placeholder/>
     </child>
@@ -1607,7 +1529,6 @@
         <property name="extension_events">all</property>
         <property name="n_rows">4</property>
         <property name="n_columns">4</property>
-        <signal name="add" handler="on_table1_add"/>
         <child>
           <object class="GtkCheckButton" id="checkbutton29">
             <property name="label" translatable="yes">meg</property>
@@ -1754,7 +1675,7 @@
         <child>
           <object class="GtkLabel" id="label32">
             <property name="visible">True</property>
-            <property name="label" translatable="yes">First Point	</property>
+            <property name="label" translatable="yes">First Point   </property>
           </object>
         </child>
         <child>
@@ -1785,7 +1706,7 @@
         <child>
           <object class="GtkLabel" id="label33">
             <property name="visible">True</property>
-            <property name="label" translatable="yes">Last Point	</property>
+            <property name="label" translatable="yes">Last Point    </property>
           </object>
           <packing>
             <property name="left_attach">1</property>
@@ -1819,20 +1740,9 @@
       </object>
     </child>
   </object>
-  <object class="GtkAdjustment" id="adjustment1">
-    <property name="upper">100</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
-    <property name="page_size">10</property>
-  </object>
   <object class="GtkImage" id="image2">
     <property name="visible">True</property>
     <property name="pixbuf">Dots.png</property>
-  </object>
-  <object class="GtkImage" id="image1">
-    <property name="visible">True</property>
-    <property name="pixbuf">WaveformButtonSmall.png</property>
-    <signal name="button_press_event" handler="on_menu_event"/>
   </object>
   <object class="GtkAboutDialog" id="aboutdialog1">
     <property name="border_width">5</property>
@@ -1944,5 +1854,9 @@
       <action-widget response="0">filedialogCancel</action-widget>
       <action-widget response="0">filedialogLoad</action-widget>
     </action-widgets>
+  </object>
+  <object class="GtkImage" id="image1">
+    <property name="visible">True</property>
+    <property name="pixbuf">WaveformButtonSmall.png</property>
   </object>
 </interface>

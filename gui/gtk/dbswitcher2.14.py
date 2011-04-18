@@ -1,3 +1,4 @@
+#!/usr/bin/python2
 #       dbswitcher.py
 #
 #       Copyright 2010 dan collins <danc@badbytes.net>

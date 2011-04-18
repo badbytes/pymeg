@@ -1,3 +1,4 @@
+#!/usr/bin/python2
 import sys
 import subprocess
 from gui.gtk import parsepdf

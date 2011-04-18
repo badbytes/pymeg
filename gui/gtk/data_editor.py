@@ -1,3 +1,4 @@
+#!/usr/bin/python2
 #!/usr/bin/env python
 #
 #       Copyright 2010 dan collins <danc@badbytes.net>
@@ -91,7 +92,7 @@ class setup_gui:
         self.create_csd_frame('none')
         self.space = 0
         #self.generate_testdata(None)
-        self.preferences_open(None)
+        #self.preferences_open(None)
 
     def printtest(self,widget):
         print 'something'
@@ -144,7 +145,8 @@ class setup_gui:
         self.builder.get_object("spinbutton2").set_range(self.t[0],self.t[-1])
         self.builder.get_object("spinbutton2").set_value(self.t[0])
         self.builder.get_object("spinbutton3").set_range(self.t[0],self.t[-1])
-        if self.t[-1] - self.t[0] > 1: #alot of time, save time in plotting and set low
+        #if self.t[-1] - self.t[0] > 1: #alot of time, save time in plotting and set low
+        if len(self.t) > 1000:
             self.builder.get_object("spinbutton3").set_value(self.t[1000])
             print '.....reducing time var'
         else:
@@ -592,7 +594,8 @@ class setup_gui:
 
 
 
-    def data_handler(self,data,srate,wintime,chanlabels,chanlocs, callback=None):
+    #def data_handler(self,data,srate,wintime,chanlabels,chanlocs, callback=None):
+    def data_handler(self,input_dict, callback=None):
         '''
         datahandler(data,srate,wintime,chanlabels,chanlocs)
         -
@@ -605,6 +608,15 @@ class setup_gui:
             coordinates for each channel. Position of X and Y is between -.5
             and .5
         '''
+        ####!!!!!!!
+        '''should rerwite the following as well as the filechooser method to make simple and compatible with dictionary based load and read'''
+        data = input_dict['data_block']
+        srate = input_dict['srate']
+        wintime = input_dict['wintime']
+        chanlabels = input_dict['labellist']
+        chanlocs = input_dict['chanlocs']
+
+        
         print type(data),srate,type(wintime),type(chanlabels),type(chanlocs)
         print len(chanlabels),size(data,1),len(wintime),size(data,0),\
         size(chanlocs,1)
@@ -614,7 +626,7 @@ class setup_gui:
             self.builder.get_object("messagedialog1").format_secondary_text\
             ('error matching wintime or chlabels or chanlocs with data')
             self.builder.get_object("messagedialog1").show()
-            return -1
+            raise RuntimeError
 
         self.data = data
         self.srate = srate
