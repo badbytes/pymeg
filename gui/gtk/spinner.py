@@ -16,7 +16,7 @@
 #       along with this program; if not, write to the Free Software
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
-import sys,time
+import sys,time,os
 
 try:
     import pygtk
@@ -33,7 +33,7 @@ except:
 class template:
     def __init__(self):
         self.builder = gtk.Builder()
-        self.builder.add_from_file("/home/danc/python/pymeg/gui/gtk/spinner.glade")
+        self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
         #spin = self.builder.get_object("spinner1")
         #spin.start()
         #self.window = builder.add_objects_from_file("/home/danc/python/pymeg/gui/gtk/spinner.glade",['window2'])

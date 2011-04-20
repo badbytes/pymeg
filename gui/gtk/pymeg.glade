@@ -279,6 +279,22 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkMenuItem" id="specgram">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Specgram</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_specgram_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="fftmenu">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">FFT</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_fft_activate"/>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkMenuItem" id="sourcespaceprojection">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Source Space Projection</property>
@@ -1504,6 +1520,9 @@
     <property name="opacity">0.90000000000000002</property>
     <signal name="close" handler="gtk_widget_hide"/>
     <signal name="cancel" handler="gtk_widget_hide"/>
+    <child>
+      <placeholder/>
+    </child>
     <child>
       <placeholder/>
     </child>

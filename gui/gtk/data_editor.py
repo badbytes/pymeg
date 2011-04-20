@@ -21,7 +21,7 @@
 Requires the following...
 srate,timeaxes,data,chanlabels,
 '''
-import sys
+import sys,os
 from gtk import gdk
 from numpy import * #fromstring, arange, int16, float, log10
 from matplotlib import rcParams
@@ -54,7 +54,7 @@ except:
 class setup_gui:
     def __init__(self):
         self.builder = gtk.Builder()
-        self.builder.add_from_file("data_editor.glade")
+        self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
         self.window = self.builder.get_object("window")
 
         dic = {
@@ -616,7 +616,7 @@ class setup_gui:
         chanlabels = input_dict['labellist']
         chanlocs = input_dict['chanlocs']
 
-        
+
         print type(data),srate,type(wintime),type(chanlabels),type(chanlocs)
         print len(chanlabels),size(data,1),len(wintime),size(data,0),\
         size(chanlocs,1)

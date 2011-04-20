@@ -16,7 +16,7 @@
 #       along with this program; if not, write to the Free Software
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
-
+import sys,os
 try:
     import pygtk
     pygtk.require("2.0")
@@ -32,7 +32,7 @@ except:
 class errorwin:
     def __init__(self, errormesg):
         self.builder = gtk.Builder()
-        self.builder.add_from_file("errordialog.glade")
+        self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
         self.dialog = self.builder.get_object("errordialog1")
         #print 'You did something wrong, you moron!'
         self.dialog.set_property('text',errormesg)

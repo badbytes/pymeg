@@ -20,20 +20,20 @@
 #       MA 02110-1301, USA.
 
 '''Main GUI Window'''
-import sys
-if sys.version > '2.9':
-    print ('Wrong Python Version !!!')
+import sys,os,subprocess
+if sys.version >= '3':
+    print ('Wrong Python Version. Only Python2 supported.')
     sys.exit(1)
-from matplotlib import use;use('GTK')
-import pymeg, sys, os, subprocess
-from pdf2py import pdf, readwrite,lA2array
-from numpy import shape, random, sort, array, append, size, arange, ndarray,vstack,mean
-from meg import dipole,plotvtk,plot2dgtk,leadfield,signalspaceprojection,nearest
-from mri import img_nibabel as img
 
+from matplotlib import use;use('GTK')
 from matplotlib.figure import Figure
 from matplotlib.axes import Subplot
 from matplotlib.backends.backend_gtk import show
+
+from pdf2py import pdf, readwrite,lA2array
+from numpy import shape, random, sort, array, append, size, arange, ndarray,vstack,mean,zeros
+from meg import dipole,plotvtk,plot2dgtk,leadfield,signalspaceprojection,nearest
+from mri import img_nibabel as img
 
 from gui.gtk import filter, offset_correct, errordialog, preferences,\
 dipoledensity, coregister, timef, data_editor, event_process, parse_instance, \
@@ -62,15 +62,9 @@ class maingui:
 
     wTree = None
 
-#builder = gtk.Builder()
-#builder.add_from_file("pymeg.glade")
-#window = builder.get_object("window")
-
     def __init__(self):
-        print('sysarg0',sys.argv[0])
-        gladepath = os.path.splitext(sys.argv[0])[0]
         self.builder = gtk.Builder()
-        self.builder.add_from_file(gladepath+".glade")
+        self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
         self.window = self.builder.get_object("windowTreeview")
         self.statusbar = self.builder.get_object("statusbar")
         self.statusbar_cid = self.statusbar.get_context_id("test")
@@ -78,7 +72,6 @@ class maingui:
         self.memorybar = self.builder.get_object("memorybar")
         self.progressbar = self.builder.get_object("progressbar")
         self.datatree(self)
-        #self.resulttree(self)
 
         dic = {
             "on_menuLoadMEG_activate" : self.fileOpenMEG,
@@ -139,7 +132,7 @@ class maingui:
         try: self.prefs = readwrite.readdata(os.getenv('HOME')+'/.pymeg.pym')
         except IOError: pass
         self.fill_combo_entries(None)
-        
+
     def test(self,widget):
         print 'tested'
         menu = self.builder.get_object("menufunctions")
@@ -382,7 +375,7 @@ class maingui:
                     iter = self.dataList.append([k,self.treedata[k]])
             elif type(self.treedata[k]) == dict:
                 iter = self.dataList.append([k,'dict keys'+str(self.treedata[k].keys())])
-                
+
             else:
                 iter = self.dataList.append([k,self.treedata[k]])
 
@@ -766,14 +759,15 @@ class maingui:
         self.tf = timef.setup() #window
         try:
             obj=self.treedata[self.selecteditem];
-            ret = (self.setup_helper(var=['data_block','labellist','srate','frames',
+            res = (self.setup_helper(var=['data_block','labellist','srate','frames',
             'numofepochs','eventtime'],obj=obj));
-            print (len(ret), 'length')
+            print (len(res), 'length')
             self.tf.builder.get_object('filechooserbutton1').set_sensitive(False)
-            self.tf.datahandler(ret[0],ret[1],ret[2][0],ret[3],ret[4][0],ret[5],callback=donetft)
+            #self.tf.datahandler(ret[0],ret[1],ret[2][0],ret[3],ret[4][0],ret[5],callback=donetft)
+            self.tf.datahandler(res,callback=donetft)
             self.tf.window.show()
             print('tft on data instance')
-        except: #tft on data variable selected
+        except IOError: #tft on data variable selected
             try:
 
                 self.tf.datahandler(self.treedata[self.selecteditem],callback=donetft)
@@ -869,7 +863,7 @@ class maingui:
         for i in var.keys():
             newobj[i] = var[i]
         return newobj
-        
+
 
     def epoch_data(self,widget):
         def epoch_callback(widget,startcut,endcut):
@@ -877,40 +871,44 @@ class maingui:
             obj = self.treedata[self.selecteditem]
             var = ['channels','srate','numofepochs','labellist',
             'chanlocs','frames','eventtime','wintime']
-            r = (self.setup_helper(var,obj=obj));
+            res = (self.setup_helper(var,obj=obj));
             data_block = (self.setup_helper(['data_block'],obj=obj))['data_block']
             ed = self.data_file_selected['epoched_data'] = {}
-            self.result_helper(ed,r)
-            
+            self.result_helper(ed,res)
+
             print ('cutsize',startcut[0],startcut[1])
             ed['frames'] = endcut[0]-startcut[0]
-            ed['eventtime'] = r['eventtime'][startcut[0]:endcut[0]]
+            ed['eventtime'] = res['eventtime'][startcut[0]:endcut[0]]
             print 'eventtime', len(ed['eventtime'])
-            ed['wintime'] = arange(0,r['wintime'][ed['frames']]*len(startcut),r['wintime'][1])
+            ed['wintime'] = arange(0,res['wintime'][ed['frames']]*len(startcut),res['wintime'][1])
             print ('size of wintime',len(ed['wintime']))
-            
-            
+
+            import time
+            ts = time.time()
             print 'Epoching file.'
+
+            tmp_data = zeros((ed['frames'],len(startcut),size(ed['chanlocs'],1)))
+            c = 0
             for i,j in zip(startcut,endcut):
-                try:
-                    print (shape(tmp_data),shape(data_block[i:j]))
-                    tmp_data = vstack((tmp_data,data_block[i:j]))
-                except UnboundLocalError:
-                    print ('first epoch')
-                    tmp_data = data_block[i:j]
-                    print (shape(tmp_data),shape(data_block[i:j]))
+                print (shape(tmp_data),shape(data_block[i:j]))
+                tmp_data[:,c] = data_block[i:j]
+                c = c+1
             print 'widgetname',widget.get_label()
-                    
+            print 'elapsed time:',time.time()-ts
+            avg_data = mean(tmp_data,axis=1)
+            tmp_data = tmp_data.reshape((ed['frames']*len(startcut),size(ed['chanlocs'],1)),order='F')
+
+
             if widget.get_label() == 'Average':
                 print 'Trying to average'
-                tmp_data = mean(tmp_data.reshape((ed['frames'],len(startcut),size(ed['chanlocs'],1)),order='F'),axis=1)
-                ed['wintime'] = arange(0,r['wintime'][ed['frames']],r['wintime'][1])
-                
+                tmp_data = avg_data;#mean(tmp_data.reshape((ed['frames'],len(startcut),size(ed['chanlocs'],1)),order='F'),axis=1)
+                ed['wintime'] = arange(0,res['wintime'][ed['frames']],res['wintime'][1])
+
             print ('tmpdatashape',shape(tmp_data))
 
             ed['data_block'] = tmp_data
             self.treegohome(None)
-            
+
         filepath = self.setup_helper(var='filepath',obj=self.treedata[self.selecteditem])['filepath']
         if os.path.isfile(filepath) == False:
             return -1
@@ -966,7 +964,7 @@ if __name__ == "__main__":
     mainwindow = maingui()
     mainwindow.window.show()
     mainwindow.testload(None)
-    
+
     i = 1
     #import code; code.interact(local=locals())
     exit

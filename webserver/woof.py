@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- encoding: utf-8 -*-
 #
 #  woof -- an ad-hoc single file webserver

@@ -34,13 +34,8 @@ except:
 class setup:
     def __init__(self, path=None,callback=None):
         self.callback=callback
-        print callback
-        print('sysarg0',sys.argv[0])
-        gladepath = os.path.splitext(sys.argv[0])[0]
-        print 'gp',gladepath
         self.builder = gtk.Builder()
-        #self.builder.add_from_file(gladepath+".glade")
-        self.builder.add_from_file("meg_assistant.glade")
+        self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
         self.assistant = self.builder.get_object("assistant1")
 
         dic = {

@@ -16,7 +16,7 @@
 #       along with this program; if not, write to the Free Software
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
-import sys
+import sys,os
 from gtk import gdk
 from numpy import * #fromstring, arange, int16, float, log10
 from matplotlib import rcParams
@@ -41,7 +41,7 @@ except:
 class template:
     def __init__(self):
         self.builder = gtk.Builder()
-        self.builder.add_from_file("draw.glade")
+        self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
         self.window = self.builder.get_object("window")
 
         dic = {
@@ -59,7 +59,7 @@ class template:
             "on_toolbutton_preferences_clicked" : self.preferences_open,
             "on_button_pref_apply_activate" : self.pref_apply,
             "set_channel_groups" : self.set_channel_groups,
-            
+
             }
 
         self.builder.connect_signals(dic)
@@ -75,16 +75,16 @@ class template:
         self.canvas.show()
         self.figure = self.canvas.figure
         self.axes = self.fig.add_axes([0.045, 0.05, 0.93, 0.925], axisbg='#FFFFCC')
-        
+
         self.vb = self.builder.get_object("vboxMain")
         self.vb.pack_start(self.canvas, gtk.TRUE, gtk.TRUE)
         self.vb.show()
-    
+
     def preferences_open(self,widget):
         self.win_prefs = self.builder.get_object("window_prefs")
         self.win_prefs.show()
         self.channel_tree(None)
-        
+
     def scroll_event(self, widget, event):
         if event.direction == gdk.SCROLL_UP:
             direction = 1
@@ -103,14 +103,14 @@ class template:
         b1 = curpos.y0
         w1 = curpos.x1
         h1 = curpos.y1
-        
+
     def space_data(self):
         self.data2plot = self.data[self.tstart:self.tstop,self.chanind] + \
         (arange(0,size(self.data[self.tstart:self.tstop,self.chanind],1)) * \
         (self.space))
-        
-    
-        
+
+
+
     def get_cursor_position(self,event):
         ap = self.axes.get_position()
         x,y = self.canvas.get_width_height()
@@ -119,7 +119,7 @@ class template:
         self.sx = (posx*(self.time[-1]-self.time[0]))+self.time[0]
         self.sy = (posy*(self.data2plot.max()-self.data2plot.min()))+self.data2plot.min()
         print self.sx, self.sy
-        
+
     def button_press_event(self,widget,event):
         self.get_cursor_position(event)
         print 'button pushed',event.button,event.type
@@ -136,15 +136,15 @@ class template:
 
         elif event.type == gtk.gdk._3BUTTON_PRESS:
             print "triple click. ouch, you hurt your user."
-            
+
         if event.type == gtk.gdk.BUTTON_PRESS and event.button == 2:
             print 'highlighting channel'
             self.axes.axhspan(self.sy-self.scalefact, \
             self.sy+self.scalefact, xmin=0, xmax=1, color='g')
-        
+
         #refresh canvas
         self.canvas.draw()
-        
+
     def button_release_event(self,widget,event):
         pass
         self.get_cursor_position(event)
@@ -155,15 +155,15 @@ class template:
             except AttributeError: self.selections = array([[self.xstart,self.sx]])
             print 'sels',self.selections
             self.canvas.draw()
-            
+
     def clear_selections(self,widget):
         del self.selections
         self.redraw(None)
-        
+
     def drag_begin(self,widget,event):
         pass
         #self.get_cursor_position(event)
-        
+
     def redraw(self,widget):
         #print 'button press'
         print len(self.time),self.data2plot.shape
@@ -180,12 +180,12 @@ class template:
         except:
             pass
         self.canvas.draw()
-        
+
     def zoomin_time(self,widget):
         startind = self.tstart;
         stopind = self.tstop-((self.tstop-self.tstart)/2)
         self.check_scale(startind,stopind)
-        
+
     def zoomout_time(self,widget):
         startind = self.tstart;
         stopind = self.tstop+((self.tstop-self.tstart)*2)
@@ -195,13 +195,13 @@ class template:
         startind = ((self.tstop-self.tstart)/2)+self.tstart;
         stopind = ((self.tstop-self.tstart)/2)+self.tstop;
         self.check_scale(startind,stopind)
-        
+
     def go_back(self,widget):
         startind = self.tstart-((self.tstop-self.tstart)/2);
         stopind = self.tstop-((self.tstop-self.tstart)/2);
         self.check_scale(startind,stopind)
 
-        
+
     def check_scale(self,startind,stopind):
         print 'req',startind,stopind, self.tstart,self.tstop
         if startind < 0:
@@ -213,38 +213,38 @@ class template:
         if stopind < 0:
             stopind = self.tstop
         print 'set',startind,stopind,self.tstart,self.tstop
-            
+
         self.tstart = startind
         self.tstop = stopind
         self.time = self.t[self.tstart:self.tstop]
         self.data2plot = self.data[self.tstart:self.tstop,self.chanind]
         self.space_data()
         self.redraw(None)
-        
+
     def page_down(self,widget):
         pass
-        
+
     def channel_tree(self,widget):
         print('updating list')
         self.View = self.builder.get_object("treeview1")
         self.dataList = gtk.ListStore(str,str)
         self.AddListColumn('Number', 0)
         self.AddListColumn('Label', 1)
-        
+
         for k in range(0,self.numchannels):
             iter = self.dataList.append([k,'label'+str(k)])
-            
+
         self.View.set_model(self.dataList)
         print 'adding channels'
-        
+
     def AddListColumn(self, title, columnId):
         column = gtk.TreeViewColumn(title, gtk.CellRendererText(), text=columnId)
         column.set_resizable(True)
         column.set_sort_column_id(columnId)
         self.View.append_column(column)
         self.View.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-        
-        
+
+
     def pref_apply(self, widget):
         liststore,iter = self.View.get_selection().get_selected_rows()
         self.chanind = []
@@ -255,7 +255,7 @@ class template:
         print self.chanind
         self.space_data()
         self.redraw(None)
-        
+
     def set_channel_groups(self,widget):
         print widget.get_label(), widget
         #for i in self.builder.get_object('vbox2').get_children():
@@ -270,11 +270,11 @@ class template:
             self.View.get_selection().unselect_all()
         if widget.get_label() == 'all' and widget.get_active() == True:
             self.View.get_selection().select_all()
-            
-            
-            
 
-        
+
+
+
+
     def generate_testdata(self,widget):
         numpts = 10
         self.numchannels = 10
@@ -293,8 +293,8 @@ class template:
         self.space_data()
         #self.time_view()
         self.redraw(None)
-        
-        
+
+
 
 
     def datahandler(data=None):

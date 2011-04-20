@@ -1,5 +1,5 @@
 #!/usr/bin/python2
-import sys
+import sys,os
 import subprocess
 from gui.gtk import parsepdf
 from pdf2py import pdf

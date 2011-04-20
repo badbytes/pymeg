@@ -16,7 +16,7 @@
 #       along with this program; if not, write to the Free Software
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
-
+import sys,os
 try:
     import pygtk
     pygtk.require("2.0")
@@ -29,16 +29,16 @@ except:
     print("GTK Not Availible")
     sys.exit(1)
 from pdf2py import readwrite
-import os
+
 class prefs:
     def __init__(self):
         self.builder = gtk.Builder()
-        self.builder.add_from_file("preferences.glade")
+        self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
         self.window = self.builder.get_object("window")
-        
+
         #for j in self.builder.get_objects():
             #n = gtk.Buildable.get_name(j)
-        
+
         try:
             self.prefs = readwrite.readdata(os.getenv('HOME')+'/.pymeg.pym')
             print 'reading pref file'
@@ -56,7 +56,7 @@ class prefs:
 
         self.builder.connect_signals(dic)
 
-    def updateprefs(self,widget): 
+    def updateprefs(self,widget):
         #print widget, 'state',widget.get_state(), widget.get_active()
         self.prefs[gtk.Buildable.get_name(widget)] = widget.get_active()
         readwrite.writedata(self.prefs, os.getenv('HOME')+'/.pymeg')

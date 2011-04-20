@@ -16,7 +16,7 @@
 #       along with this program; if not, write to the Free Software
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
-import sys
+import sys,os
 from numpy import arange,ceil,sqrt,shape,size
 from gui.gtk import meg_assistant,errordialog
 from meg import timef
@@ -37,7 +37,7 @@ except:
 class setup:
     def __init__(self):
         self.builder = gtk.Builder()
-        self.builder.add_from_file("timef.glade")
+        self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
         self.window = self.builder.get_object("window")
 
         dic = {
@@ -99,14 +99,16 @@ class setup:
         self.callback(self.t)
 
 
-    def datahandler(self,data,chlabels=None,srate=None,frames=None,trials=None,eventtime=None,callback=None):
+    #def datahandler(self,data,chlabels=None,srate=None,frames=None,trials=None,eventtime=None,callback=None):
+    def datahandler(self,ddict,callback=None):
+
         if callback != None: self.callback = callback
 
-
-        if chlabels == None:
-            chlabels = arange(size(data,1))
-        self.set_tft_info(srate,frames,eventtime,trials,chlabels)
-        self.data = data
+        print 'keys!',ddict.keys()
+        try: chlabels = ddict['labellist']
+        except AttributeError: chlabels = arange(size(ddict['data_block'],1))
+        self.set_tft_info(ddict['srate'],ddict['frames'],ddict['eventtime'],ddict['numofepochs'],ddict['labellist'])
+        self.data = ddict['data_block']
         self.chlabels = chlabels
         #self.workspace_data = workspace_data
 

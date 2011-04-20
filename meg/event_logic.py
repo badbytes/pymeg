@@ -26,7 +26,8 @@ def get_ind(triggervals, data):
     u,n,nz = trigger.vals(data)
     ind = {}
     for i in range(0,len(triggervals)):
-        ind[i] = trigger.ind([triggervals[i]],n,nz)
+        ind[i] = trigger.zero_to_nonzero_ind(data,triggervals[i])
+        #ind[i] = trigger.ind([triggervals[i]],n,nz)
     return ind
 
 #ind_dict = {0:array([0,10,20,300,350]),1:array([2,11,22,290,345,370])}

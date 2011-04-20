@@ -19,7 +19,7 @@
 
 from pylab import *
 from numpy import *
-import sys,nibabel
+import sys,nibabel,os
 try:
     sys.path.index('/usr/lib/python2.6')
 except ValueError:
@@ -54,33 +54,30 @@ import time
 class setup_gui:
     def __init__(self):
         self.builder = gtk.Builder()
-        self.builder.add_from_file("viewmri.glade")
+        self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
         self.window = self.builder.get_object("window1")
-        #self.window.connect("delete-event", self.hideinsteadofdelete)
 
         dic = {
             "on_checkbutton1_toggled" : self.test,
-            #"on_button2_clicked" : self.test2,
-            #"on_button3_clicked" : self.test3,
             "gtk_widget_hide" : self.hideinsteadofdelete,
             "on_menu_load_data_activate" : self.load_data,
             "on_menu_load_channels_activate" : self.load_channel_positions,
-            "on_menuAbout_activate": self.show_aboutdialog, 
+            "on_menuAbout_activate": self.show_aboutdialog,
             "on_menu_coregister_toggled" : self.coregister_toggle
             }
 
         self.builder.connect_signals(dic)
         self.create_draw_frame('none')
-        
+
     def coregister_toggle(self,widget):
         if widget.get_active() == True:
             self.builder.get_object("hbuttonbox2").show()
         else:
             self.builder.get_object("hbuttonbox2").hide()
-        
+
     def show_aboutdialog(self,widget):
         self.builder.get_object("aboutdialog1").show()
-        
+
     def load_data(self,widget):
         pass
     def load_channel_positions(self,widget):
@@ -91,9 +88,9 @@ class setup_gui:
         circle = Circle((self.ind2,self.ind3), 5)
         self.ax1.add_patch(circle)
         self.update()
-        
 
-        
+
+
     def test2(self,widget):
 
         self.fig.clf()
@@ -208,7 +205,7 @@ class setup_gui:
         if event.button == 3:
             self.showpopupmenu(None,event)
             return
-        
+
         #print self.pixdim
 
 
@@ -230,7 +227,7 @@ class setup_gui:
         #print self.ind1,self.ind2,self.ind3
         #self.coord.title.set_text([round(self.ind3*self.pixdim[0]), round(self.ind2*self.pixdim[1]), round(self.ind1*self.pixdim[2])])
         return self.ind3*self.pixdim[0], self.ind2*self.pixdim[1], self.ind1*self.pixdim[2]#event
-    
+
     def showpopupmenu(self,widget,event):
         print('button ',event.button)
         if event.button == 3:
@@ -238,7 +235,7 @@ class setup_gui:
             print(widget, event)
             m.show_all()
             m.popup(None,None,None,3,0)
-        
+
     def display(self,data=None, orient='LPS', overlay=None, colormap=cm.gray, pixdim=None):
         #self.sp = self.fig.add_subplot(111);
         #self.plot_data(data)

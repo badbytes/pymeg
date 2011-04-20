@@ -17,8 +17,6 @@
     </data>
   </object>
   <object class="GtkWindow" id="window">
-    <property name="width_request">600</property>
-    <property name="height_request">300</property>
     <property name="tooltip_text" translatable="yes">This tool reads the trigger and
  response channels, returning values
 and allows for the re-epoching of data.
@@ -44,15 +42,20 @@ Will result in a new epoch or average array.</property>
           </packing>
         </child>
         <child>
+          <placeholder/>
+        </child>
+        <child>
           <object class="GtkHPaned" id="hpaned1">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="border_width">6</property>
             <child>
               <object class="GtkTreeView" id="treeview1">
                 <property name="width_request">470</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="model">liststore1</property>
+                <property name="search_column">0</property>
                 <signal name="button_press_event" handler="showpopupmenu"/>
               </object>
               <packing>
@@ -71,10 +74,6 @@ Will result in a new epoch or average array.</property>
                     <property name="sensitive">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">Boolean logic operations on events.
-ex. TrigCode1&gt;TrigCode2,TimeDifference
-8192&gt;4216,10 means Look for 8192 followed
-by a 4216 with a 10 second window.</property>
                     <property name="use_underline">True</property>
                     <signal name="clicked" handler="on_button_test_logic_clicked"/>
                   </object>
@@ -90,7 +89,6 @@ by a 4216 with a 10 second window.</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">Select and event to delete</property>
                     <signal name="clicked" handler="on_button_delete_clicked"/>
                   </object>
                   <packing>
@@ -100,7 +98,81 @@ by a 4216 with a 10 second window.</property>
                   </packing>
                 </child>
                 <child>
-                  <placeholder/>
+                  <object class="GtkToggleButton" id="togglebutton1">
+                    <property name="label" translatable="yes">Custom Trigger Channel</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <signal name="toggled" handler="on_custom_trig_toggled"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="padding">8</property>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkHBox" id="hbox2">
+                    <property name="orientation">vertical</property>
+                    <child>
+                      <object class="GtkComboBox" id="combobox1">
+                        <property name="visible">True</property>
+                      </object>
+                      <packing>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkEntry" id="entry3">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="invisible_char">&#x25CF;</property>
+                        <property name="text" translatable="yes">Selection window width (sec)</property>
+                      </object>
+                      <packing>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkEntry" id="entry4">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="invisible_char">&#x25CF;</property>
+                        <property name="text" translatable="yes">Sliding window</property>
+                      </object>
+                      <packing>
+                        <property name="position">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkEntry" id="entry5">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="invisible_char">&#x25CF;</property>
+                        <property name="text" translatable="yes">Threshold</property>
+                      </object>
+                      <packing>
+                        <property name="position">3</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="button3">
+                        <property name="label" translatable="yes">Filter and Add</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <signal name="clicked" handler="on_filter_and_add_clicked"/>
+                      </object>
+                      <packing>
+                        <property name="position">4</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="fill">False</property>
+                    <property name="padding">28</property>
+                    <property name="position">3</property>
+                  </packing>
                 </child>
               </object>
               <packing>
@@ -110,7 +182,7 @@ by a 4216 with a 10 second window.</property>
             </child>
           </object>
           <packing>
-            <property name="position">1</property>
+            <property name="position">2</property>
           </packing>
         </child>
         <child>
@@ -124,8 +196,7 @@ by a 4216 with a 10 second window.</property>
                 <child>
                   <object class="GtkLabel" id="label1">
                     <property name="visible">True</property>
-                    <property name="label" translatable="yes">PreEvent
-   (sec)</property>
+                    <property name="label" translatable="yes">PreEvent  (sec)</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -136,17 +207,13 @@ by a 4216 with a 10 second window.</property>
                 <child>
                   <object class="GtkLabel" id="label2">
                     <property name="visible">True</property>
-                    <property name="label" translatable="yes">PostEvent
-    (sec)</property>
+                    <property name="label" translatable="yes">PostEvent  (sec)</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
                     <property name="position">1</property>
                   </packing>
-                </child>
-                <child>
-                  <placeholder/>
                 </child>
               </object>
               <packing>
@@ -168,8 +235,6 @@ by a 4216 with a 10 second window.</property>
                     <signal name="changed" handler="on_text_changed"/>
                   </object>
                   <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
                     <property name="position">0</property>
                   </packing>
                 </child>
@@ -184,13 +249,8 @@ by a 4216 with a 10 second window.</property>
                     <signal name="changed" handler="on_text_changed"/>
                   </object>
                   <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
                     <property name="position">1</property>
                   </packing>
-                </child>
-                <child>
-                  <placeholder/>
                 </child>
               </object>
               <packing>
@@ -233,9 +293,6 @@ by a 4216 with a 10 second window.</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
-                <child>
-                  <placeholder/>
-                </child>
               </object>
               <packing>
                 <property name="position">2</property>
@@ -243,7 +300,9 @@ by a 4216 with a 10 second window.</property>
             </child>
           </object>
           <packing>
-            <property name="position">2</property>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">3</property>
           </packing>
         </child>
         <child>
@@ -253,7 +312,7 @@ by a 4216 with a 10 second window.</property>
           </object>
           <packing>
             <property name="expand">False</property>
-            <property name="position">3</property>
+            <property name="position">4</property>
           </packing>
         </child>
       </object>

@@ -16,7 +16,7 @@
 #       along with this program; if not, write to the Free Software
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
-
+import sys,os
 try:
     import pygtk
     pygtk.require("2.0")
@@ -43,7 +43,7 @@ from numpy import random, array, round
 class setup:
     def __init__(self):
         self.builder = gtk.Builder()
-        self.builder.add_from_file("coregister.glade")
+        self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
         self.window = self.builder.get_object("window1")
         self.statusbar = self.builder.get_object("statusbar1")
         self.statusbar_cid = self.statusbar.get_context_id("")

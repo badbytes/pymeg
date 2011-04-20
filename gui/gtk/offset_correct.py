@@ -32,7 +32,7 @@ except:
 class offsetwin:
     def __init__(self):
         self.builder = gtk.Builder()
-        self.builder.add_from_file("offset_correct.glade")
+        self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
         self.window = self.builder.get_object("OffsetWindow")
 
         dic = {

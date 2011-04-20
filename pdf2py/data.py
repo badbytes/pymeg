@@ -103,7 +103,7 @@ class read(initialize):
                 return
 
         self.fid.close
-        self.numofepochs = self.hdr.header_data.total_epochs #self.pnts_in_file/self.time_slice_size
+        self.numofepochs = self.hdr.header_data.total_epochs[0] #self.pnts_in_file/self.time_slice_size
         #lasttimepnt = (self.pnts_in_file / self.numofepochs)/\
         #(1/self.hdr.header_data.sample_period)
         #self.wintime = arange(0,lasttimepnt,self.hdr.header_data.sample_period)[:-1]
@@ -112,8 +112,8 @@ class read(initialize):
         self.epoch_size = self.pnts_in_file / self.numofepochs
         self.eventtime = self.wintime[0:self.epoch_size] - self.hdr.event_data[0].start_lat
         self.numofchannels = size(self.data_block,1)
-        self.srate = 1/self.hdr.header_data.sample_period
-        self.frames = self.data_block.shape[0] / self.numofepochs[0]
+        self.srate = 1/self.hdr.header_data.sample_period[0]
+        self.frames = self.data_block.shape[0] / self.numofepochs
 
     def setchannels(self, chtype):
         '''chtype = = type of channel (meg | eeg | ref | trig | ext | derived | utility | shorted)'''

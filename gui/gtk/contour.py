@@ -18,7 +18,7 @@
 #       MA 02110-1301, USA.
 
 from pylab import *
-import sys
+import sys,os
 try:
     sys.path.index('/usr/lib/python2.6')
 except ValueError:
@@ -52,7 +52,7 @@ import time
 class setup_gui:
     def __init__(self):
         self.builder = gtk.Builder()
-        self.builder.add_from_file("contour.glade")
+        self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
         self.window = self.builder.get_object("window1")
         #self.window.connect("delete-event", self.hideinsteadofdelete)
 

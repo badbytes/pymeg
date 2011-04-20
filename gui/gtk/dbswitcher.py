@@ -21,12 +21,11 @@
 #       MA 02110-1301, USA.
 
 
-import pygtk,sys
+import pygtk,sys,subprocess,os
 pygtk.require('2.0')
 import gtk, gtk.glade
 
 from mswtools import vistadbscan
-import subprocess, os
 
 
 class cbtest:
@@ -34,13 +33,8 @@ class cbtest:
         self.scandbs = vistadbscan.run()
         print self.scandbs
 
-        print('sysarg0',sys.argv[0])
-        gladepath = os.path.splitext(sys.argv[0])[0]
         self.builder = gtk.Builder()
-        self.builder.add_from_file(gladepath+".glade")
-
-        #self.builder = gtk.Builder()
-        #self.builder.add_from_file("dbswitcher.glade")
+        self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
         self.window = self.builder.get_object("window1")
         self.window.show()
         self.box=self.builder.get_object("combobox1")
