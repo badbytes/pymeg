@@ -84,8 +84,10 @@ def event_detection(data, sample_period, selectwin, slidingwin, thresh):
     win = int((1 / sample_period) * selectwin) #get ind for selction window
     indslid = int((1 / sample_period) * slidingwin) #get ind for slidingwin
     lastind = indslid*np.floor(len(data)/np.float(indslid))
+    print 'params',s,win,indslid,lastind
 
     t = np.where(s>thresh+s.min())[0] #reduce computation by picking points that could qualify.
+    print t.shape
     tind = []
     a = 0
     val = t[0] #starting val

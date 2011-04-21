@@ -127,7 +127,7 @@ Will result in a new epoch or average array.</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="invisible_char">&#x25CF;</property>
-                        <property name="text" translatable="yes">Selection window width (sec)</property>
+                        <property name="text" translatable="yes">1</property>
                       </object>
                       <packing>
                         <property name="position">1</property>
@@ -138,7 +138,7 @@ Will result in a new epoch or average array.</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="invisible_char">&#x25CF;</property>
-                        <property name="text" translatable="yes">Sliding window</property>
+                        <property name="text" translatable="yes">.1</property>
                       </object>
                       <packing>
                         <property name="position">2</property>
@@ -149,7 +149,7 @@ Will result in a new epoch or average array.</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="invisible_char">&#x25CF;</property>
-                        <property name="text" translatable="yes">Threshold</property>
+                        <property name="text" translatable="yes">1</property>
                       </object>
                       <packing>
                         <property name="position">3</property>

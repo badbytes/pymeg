@@ -146,19 +146,19 @@ class setup:
             pass
         self.populate_combo(chlabels)
 
-    def populate_combo(self, data_list=None):
+    def populate_combo(self, chlabels=None):
         print 'populating channel list'
-        if data_list == None:
-            data_list = ['None']#arange(50)
+        if chlabels == None:
+            chlabels = ['None']#arange(50)
         combobox = self.builder.get_object("combobox1")
         combobox.clear()
         liststore = gtk.ListStore(str)
         cell = gtk.CellRendererText()
         combobox.pack_start(cell)
         combobox.add_attribute(cell, 'text', 0)
-        combobox.set_wrap_width(int(ceil(sqrt(len(data_list)))))
+        combobox.set_wrap_width(int(ceil(sqrt(len(chlabels)))))
 
-        for n in data_list: #range(50):
+        for n in chlabels: #range(50):
             liststore.append([n])
         combobox.set_model(liststore)
         combobox.connect('changed', self.changed_cb)
