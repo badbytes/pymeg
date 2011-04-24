@@ -279,25 +279,17 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="specgram">
+                      <object class="GtkMenuItem" id="powerspectraldensity">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">Specgram</property>
+                        <property name="label" translatable="yes">Power Spectral Density</property>
                         <property name="use_underline">True</property>
-                        <signal name="activate" handler="on_specgram_activate"/>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkMenuItem" id="fftmenu">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">FFT</property>
-                        <property name="use_underline">True</property>
-                        <signal name="activate" handler="on_fft_activate"/>
+                        <signal name="activate" handler="on_power_spectral_density_activate"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="sourcespaceprojection">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">Source Space Projection</property>
+                        <property name="label" translatable="yes">__Source Space Projection</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
@@ -1520,6 +1512,9 @@
     <property name="opacity">0.90000000000000002</property>
     <signal name="close" handler="gtk_widget_hide"/>
     <signal name="cancel" handler="gtk_widget_hide"/>
+    <child>
+      <placeholder/>
+    </child>
     <child>
       <placeholder/>
     </child>

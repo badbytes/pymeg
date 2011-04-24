@@ -197,8 +197,7 @@ class setup_gui:
         print 'logic found',logic_list
 
 
-        for logic in logic_list:
-
+        for logic in logic_list: #logic var is an event
 
             #parse logic string into val,val,time
             trig_vals = logic.split(',')[0].split('>')
@@ -370,6 +369,6 @@ if __name__ == "__main__":
     mainwindow = setup_gui()
     mainwindow.window.show()
     fn = '/home/danc/programming/python/data/0611/0611piez/e,rfhp1.0Hz,COH'
-    fn = '/opt/msw_danc/data/spartan_data0/0611/IB_MOTb/04%13%11@14:55/1/c,rfDC,f.1hp,o,o,d2'
+    #fn = '/opt/msw_danc/data/spartan_data0/0611/IB_MOTb/04%13%11@14:55/1/c,rfDC,f.1hp,o,o,d2'
     mainwindow.set_passed_filename(fn)
     gtk.main()

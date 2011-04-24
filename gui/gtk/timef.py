@@ -48,57 +48,6 @@ class setup:
 
         self.builder.connect_signals(dic)
 
-    def errordialog(self, errormesg):
-        error = errordialog.errorwin(errormesg)
-
-
-    def apply_button(self,widget):
-        print 'apply_button'
-        print 'uri',self.builder.get_object('filechooserbutton1').get_uri()
-        try:
-            cycles = eval(self.builder.get_object("entry2").get_text())
-            freqrange = eval(self.builder.get_object("entry3").get_text())
-            padratio = eval(self.builder.get_object("entry4").get_text())
-            timesout = eval(self.builder.get_object("entry5").get_text())
-            frames = eval(self.builder.get_object("entry6").get_text())
-            trials = eval(self.builder.get_object("entry7").get_text())
-            srate = eval(self.builder.get_object("entry8").get_text())
-            eventtime = eval(self.builder.get_object("entry9").get_text())
-        except:
-            print('not enough info. exiting')
-            self.errordialog('not enough info. exiting');
-            return -1
-
-        print cycles,freqrange,padratio,timesout,frames,trials,srate,eventtime
-        self.t = timef.initialize()
-
-        try:
-            chind = self.chlabels.index(self.chan_sel);print 'chind',chind
-            self.data2timef = self.data[:,chind]
-        except:
-            print 'assuming data passed.'
-
-
-
-        print 'shape',self.data2timef.shape
-        return_code = self.t.calc(data=self.data2timef,freqrange=freqrange,cycles=cycles,\
-        padratio=int(padratio),timesout=int(timesout),frames=int(frames),\
-        trials=int(trials),srate=float(srate),eventtime=int(eventtime))
-        if return_code == -2:
-            self.errordialog('Too few points in data for that freq range. Load more points or increase the min freq.');
-        try:
-            pass
-            #self.workspace_data['tft'] = []
-            #self.workspace_data['tft'] = self.t
-            #print 'tft ws',self.workspace_data['tft']
-        except AttributeError:
-            self.builder.get_object('filechooserbutton2').set_uri(self.builder.get_object('filechooserbutton1').get_uri())
-            self.builder.get_object('filechooserbutton2').show()
-            self.builder.get_object('filechooserbutton2').set_state(True)
-
-        self.callback(self.t)
-
-
     #def datahandler(self,data,chlabels=None,srate=None,frames=None,trials=None,eventtime=None,callback=None):
     def datahandler(self,ddict,callback=None):
 
@@ -172,6 +121,54 @@ class setup:
             print model[index][0], 'selected'
             self.chan_sel = str(model[index][0])
         return
+        
+    def apply_button(self,widget):
+        print 'apply_button'
+        print 'uri',self.builder.get_object('filechooserbutton1').get_uri()
+        try:
+            cycles = eval(self.builder.get_object("entry2").get_text())
+            freqrange = eval(self.builder.get_object("entry3").get_text())
+            padratio = eval(self.builder.get_object("entry4").get_text())
+            timesout = eval(self.builder.get_object("entry5").get_text())
+            frames = eval(self.builder.get_object("entry6").get_text())
+            trials = eval(self.builder.get_object("entry7").get_text())
+            srate = eval(self.builder.get_object("entry8").get_text())
+            eventtime = eval(self.builder.get_object("entry9").get_text())
+        except:
+            print('not enough info. exiting')
+            self.errordialog('not enough info. exiting');
+            return -1
+
+        print cycles,freqrange,padratio,timesout,frames,trials,srate,eventtime
+        self.t = timef.initialize()
+
+        try:
+            chind = self.chlabels.index(self.chan_sel);print 'chind',chind
+            self.data2timef = self.data[:,chind]
+        except:
+            print 'assuming data passed.'
+
+        print 'shape',self.data2timef.shape
+        return_code = self.t.calc(data=self.data2timef,freqrange=freqrange,cycles=cycles,\
+        padratio=int(padratio),timesout=int(timesout),frames=int(frames),\
+        trials=int(trials),srate=float(srate),eventtime=int(eventtime))
+        if return_code == -2:
+            self.errordialog('Too few points in data for that freq range. Load more points or increase the min freq.');
+        try:
+            pass
+            #self.workspace_data['tft'] = []
+            #self.workspace_data['tft'] = self.t
+            #print 'tft ws',self.workspace_data['tft']
+        except AttributeError:
+            self.builder.get_object('filechooserbutton2').set_uri(self.builder.get_object('filechooserbutton1').get_uri())
+            self.builder.get_object('filechooserbutton2').show()
+            self.builder.get_object('filechooserbutton2').set_state(True)
+
+        self.callback(self.t)
+        
+    def errordialog(self, errormesg):
+        error = errordialog.errorwin(errormesg)
+
 
 
 if __name__ == "__main__":

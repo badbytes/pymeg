@@ -24,53 +24,51 @@ import sys,os,subprocess
 if sys.version >= '3':
     print ('Wrong Python Version. Only Python2 supported.')
     sys.exit(1)
-
+try:
+    import pygtk
+    pygtk.require("2.0")
+except:
+    print("PyGTK Version Import Error")
+    sys.exit(1)
+try:
+    import gtk
+    import gtk.glade
+except:
+    print("GTK import error")
+    sys.exit(1)
+    
+#pylab methods
 from matplotlib import use;use('GTK')
 from matplotlib.figure import Figure
 from matplotlib.axes import Subplot
 from matplotlib.backends.backend_gtk import show
 
+#load required methods
 from pdf2py import pdf, readwrite,lA2array
 from numpy import shape, random, sort, array, append, size, arange, ndarray,vstack,mean,zeros
 from meg import dipole,plotvtk,plot2dgtk,leadfield,signalspaceprojection,nearest
 from mri import img_nibabel as img
 
+#gui modules
 from gui.gtk import filter, offset_correct, errordialog, preferences,\
 dipoledensity, coregister, timef, data_editor, event_process, parse_instance, \
-meg_assistant, errordialog, viewmri
+meg_assistant, errordialog, viewmri, power_spectral_density
 from gui.gtk import contour as contour_gtk
 
 #from IPython.Shell import IPShellEmbed
 #ipshell = IPShellEmbed()
 #ipshell() # this call anywhere in your program will start IPython
 
-
-try:
-    import pygtk
-    pygtk.require("2.0")
-except:
-    #print('1'
-    pass
-try:
-    import gtk
-    import gtk.glade
-except:
-    print("GTK Not Availible")
-    sys.exit(1)
-
 class maingui:
-
-    wTree = None
-
+    wTree = None 
     def __init__(self):
         self.builder = gtk.Builder()
         self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
         self.window = self.builder.get_object("windowTreeview")
         self.statusbar = self.builder.get_object("statusbar")
-        self.statusbar_cid = self.statusbar.get_context_id("test")
-
-        self.memorybar = self.builder.get_object("memorybar")
-        self.progressbar = self.builder.get_object("progressbar")
+        self.statusbar_cid = self.statusbar.get_context_id("")
+        #self.memorybar = self.builder.get_object("memorybar")
+        #self.progressbar = self.builder.get_object("progressbar")
         self.datatree(self)
 
         dic = {
@@ -116,6 +114,7 @@ class maingui:
             "on_menu_signal_space_filter_activate" : self.signal_space_filter,
             "on_menu_contour_plot_activate" : self.contour_plot,
             "on_menu_epoch_data_activated" : self.epoch_data,
+            "on_power_spectral_density_activate" : self.power_spectral_density,
             "on_test" : self.test,
         }
 
@@ -125,21 +124,21 @@ class maingui:
         self.datadict = {} #store the actual loaded data
         self.treelist = [] #appends list with newly clicked items from treeview
         self.treedict = {} #initialize the treeview dictionary.
-        self.queue_store = gtk.ListStore(str)
+        #self.queue_store = gtk.ListStore(str)
         self.dataselected = [] #tree item currently selected
 
-
+        #preference data
         try: self.prefs = readwrite.readdata(os.getenv('HOME')+'/.pymeg.pym')
         except IOError: pass
         self.fill_combo_entries(None)
 
-    def test(self,widget):
+    def test(self,widget): #dev default function
         print 'tested'
         menu = self.builder.get_object("menufunctions")
         menu.show_all(); menu.hide()
         menu.set_tearoff_state(True)
 
-    def updatestatusbar(self,string):
+    def updatestatusbar(self,string): 
         self.statusbar.push(self.statusbar_cid, string)
 
     def showpopupmenu(self,widget,event):
@@ -161,19 +160,13 @@ class maingui:
     def showplotwin(self, widget):
         self.builder.get_object('plotdialog').show()
 
-
     def abouthide(self,null,null2):
         self.builder.get_object('aboutdialog1').hide()
 
     def meg_assist(self):
-        #from gui.gtk import filechooser
-        #fn = filechooser.open()
-        pass
         self.data_assist = meg_assistant.setup(path = self.fn, callback=self.load_megdata_callback)
 
     def load_megdata_callback(self):
-        print('DONE!')
-        #p = self.data_assist.pdfdata
         path = self.data_assist.pdfdata.data.filepath
         self.datadict[path] = self.data_assist.pdfdata
         self.readMEG()
@@ -185,7 +178,6 @@ class maingui:
     def readMEG(self):
         path = self.fn
         self.dataList.clear()
-
         #convert pdf object to dictonary
         self.parseinstance(self.datadict[path])
         self.refreshdatasummary()
@@ -263,16 +255,11 @@ class maingui:
         if self.filetype == 'MRI':
             print('filetype MRI')
             self.datadict[self.fn] = {'nifti':img.loadimage(self.fn)}
-            #self.datadict[self.fn] = img.read(self.fn)
-            #self.mr = self.datadict[self.fn] #make a copy for easy use later.
             self.refreshdatasummary()
             self.treegohome(None)
 
         if self.filetype == 'PYM':
             print('filetype PYTHON')
-            #from instantiate import pymeg
-            #p = pymeg.PYMEG()
-            #p.data = readwrite.readdata(self.fn)
             d = readwrite.readdata(self.fn)
             self.datadict[self.fn] = d
             self.refreshdatasummary()
@@ -311,7 +298,6 @@ class maingui:
 
     def saveselected(self,widget):
         fcd = self.builder.get_object("filechooserdialog2")
-
         try:
             readwrite.writedata(self.treedata[self.selecteditem], fcd.get_filename())
         except AttributeError:
@@ -391,7 +377,6 @@ class maingui:
         iter = self.dataList.get_iter(c[0])
         print('you selected', self.dataList.get_value(iter,0))#, self.dataList.get_value(iter,1))
         self.refreshdatasummary()
-        #self.refreshresults()
 
         print('you selected position',c[0])
         print('length of tree', len(self.treedict))
@@ -432,7 +417,6 @@ class maingui:
         for i in self.parseddatadict:
             iter = self.dataList.append([i,type(self.parseddatadict[i])])#, 'Data File'])
             print('data items...',i)
-        #self.builder.get_object('treebutton3').set_sensitive(True)
         self.builder.get_object('treebutton2').set_sensitive(False)
 
     def treeuplevel(self,widget):
@@ -448,12 +432,10 @@ class maingui:
         except IndexError:
             self.treegohome(self)
             return
-        #print(self.data2parse,'------------------')
         self.dataList.clear()
         print('type of data2parse:', type(self.data2parse))
         if type(self.data2parse) == dict:
             self.treedata = self.data2parse#self.parseddata.out
-            #print('dict parse', self.data2parse)
         else:
             self.parseinstance(self.data2parse)
             self.treedata = self.parseddata.out
@@ -487,9 +469,10 @@ class maingui:
 
         for i in range(0, len(self.labeldict.keys())):
             c[i].set_label(self.labeldict[self.labeldict.keys()[i]])
-            c[i].show(); #c[i].set_active(True)
-            e[i].show(); e[i].activate()
-            col[i].show(); #col[i].activate()
+            c[i].show(); 
+            e[i].show();
+            e[i].activate();
+            col[i].show(); 
             shape_type[i].show()
 
     def fill_combo_entries(self,widget):
@@ -516,7 +499,6 @@ class maingui:
         counternum = 0
 
         for i in self.builder.get_object('vbox3').get_children():
-
             if i.get_active() == True:
                 print(i), i.get_label()
                 self.sel2plot[counternum] = self.plotdict[counternum]
@@ -536,8 +518,6 @@ class maingui:
         print(self.sel2plot, self.plotdict)
         print('data', self.sel2plot)
         plotvtk.display(self.sel2plot, color = colordict, radius = sizedict)
-
-
 
     def plot2D(self, widget):
         try:
@@ -645,7 +625,6 @@ class maingui:
             return -1
         self.fil.builder.get_object('FilterWindow').show()
 
-
     def offset_handler(self,widget):
         self.checkreq()
         self.offset = offset_correct.offsetwin()#.window.show()
@@ -658,14 +637,13 @@ class maingui:
             return
 
         from gui.gtk import grid
-        self.gridwin = grid.gridwin()#.window.show()gridwin
+        self.gridwin = grid.gridwin()
         try:
             self.gridwin.mriwin(workspace_data=self.data_file_selected)
         except (AttributeError, KeyError):
             print('no data')
             self.errordialog\
             ('No data selected. Double Click a MEG filename')
-
 
     def checkreq(self):
         try: self.fn
@@ -686,7 +664,7 @@ class maingui:
             F.say(errormesg)
 
     def loadpreferences(self, widget):
-        self.prefinit = preferences.prefs()#.prefs.window.show()#.window.show()
+        self.prefinit = preferences.prefs()
         self.prefinit.window.show()
         self.prefs = self.prefinit.prefs
 
@@ -804,6 +782,16 @@ class maingui:
             self.data_file_selected['signal_projection']['signal_weights'] = data[self.de.sel_ind]
 
     def signal_space_filter(self,widget):
+        
+        self.datadict[self.data_filename_selected] = self.data_file_selected
+        #sp = self.data_file_selected['signal_projection']
+        #obj = self.treedata[self.selecteditem]
+        #var = ['channels','srate','numofepochs','labellist',
+        #'chanlocs','frames','eventtime','wintime']
+        #res = (self.setup_helper(var,obj=obj));
+        #data_block = (self.setup_helper(['data_block'],obj=obj))['data_block']
+        #ed = self.data_file_selected['epoched_data'] = {}
+        #self.result_helper(ed,res)
 
         if self.signal_space_build_weights(widget) == -1:
             self.data_editor(None)
@@ -817,30 +805,35 @@ class maingui:
             return -1
         weights = sp['signal_weights']
         try:
-            data = self.setup_helper(var='data_block',obj=self.treedata[self.selecteditem])
+            res = self.setup_helper(var='data_block',obj=self.treedata[self.selecteditem])
         except KeyError:
             print ("No appropriate data found!!")
             self.errordialog("Incorrect data selected");
             pass
 
-        ssp = signalspaceprojection.calc(data, weight=weights)
+        ssp = signalspaceprojection.calc(res['data_block'], weight=weights)
 
 
-        sp['ssp'] = ssp
-        sp['channels'] = {}
+        sp['ssp'] = sp['data_block'] = ssp
+        var = ['channels','srate','numofepochs','labellist','chanlocs','frames','eventtime','wintime']
+        obj = self.treedata[self.selecteditem]
+        res = (self.setup_helper(var,obj=obj));
+        self.result_helper(sp,res)
+        
+        #sp['channels'] = {}
         labels = []
         for i in range(0,size(ssp,1)):
             labels.extend(['SigSP'+str(i)])
-        sp['channels']['labellist'] = labels
-        sp['channels']['chanlocs'] = \
+        sp['labellist'] = labels
+        sp['chanlocs'] = \
         array(self.treedata[self.selecteditem].channels.chanlocs[:,0:size(ssp,1)])
-        sp['data_block'] = ssp
-        sp['srate'] = self.treedata[self.selecteditem].srate
-        sp['wintime'] = self.treedata[self.selecteditem].wintime
-        sp['eventtime'] = self.treedata[self.selecteditem].eventtime
-        sp['frames'] = self.treedata[self.selecteditem].frames
-        sp['srate'] = self.treedata[self.selecteditem].srate
-        sp['numofepochs'] = self.treedata[self.selecteditem].numofepochs
+        #sp['data_block'] = ssp
+        #sp['srate'] = self.treedata[self.selecteditem].srate
+        #sp['wintime'] = self.treedata[self.selecteditem].wintime
+        #sp['eventtime'] = self.treedata[self.selecteditem].eventtime
+        #sp['frames'] = self.treedata[self.selecteditem].frames
+        #sp['srate'] = self.treedata[self.selecteditem].srate
+        #sp['numofepochs'] = self.treedata[self.selecteditem].numofepochs
 
     def contour_plot(self,widget):
         try:
@@ -856,14 +849,13 @@ class maingui:
 
         self.mc.fig.clf()
 
-        chanlocs = self.setup_helper(var='chanlocs',obj=self.treedata['channels'])
+        chanlocs = self.setup_helper(var='chanlocs',obj=self.treedata['channels'])['chanlocs']
         self.mc.display(self.treedata[self.selecteditem],chanlocs, subplot='on')
 
     def result_helper(self,newobj,var):
         for i in var.keys():
             newobj[i] = var[i]
         return newobj
-
 
     def epoch_data(self,widget):
         def epoch_callback(widget,startcut,endcut):
@@ -941,6 +933,17 @@ class maingui:
 
     def data_editor_callback(self):
         print ('Done')
+    
+    def power_spectral_density(self,widget):
+        obj=self.treedata[self.selecteditem];
+        res = (self.setup_helper(var=['data_block','srate','labellist','chanlocs'],obj=obj));
+        self.psd = power_spectral_density.setup_gui()
+        self.psd.datahandler(res)
+        self.psd.window.show()
+        
+        
+
+
 
     def testhandler(self, widget):
         self.prnt(None)
