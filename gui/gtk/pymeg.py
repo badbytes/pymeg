@@ -670,17 +670,18 @@ class maingui:
 
     def plot2Dmri(self, widget):
         vm = viewmri.setup_gui()
-        print(self.treedata[self.selecteditem].data)
-        try:
-            self.mrimousepos = vm.display(self.treedata[self.selecteditem].data,pixdim=self.treedata[self.selecteditem].pixdim)
+        vm.window.show()
+        #print(self.treedata[self.selecteditem].data)
+        #try:
+        self.mrimousepos = vm.display(self.treedata[self.selecteditem].data.T,pixdim=self.treedata[self.selecteditem].pixdim)
 
-        except:# (AttributeError, KeyError):
-            try:
-                self.mrimousepos = vm.display(self.treedata[self.selecteditem])
-                vm.window.show()
-            except (AttributeError, KeyError):
-                print('Unknown data format')
-                self.errordialog('Unknown data format. Try selecting variable = nifti, or data array');
+        #except:# (AttributeError, KeyError):
+            #try:
+                #self.mrimousepos = vm.display(self.treedata[self.selecteditem])
+                #vm.window.show()
+            #except (AttributeError, KeyError):
+                #print('Unknown data format')
+                #self.errordialog('Unknown data format. Try selecting variable = nifti, or data array');
 
     def plot3DMRIhandle(self, widget):
         from mri import vtkview
@@ -825,8 +826,8 @@ class maingui:
         for i in range(0,size(ssp,1)):
             labels.extend(['SigSP'+str(i)])
         sp['labellist'] = labels
-        sp['chanlocs'] = \
-        array(self.treedata[self.selecteditem].channels.chanlocs[:,0:size(ssp,1)])
+        #sp['chanlocs'] = \
+        #array(self.treedata[self.selecteditem].channels.chanlocs[:,0:size(ssp,1)])
         #sp['data_block'] = ssp
         #sp['srate'] = self.treedata[self.selecteditem].srate
         #sp['wintime'] = self.treedata[self.selecteditem].wintime
