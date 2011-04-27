@@ -46,7 +46,7 @@ def build(sourcedata, sourcespace, hisample=None):
 
     #for ii in range(0, size(sourcedata,0)): #for each component
     for j in range(0, size(sourcedata,0)): #for each component
-        print 'slice',j
+        print 'processing component',j
         for i in range(0, size(sourcedata,1)): #for each location
             newimg[j,sourcespace.ind[0,i],sourcespace.ind[1,i],sourcespace.ind[2,i]] = sourcedata[j,i];
     #del sourcedata#, sourcespace.mrixyz, sourcespace.ind, sourcespace.img

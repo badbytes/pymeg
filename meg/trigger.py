@@ -24,7 +24,6 @@ where u are unique values in data, n are nonzero indicies and nz is the value at
 t = trigger.zero_to_nonzero_ind(p.data.data_block,u[1]);
 returns t, the indices to value u where the transition is from zero to u.
 
-
 '''
 
 import numpy as np
@@ -88,49 +87,6 @@ def event_detection(data, sample_period, selectwin, slidingwin, thresh):
 
     t = np.where(s>thresh+s.min())[0] #reduce computation by picking points that could qualify.
     print t.shape
-    tind = []
-    a = 0
-    val = t[0] #starting val
-    looping = True
-    while looping == True:
-        indx = val-indslid #step back from ind to start the peak-peak sliding window.
-        stopindx = indx + win #create a stop point to keep the sliding window for going on forever
-        while indx < stopindx:
-            mini = min(s[indx:indx+indslid])
-            maxi = max(s[indx:indx+indslid])
-            if maxi - mini > thresh:
-                tind.append(indx)
-                indx = stopindx #stop this iteration, move on to next win
-
-            indx = indx + 1 #slide to next index
-
-        a = a + 1
-        print 'event', a, 'detected'
-
-        try:
-            val = t[np.where(t > indx)[0][0]] #get ind for the next window
-        except IndexError:
-            looping == False
-            return tind
-
-
-
-def external(data, sample_period, selectwin, slidingwin, thresh):
-    '''use external channel with sliding window and threshold to create ind
-    t = trigger.external(data, sample_period, 1.5, .05, .3)
-    #returns the indices (t)
-    data = t.data.data_block[:,0]
-    sample_period = t.hdr.header_data.sample_period
-    window size 1.5 sec
-    for a sliding window of 50 msec
-    and a threshold of .3 V'''
-
-    s = np.sqrt(np.square(data)) #make positive
-    win = int((1 / sample_period) * selectwin) #get ind for selction window
-    indslid = int((1 / sample_period) * slidingwin) #get ind for slidingwin
-    lastind = indslid*np.floor(len(data)/np.float(indslid))
-
-    t = np.where(s>thresh+s.min())[0] #reduce computation by picking points that could qualify.
     tind = []
     a = 0
     val = t[0] #starting val

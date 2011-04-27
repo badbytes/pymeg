@@ -124,6 +124,10 @@ class read(initialize):
         from pdf2py import update_data_header
         self.channels = channel_new.index(self.datapdf, chtype)
         update_data_header.cutchannels(self)
+        try:
+            self.channels.getposition()
+        except:
+            print('Error setting channel positions')
 
     def setchannellabels(self, chlabels):
         from pdf2py import update_data_header

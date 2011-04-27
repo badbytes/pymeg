@@ -37,6 +37,7 @@ class loadimage():
         self.nifti = nibabel.load(filepath)
         dirpath = os.path.dirname(filepath)
         self.data = self.nifti.get_data()
+        self.nifti.data = self.data
         h = self.nifti.get_header()
         self.pixdim = h['pixdim'][0:3]
         if os.path.isfile(filepath+'.pym') == True:
@@ -103,7 +104,7 @@ class loadimage():
             [t,r] = transform.meg2mri(self.lpa,self.rpa,self.nas)
             self.megxyz = transform.mri2meg(t,r,self.mrixyz)
         except AttributeError:
-            pass
+            print 'Transform Error, skipping'
 
     def getscalespace(self, path2pdf):
         self.scaledgrid = transform.scalesourcespace(path2pdf, self.megxyz, self.lpa, self.rpa, self.nas, self.nifti.voxdim)/1000

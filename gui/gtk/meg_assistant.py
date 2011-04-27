@@ -78,17 +78,25 @@ class setup:
             chlabels.extend(self.pdfdata.data.channels.labellist)
         print 'chlabels', chlabels
         self.pdfdata = pdf.read(self.path)
-        startpnt = int(self.builder.get_object("entry29").get_text())
+
         if self.ne > 1: #only load value in epoch increments
             pntsinepoch = self.pdfdata.data.pnts_in_file/self.ne
+            startepoch = int(self.builder.get_object("entry29").get_text())
             endepoch = int(self.builder.get_object("entry30").get_text())
+            startpnt = pntsinepoch * startepoch
             endpnt = pntsinepoch * endepoch
+            numofepochs = endepoch - startepoch
 
         else:
+            startpnt = int(self.builder.get_object("entry29").get_text())
             endpnt = int(self.builder.get_object("entry30").get_text())
+            numofepochs = 1
+
         self.pdfdata.data.setchannellabels(chlabels)
         self.pdfdata.data.getdata(startpnt,endpnt)
         self.pdfdata.data.wintime = self.pdfdata.data.wintime[startpnt:endpnt]
+        self.pdfdata.data.numofepochs = numofepochs
+        self.pdfdata.data.pnts_in_file = endpnt-startpnt
         self.builder.get_object("assistant1").hide()
         self.callback()
         return self.pdfdata

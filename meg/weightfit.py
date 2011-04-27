@@ -17,8 +17,15 @@
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
 
-'''weight fit
+
+
+'''
+Attribution to Source Localization of EEG/MEG Data by Correlating Columns of ICA Solution with Lead Field Matrix
+    Hild, K.E.; Nagarajan, S.S.
+
+weight fit
 reload(weightfit); w=weightfit.calc(path2pdf, lfmat, winv)
+
 '''
 
 
