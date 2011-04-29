@@ -21,6 +21,7 @@
 
 from numpy import zeros,shape,size, array, squeeze
 from mri import interp_array
+import sys
 try:
     import ndimage
 except ImportError:
@@ -33,7 +34,9 @@ def build(sourcedata, sourcespace, hisample=None):
     ie, dec = img.decimate(nimstripped, 20)
     lf = leadfield.calc(p.data.channels, grid=i.megxyz)
     '''
-    #~ oi = sourcespace;
+    if size(sourcedata,1) != size(sourcespace.ind,1):
+        print('mismatch between sourcedata and sourcespace indices. They are diff lengths and this wont make sense. exiting.')
+        return
 
     if size(sourcedata.shape) == 1: #make 2D
         sourcedata = array([sourcedata])
@@ -47,11 +50,11 @@ def build(sourcedata, sourcespace, hisample=None):
 
 
     #for ii in range(0, size(sourcedata,0)): #for each component
+
     for j in range(0, size(sourcedata,0)): #for each component
         print 'processing component',j
         for i in range(0, size(sourcedata,1)): #for each location
             newimg[j,sourcespace.ind[0,i],sourcespace.ind[1,i],sourcespace.ind[2,i]] = sourcedata[j,i];
-            print i#sourcespace.ind[:,i]
     #del sourcedata#, sourcespace.mrixyz, sourcespace.ind, sourcespace.img
     #resample back to original resolution
     newshape = [size(newimg,0),sourcespace.nifti.data.shape[0],sourcespace.nifti.data.shape[1],\

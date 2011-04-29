@@ -31,6 +31,9 @@ from numpy import linalg
 from scipy import *
 from meg import sensors,leadfield,grid
 from time import time
+from misc import progressbar
+import sys
+
 
 def setup(self): #set some things up
     lsc = ([0, 0, 4]);
@@ -80,7 +83,10 @@ class calc:
         self.f = f = fn
         self.psi_reconstruct = psi_reconstruct = zeros((len(fn)*2,len(f)));
 
+
+        pbar = progressbar.ProgressBar().start()
         for i in range(0,len(f)):
+
             L = Lc[:,(i+1-1)*2+1-1:(i+1)*2]; #check indicies
             self.L=L
 
@@ -117,13 +123,15 @@ class calc:
             psi_reconstruct[prange[0]+(i+1-1)*2:prange[1]+(i+1-1)*2,i] = psi_tmp[:,pos];
             self.psi_reconstruct = psi_reconstruct
 
+            sys.stdout.flush()
+            pbar.update((float(i)/float(len(f)))*100)
+            sys.stdout.flush()
 
+        print('please wait, need to do some heavy number crunching');sys.stdout.flush()
         self.L = L = dot(Lc,psi_reconstruct);
-
         for i in range(0,size(L,1)):#remove mean
             L[:,i] = L[:,i] - mean(L[:,i])
         self.L = L
-
         #compute standard deviation of each column
         self.L_std = L_std = sqrt(sum(L**2,0));
 

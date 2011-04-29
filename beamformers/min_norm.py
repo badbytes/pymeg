@@ -2,6 +2,13 @@
 #       Adapted from nutmeg code for python by dan collins <danc@badbytes.net>
 
 '''
+p.data.getdata(0,p.data.pnts_in_file)
+leadfieldobj = leadfield.calc(p.data.channels,grid=array([[0,40,100],[0,-40,100]]),centerofsphere=[0,0,40])
+localize(p.data.data_block,leadfieldobj)
+mn = min_norm.localize(p.data.data_block, leadfieldobj)
+'''
+
+'''
 Adapted from nutmeg code for python by dan collins <danc@badbytes.net>
 
 Portions of NUTMEG contain code distributed under the GNU General Public License; see GPL.txt for the text of this license. The remainder is released under the revised BSD license, as follows:
@@ -32,7 +39,9 @@ class localize:
     def __init__(self,data,leadfieldobj):
         '''
         p.data.getdata(0,p.data.pnts_in_file)
-        leadfieldobj = leadfield.calc(p.data.channels,grid=array([[0,40,100],[0,-40,100]]),centerofsphere=[0,0,40])
+        i = img_nibabel.loadimage('/home/danc/data/standardmri/ch3_brain.nii.gz') #coregistered MRI
+        i.decimate(10) #reduce source space by factor of 10.
+        leadfieldobj = leadfield.calc(p.data.channels,grid=i.megxyz),centerofsphere=[0,0,40]) #calculate leadfield for reduced dimension data.
         localize(p.data.data_block,leadfieldobj)
         mn = min_norm.localize(p.data.data_block, leadfieldobj)
         '''
