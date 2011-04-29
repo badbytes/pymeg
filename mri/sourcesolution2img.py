@@ -30,7 +30,9 @@ def build(sourcedata, sourcespace, hisample=None):
     '''[decimg, hiresimg] = sourcesolution2img(w.corr_mat, dec)'''
     '''sourcedata = w.corr_mat
     sourcespace = dec
-    ie, dec = img.decimate(nimstripped, 20)'''
+    ie, dec = img.decimate(nimstripped, 20)
+    lf = leadfield.calc(p.data.channels, grid=i.megxyz)
+    '''
     #~ oi = sourcespace;
 
     if size(sourcedata.shape) == 1: #make 2D
@@ -49,6 +51,7 @@ def build(sourcedata, sourcespace, hisample=None):
         print 'processing component',j
         for i in range(0, size(sourcedata,1)): #for each location
             newimg[j,sourcespace.ind[0,i],sourcespace.ind[1,i],sourcespace.ind[2,i]] = sourcedata[j,i];
+            print i#sourcespace.ind[:,i]
     #del sourcedata#, sourcespace.mrixyz, sourcespace.ind, sourcespace.img
     #resample back to original resolution
     newshape = [size(newimg,0),sourcespace.nifti.data.shape[0],sourcespace.nifti.data.shape[1],\
