@@ -8,32 +8,47 @@ p.data.getdata(0,p.data.pnts_in_file)
 from mri import img_nibabel
 
 i = img_nibabel.loadimage('/home/danc/python/data/standardmri/ch3_brain.nii.gz')
+i.decimate(50)
 from meg import leadfield
 
 lf = leadfield.calc(p.data.channels, grid=i.megxyz)
-from numpy import *
-noisecov = cov(p.data.data_block[0:50])
+from numpy import *;from scipy.linalg import *
+#noisecov = cov(p.data.data_block[0:50])
 noisecov = dot(p.data.data_block[0:50].T,p.data.data_block[0:50])
-sourcecov = cov(p.data.data_block[75:150])
-sourcecov = dot(p.data.data_block[75:150].T,p.data.data_block[75:150])
+#sourcecov = cov(p.data.data_block[75:150])
+sourcecov = dot(p.data.data_block[90:110].T,p.data.data_block[90:110])
+Nsource = size(lf.leadfield,2)*size(lf.leadfield,0)
 
-lfr = swapaxes(lf.leadfield,1,2).reshape((size(lf.leadfield,0)*size(lf.leadfield,2),size(lf.leadfield,1)),order='F')
+sourcecov = eye(Nsource,Nsource);#sourcecov = sparse.eye(Nsource,Nsource);
 
-  A = lfr;
-  R = sourcecov;
-  C = noisecov;
-  snr = 10
-lambd = trace(dot(dot(A , R) , A.T))/dot(trace(C),snr**2);
-w = dot(dot(R , A.T) , inv((dot(dot( A , R) , A.T) + dot(lambd**2)) , C));
+from scipy import sparse
+
+lfr = swapaxes(lf.leadfield,1,2).reshape((size(lf.leadfield,0)*size(lf.leadfield,2),size(lf.leadfield,1)),order='F').T
+
+A = lfr;
+R = sourcecov; #Nsources X Nsources
+C = noisecov;
+snr = 5
+lambd = trace(dot(dot(A , R) , A.T)) / (dot(trace(C),snr**2));
+dd1 = dot(R, A.T)
+dd2 = dot(dot(A, R), A.T)
+dd3 = dot(lambd**2 , C)
+iv = inv(dd2 + dd3)
+w = dot(dd1,iv)
+mom = dot(w,p.data.data_block.T)
+momr = mom.reshape((3,723/3,245))
+momp = sqrt(momr[0]**2 + momr[1]**2 + momr[2]**2)
+
+w = dot(dot(R , A.T).T , inv((dot(dot( A , R).T , A) + dot(lambd**2 , C));
   w = R * A' * inv( A * R * A' + (lambda^2) * C);
 
 
 function [dipout] = minimumnormestimate(dip, grad, vol, dat, varargin);
 
-% MINIMUMNORMESTIMATE computes a linear estimate of the current 
-% in a distributed source model  
-% 
-% Use as 
+% MINIMUMNORMESTIMATE computes a linear estimate of the current
+% in a distributed source model
+%
+% Use as
 %   [dipout] = minimumnormestimate(dip, grad, vol, dat, ...)
 %
 % Optional input arguments should come in key-value pairs and can include
@@ -68,7 +83,7 @@ function [dipout] = minimumnormestimate(dip, grad, vol, dat, varargin);
 % - keepinverse (i.e. equivalent to keepfilter)
 
 % Copyright (C) 2004-2008, Robert Oostenveld
-% 
+%
 % Subversion does not use the Log keyword, use 'svn log <filename>' or 'svn -v log | less' to get detailled information
 
 % ensure that these are row-vectors
@@ -130,7 +145,7 @@ if isempty(noisecov)
   % use an unregularised minimum norm solution, i.e. using the Moore-Penrose pseudoinverse
   warning('doing a unregularised minimum norm solution. This typically does not work');
   w = pinv(lf);
-else 
+else
   % the noise covariance has been given and can be used to regularise the solution
   if isempty(sourcecov)
     sourcecov = speye(Nsource);
