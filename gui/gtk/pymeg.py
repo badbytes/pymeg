@@ -693,8 +693,11 @@ class maingui:
                 return
         try:
             self.data_file_selected['grid']
-        except AttributeError:
-            print('grid not detected in results')
+        except(AttributeError,KeyError):
+            print('grid not detected')
+            self.errordialog('No grid detected');
+            return -1
+            
             if self.treedata[self.selecteditem] == 'grid':
                 print('using selected grid')
             else:

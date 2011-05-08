@@ -56,22 +56,24 @@ class gridwin:
 
         self.builder.connect_signals(dic)
 
-        #try:
-            #self.prevdata = readwrite.readdata(os.getenv('HOME')+'/.pymegdata.pym')
-            #print 'previous data', self.prevdata
-            #self.builder.get_object("filechooserbutton1").set_uri('file://'+self.prevdata['brain.nii.gz'])
-            #self.builder.get_object("filechooserbutton1").set_filename(self.prevdata['brain.nii.gz'])
-            #self.mr = img.loadimage(self.prevdata['brain.nii.gz'])
-            #self.statusbar.push(self.statusbar_cid, 'Loading Previous MRI.')
-            #if type(eval(self.mr.description)[0]) == ndarray: #coregegistered mri
-                #self.builder.get_object("button1").set_sensitive(True)
-            #else:
-                #self.builder.get_object("button1").set_sensitive(False)
-        #except IOError: #no last file
-            #print 'no prev data'
-            #self.prevdata = {}
-        #except TypeError:
-            #pass
+        try:
+            self.prevdata = readwrite.readdata(os.getenv('HOME')+'/.pymegdata.pym')
+            print 'previous data', self.prevdata
+            self.builder.get_object("filechooserbutton1").set_uri('file://'+self.prevdata['brain.nii.gz'])
+            self.builder.get_object("filechooserbutton1").set_filename(self.prevdata['brain.nii.gz'])
+            self.mr = img.loadimage(self.prevdata['brain.nii.gz'])
+            self.statusbar.push(self.statusbar_cid, 'Loading Previous MRI.')
+            
+            try:
+                type(self.mr.lpa) == ndarray#type(eval(self.mr.description)[0]) == ndarray: #coregegistered mri
+                self.builder.get_object("button1").set_sensitive(True)
+            except:
+                self.builder.get_object("button1").set_sensitive(False)
+        except IOError: #no last file
+            print 'no prev data'
+            self.prevdata = {}
+        except TypeError:
+            pass
 
     def coregister_handler(self, widget):
         self.cr = coregister.setup() #window
@@ -80,10 +82,10 @@ class gridwin:
 
 
     def coregistercheck(self,widget):
-        print 'p',self.builder.get_object("filechooserbutton1").get_filename()
+        print 'filename ',self.builder.get_object("filechooserbutton1").get_filename()
         try:
-            self.mr = img.read(self.builder.get_object("filechooserbutton1").get_filename())
-            self.prevdata['brain.nii.gz'] = self.builder.get_object("filechooserbutton1").get_filename()
+            self.mr = img.loadimage(self.builder.get_object("filechooserbutton1").get_filename())
+            #self.prevdata['brain.nii.gz'] = self.builder.get_object("filechooserbutton1").get_filename()
             readwrite.writedata(self.prevdata, os.getenv('HOME')+'/.pymegdata')
         except RuntimeError:
             print('not a nifti image. exiting')
@@ -106,19 +108,19 @@ class gridwin:
     def mriwin(self,workspace_data=None):
         self.workspace_data = workspace_data
         self.builder.get_object('window1').show()
-
-
+        
     def mrigrid(self,widget):
         print 'MRI source space computing'
         from numpy import shape
-        dec = img.decimate(self.mr, int(self.builder.get_object('entry1').get_text()))
-        print 'dec', dec
-        lpa=eval(dec.origimg.description)[0]
-        rpa=eval(dec.origimg.description)[1]
-        nas=eval(dec.origimg.description)[2]
-        [t,r] = transform.meg2mri(lpa,rpa,nas)
-        dec.megxyz = transform.mri2meg(t,r,dec.mrixyz)
-        print 'fn', self.workspace_data.data.filepath
+        #dec = img.decimate(self.mr, int(self.builder.get_object('entry1').get_text()))
+        self.mr.decimate(int(self.builder.get_object('entry1').get_text()))
+        #print 'dec', dec
+        #lpa=self.mr.lpa#eval(dec.origimg.description)[0]
+        #rpa=eval(dec.origimg.description)[1]
+        #nas=eval(dec.origimg.description)[2]
+        #[t,r] = transform.meg2mri(self.mr.lpa,self.mr.rpa,self.mr.nas)
+        #dec.megxyz = transform.mri2meg(t,r,self.mr.mrixyz)
+        #print 'fn', self.workspace_data.data.filepath
 
         if self.builder.get_object('radiobutton4').get_active() == True:
             braintype = 'yes'
