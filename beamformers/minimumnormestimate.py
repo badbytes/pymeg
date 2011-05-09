@@ -25,6 +25,18 @@ from scipy import sparse
 
 lfr = swapaxes(lf.leadfield,1,2).reshape((size(lf.leadfield,0)*size(lf.leadfield,2),size(lf.leadfield,1)),order='F').T
 
+#REDuce rank
+  # decompose the leadfield
+[u, s, v] = svd(lf);
+r = diag(s);
+s[:] = 0;
+for j in range(0,2):
+    s(j,j) = r(j);
+  end
+  % recompose the leadfield with reduced rank
+  lf = u * s * v';
+end
+
 A = lfr;
 R = sourcecov; #Nsources X Nsources
 C = noisecov;
@@ -36,11 +48,11 @@ dd3 = dot(lambd**2 , C)
 iv = inv(dd2 + dd3)
 w = dot(dd1,iv)
 mom = dot(w,p.data.data_block.T)
-momr = mom.reshape((3,723/3,245))
+momr = mom.reshape((size(lf.grid,1),size(lf.grid,0),size(mom,1)))
 momp = sqrt(momr[0]**2 + momr[1]**2 + momr[2]**2)
 
-w = dot(dot(R , A.T).T , inv((dot(dot( A , R).T , A) + dot(lambd**2 , C));
-  w = R * A' * inv( A * R * A' + (lambda^2) * C);
+#w = dot(dot(R , A.T).T , inv((dot(dot( A , R).T , A) + dot(lambd**2 , C));
+  #w = R * A' * inv( A * R * A' + (lambda^2) * C);
 
 
 function [dipout] = minimumnormestimate(dip, grad, vol, dat, varargin);
