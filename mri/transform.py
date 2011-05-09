@@ -20,8 +20,6 @@
 
 from numpy import *
 from scipy import linalg
-#from numpy import linalg
-#from pylab import norm #depreciated
 from numpy.linalg import norm
 from pdf2py import pdf
 
@@ -74,7 +72,6 @@ def dipoletransform(dipole, transformvector, transformmatrix):
         t=tile(transformvector,(len(dip),1));
         xyz = dot(transformmatrix.T, dipole.T).T+transformvector
         print 'note: coordinates returned are in the MRI convention R/L,P/A,I/S'
-        #print 'The convention for the mriviewer is R/L,P/A,I/S'
         print 'to use with nifti orient=0 files (I/S,P/A,I/S) we need to use flipup(xyz,1,axis=0)'
         return xyz
 
@@ -83,21 +80,16 @@ def mri2meg(translation,rotation, mrixyz):
     print 'what are your units?'
     trep=tile(translation.transpose(),size(mrixyz,1)).reshape([size(mrixyz,0),size(mrixyz,1)])
     megxyz = dot(rotation, (mrixyz - trep));
-
     return megxyz
 
-def scalesourcespace(datapdf, megxyz, lpa, rpa, nas, voxdim, brain='no'):
-    #megxyz = dec.megxyz
-    #lpa = eval(dec.origimg.description)[0]
-    #rpa = eval(dec.origimg.description)[1]
-    #nas = eval(dec.origimg.description)[2]
-    #voxdim = dec.origimg.voxdim
+def scalesourcespace(headshape, megxyz, lpa, rpa, nas, voxdim, brain='no'):
     print 'what are your units?', 'assuming cm'
     scale = 1000 #from meters (hs.index points) to mm.
-    p=pdf.read(datapdf)
-    sx=abs(p.hs.index_nasion[0])+abs(min(p.hs.hs_point[:,0])); #from nas to back of head
-    sy=abs(p.hs.index_lpa[1])+abs(p.hs.index_rpa[1]); #from lpa to rpa
-    sz=abs(max(p.hs.hs_point[:,2])); #top of head
+    #p=pdf.read(datapdf)
+    hs = headshape
+    sx=abs(hs.index_nasion[0])+abs(min(hs.hs_point[:,0])); #from nas to back of head
+    sy=abs(hs.index_lpa[1])+abs(hs.index_rpa[1]); #from lpa to rpa
+    sz=abs(max(hs.hs_point[:,2])); #top of head
     mriLRdim = (lpa*voxdim - rpa*voxdim)[1]#166; #lpa to rpa in mri
     mriAPdim = (((lpa[0]+rpa[0])/2)-nas[0])*2#211;  #nas to center of head X 2
     mriISdim = mriLRdim/1.11 #this is a guess. based on standard ch brain, the AP to IS ratio is 1.11
@@ -107,9 +99,7 @@ def scalesourcespace(datapdf, megxyz, lpa, rpa, nas, voxdim, brain='no'):
     sourcespacescaledmegx=megxyz[0,:]*scalemegx;
     sourcespacescaledmegy=megxyz[1,:]*scalemegy;
     sourcespacescaledmegz=megxyz[2,:]*scalemegz;
-    #sourcespacescaledmeg=[]
     sourcespacescaledmeg=array([sourcespacescaledmegx,sourcespacescaledmegy,sourcespacescaledmegz]);
-    #sourcespacescaledmeg=sourcespacescaledmeg#.transpose()
     if brain == 'yes':
         print 'your using a brain sourcespace. adding additional scaling factor of 1.1'
         sourcespacescaledmeg = sourcespacescaledmeg/1.1

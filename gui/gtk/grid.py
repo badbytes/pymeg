@@ -32,12 +32,13 @@ except:
 from mri import img_nibabel as img
 from mri import transform
 from numpy import array, ndarray, float
-from pdf2py import readwrite
+from pdf2py import readwrite,pdf
 from meg import grid
 from gui.gtk import coregister
 
 class gridwin:
-    def __init__(self):
+    def __init__(self, callback=None):
+        self.callback = callback
         self.builder = gtk.Builder()
         self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
         self.window = self.builder.get_object("window1")
@@ -48,6 +49,7 @@ class gridwin:
         dic = {
             "on_button1_clicked" : self.mrigrid,
             "on_filechooserbutton1_file_set": self.coregistercheck,
+            "on_filechooserbutton2_file_set": self.pdfcheck,
             "on_button3_clicked" : self.coregister_handler,
             "on_radiobutton_clicked" : self.gridtypechanged,
             "on_button2_clicked" : self.manualgrid,
@@ -80,7 +82,12 @@ class gridwin:
         self.cr.window.show()
         self.cr.builder.get_object('filechooserbutton1').set_uri(self.builder.get_object("filechooserbutton1").get_uri())
 
-
+    def pdfcheck(self, widget):
+        print 'pdfcheck'
+        p = pdf.read(self.builder.get_object("filechooserbutton2").get_filename())
+        self.headshape = p.hs
+        print self.headshape,'headshape'
+        
     def coregistercheck(self,widget):
         print 'filename ',self.builder.get_object("filechooserbutton1").get_filename()
         try:
@@ -105,9 +112,9 @@ class gridwin:
             pass
 
 
-    def mriwin(self,workspace_data=None):
-        self.workspace_data = workspace_data
-        self.builder.get_object('window1').show()
+    #def mriwin(self,workspace_data=None):
+        #self.workspace_data = workspace_data
+        #self.builder.get_object('window1').show()
         
     def mrigrid(self,widget):
         print 'MRI source space computing'
@@ -129,10 +136,12 @@ class gridwin:
 
 
         #self.workspace_data.results.grid = transform.scalesourcespace(self.workspace_data.data.filepath, dec, brain=braintype)/1000
-        self.workspace_data.results.grid = (transform.scalesourcespace
-        (self.workspace_data.data.filepath, dec.megxyz, lpa,rpa,nas,dec.origimg.voxdim,brain=braintype)/1000)
+        self.grid = (transform.scalesourcespace
+        (self.headshape, self.mr.megxyz, self.mr.lpa,self.mr.rpa,self.mr.nas,
+        self.mr.pixdim,brain=braintype)/1000)
         #(datapdf, megxyz, lpa, rpa, nas, voxdim, brain='no')
-        print 'grid shape', shape(self.workspace_data.results.grid)
+        print 'grid shape', shape(grid) #shape(self.workspace_data.results.grid)
+        self.gridcallback(callback=self.callback)
 
     def gridtypechanged(self, widget):
         print gtk.Buildable.get_name(widget)
@@ -148,20 +157,30 @@ class gridwin:
 
         #manualtypeselected = h.get_focus_child().get_label()
         if manualtypeselected == 'Point':
-            self.workspace_data['grid']  = array(eval(self.builder.get_object("entry2").get_text()))
+            self.grid  = array(eval(self.builder.get_object("entry2").get_text()))
             print 'done point'
         elif manualtypeselected == 'Cube':
-            self.workspace_data['grid'] = grid.cube(eval(self.builder.get_object("entry2").get_text()), \
+            self.grid = grid.cube(eval(self.builder.get_object("entry2").get_text()), \
             float(self.builder.get_object("entry3").get_text()), \
             float(self.builder.get_object("entry4").get_text()))
             print 'done cube'
         elif manualtypeselected == 'Sphere':
-            self.workspace_data['grid'] = grid.sphere(eval(self.builder.get_object("entry2").get_text()), \
+            self.grid = grid.sphere(eval(self.builder.get_object("entry2").get_text()), \
             float(self.builder.get_object("entry3").get_text()), \
             float(self.builder.get_object("entry4").get_text()))
             print 'done sphere'
+            
+        
+        self.gridcallback(callback=self.callback)
 
-        self.window.hide()
+        #self.window.hide()
+        
+        
+    def gridcallback(callback=None):
+        if callback != None:
+            callback(self.grid)
+        else:
+            return self.grid
 
 
 

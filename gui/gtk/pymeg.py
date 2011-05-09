@@ -631,20 +631,6 @@ class maingui:
         self.offset.setupoffsetwin(None, workspace_data=self.datadict[self.fn], \
         data_selected=self.treedata[self.selecteditem])
 
-    def gridcalc(self, widget):
-        if self.checkreq() == -1:
-            print('caught error')
-            return
-
-        from gui.gtk import grid
-        self.gridwin = grid.gridwin()
-        try:
-            self.gridwin.mriwin(workspace_data=self.data_file_selected)
-        except (AttributeError, KeyError):
-            print('no data')
-            self.errordialog\
-            ('No data selected. Double Click a MEG filename')
-
     def checkreq(self):
         try: self.fn
         except AttributeError: self.errordialog('No MEG data loaded');self.fileOpenMEG(None);return -1
@@ -686,6 +672,28 @@ class maingui:
     def plot3DMRIhandle(self, widget):
         from mri import vtkview
         vtkview.show()
+        
+    def gridcalc(self, widget):
+        def setgrid(grid):
+            self.data_file_selected['grid'] = grid
+        if self.checkreq() == -1:
+            print('caught error')
+            return
+
+        from gui.gtk import grid
+        gridwin = grid.gridwin()
+        gridwin.window.show()# = grid.gridwin()
+        try:
+            #self.gridwin.mriwin(workspace_data=self.data_file_selected)
+            obj=self.treedata[self.selecteditem];
+            res = (self.setup_helper(var=['hs'],obj=obj));
+            gridwin.headshape = res['hs']
+            gridwin.builder.get_object("filechooserbutton2").set_sensitive(False)
+            gridwin(callback=setgrid)
+        except (AttributeError, KeyError):
+            print('no data')
+            self.errordialog\
+            ('No data selected. Double Click a MEG filename')
 
     def leadfieldcalc(self, widget):
         if self.checkreq() == -1:
