@@ -33,7 +33,7 @@ class loadimage():
         print 'reading',filepath
         self.nifti = nibabel.load(filepath)
         dirpath = os.path.dirname(filepath)
-        self.data = self.nifti.get_data()
+        self.data = self.nifti.get_data().T
         self.nifti.data = self.data
         h = self.nifti.get_header()
         self.pixdim = h['pixdim'][0:3]
@@ -81,7 +81,7 @@ class loadimage():
         else:
             print 'uniform decimation'
             startval=ceil(dec/2);
-            decimg=array(nim.get_data()[startval::dec,:,:][:,startval::dec,:][:,:,startval::dec])
+            decimg=array(nim.data[startval::dec,:,:][:,startval::dec,:][:,:,startval::dec])
             nonz = where(decimg > 0)
             x = ((nonz[0]+1)*dec)#-(dec)
             y = ((nonz[1]+1)*dec)#-(dec)

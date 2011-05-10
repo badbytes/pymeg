@@ -16,31 +16,60 @@ from numpy import *;from scipy.linalg import *
 #noisecov = cov(p.data.data_block[0:50])
 noisecov = dot(p.data.data_block[0:50].T,p.data.data_block[0:50])
 #sourcecov = cov(p.data.data_block[75:150])
-sourcecov = dot(p.data.data_block[90:110].T,p.data.data_block[90:110])
+#sourcecov = dot(p.data.data_block[90:110].T,p.data.data_block[90:110])
 Nsource = size(lf.leadfield,2)*size(lf.leadfield,0)
 
 sourcecov = eye(Nsource,Nsource);#sourcecov = sparse.eye(Nsource,Nsource);
 
-from scipy import sparse
+#from scipy import sparse
 
 lfr = swapaxes(lf.leadfield,1,2).reshape((size(lf.leadfield,0)*size(lf.leadfield,2),size(lf.leadfield,1)),order='F').T
 
 #REDuce rank
-  # decompose the leadfield
-[u, s, v] = svd(lf);
-r = diag(s);
+[u, s, v] = svd(lfr);
+s = diag(s) #make square
+r = diag(s); #take diag
 s[:] = 0;
 for j in range(0,2):
-    s(j,j) = r(j);
-  end
-  % recompose the leadfield with reduced rank
-  lf = u * s * v';
-end
+    s[j,j] = r[j];
+
+#% recompose the leadfield with reduced rank
+tmp = zeros((size(lfr,0),size(lfr,1))) #make not square
+tmp[:,0:size(s,1)] = s #replace
+s = tmp #reset
+lfrr = dot(dot(u , s) , v.T); #reconstruct
+
+#normalize lf
+nrm = sum(lfr**2)**.5 #normfact
+lfn = lfr / nrm
+
+#switch normalize
+#case 'yes'
+  #if normalizeparam==0.5
+    #% normalize the leadfield by the Frobenius norm of the matrix
+    #% this is the same as below in case normalizeparam is 0.5
+    #nrm = norm(lf, 'fro');
+  #else
+    #% normalize the leadfield by sum of squares of the elements of the leadfield matrix to the power "normalizeparam"
+    #% this is the same as the Frobenius norm if normalizeparam is 0.5
+    #nrm = sum(lf(:).^2)^normalizeparam;
+  #end
+  #if nrm>0
+    #lf = lf ./ nrm;
+  #end
+#case 'column'
+  #% normalize each column of the leadfield by its norm
+  #for j=1:size(lf,2)
+    #nrm = sum(lf(:,j).^2)^normalizeparam;
+    #lf(:,j) = lf(:,j)./nrm;
+  #end
+#end
 
 A = lfr;
+A = lfn
 R = sourcecov; #Nsources X Nsources
 C = noisecov;
-snr = 5
+snr = 10
 lambd = trace(dot(dot(A , R) , A.T)) / (dot(trace(C),snr**2));
 dd1 = dot(R, A.T)
 dd2 = dot(dot(A, R), A.T)
@@ -50,6 +79,7 @@ w = dot(dd1,iv)
 mom = dot(w,p.data.data_block.T)
 momr = mom.reshape((size(lf.grid,1),size(lf.grid,0),size(mom,1)))
 momp = sqrt(momr[0]**2 + momr[1]**2 + momr[2]**2)
+
 
 #w = dot(dot(R , A.T).T , inv((dot(dot( A , R).T , A) + dot(lambd**2 , C));
   #w = R * A' * inv( A * R * A' + (lambda^2) * C);
