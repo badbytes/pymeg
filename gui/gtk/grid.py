@@ -36,9 +36,10 @@ from pdf2py import readwrite,pdf
 from meg import grid
 from gui.gtk import coregister
 
-class gridwin:
-    def __init__(self, callback=None):
-        self.callback = callback
+class gridwin():
+    def __init__(self):
+        #self.callback = callback
+        self.datahandler()
         self.builder = gtk.Builder()
         self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
         self.window = self.builder.get_object("window1")
@@ -76,6 +77,11 @@ class gridwin:
             self.prevdata = {}
         except TypeError:
             pass
+            
+    def datahandler(self,callback=None):
+        self.callback = callback
+        #if callback != None: self.callback = callback
+        
 
     def coregister_handler(self, widget):
         self.cr = coregister.setup() #window
@@ -140,8 +146,10 @@ class gridwin:
         (self.headshape, self.mr.megxyz, self.mr.lpa,self.mr.rpa,self.mr.nas,
         self.mr.pixdim,brain=braintype)/1000)
         #(datapdf, megxyz, lpa, rpa, nas, voxdim, brain='no')
-        print 'grid shape', shape(grid) #shape(self.workspace_data.results.grid)
-        self.gridcallback(callback=self.callback)
+        print 'grid shape', shape(self.grid) #shape(self.workspace_data.results.grid)
+        print self.callback
+        self.gridcallback()
+        #self.callback
 
     def gridtypechanged(self, widget):
         print gtk.Buildable.get_name(widget)
@@ -171,14 +179,14 @@ class gridwin:
             print 'done sphere'
             
         
-        self.gridcallback(callback=self.callback)
+        self.gridcallback()
 
         #self.window.hide()
         
         
-    def gridcallback(callback=None):
-        if callback != None:
-            callback(self.grid)
+    def gridcallback(self):
+        if self.callback != None:
+            self.callback(self.grid)
         else:
             return self.grid
 
