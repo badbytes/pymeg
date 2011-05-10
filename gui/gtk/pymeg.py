@@ -539,7 +539,7 @@ class maingui:
         aboutdialog = self.builder.get_object("aboutdialog1")
         aboutdialog.show()
 
-    def setup_helper(self,var,obj=None):
+    def setup_helper(self,var,obj=None,par=None):
         '''This function is going to search in two places for a queried variable.
         1st search is below what is selected, or within that instance/dictonary
         2nd search is at the same level as the item selected ie all parents objects.
@@ -558,7 +558,7 @@ class maingui:
 
 
         for ii in var:
-            print('look for dependency',ii)
+            print('look for dependency',ii),type(obj)
             if type(obj) == dict:
                 print('dict search')
                 try:
@@ -682,23 +682,32 @@ class maingui:
 
         from gui.gtk import grid
         gridwin = grid.gridwin()
-        gridwin.window.show()# = grid.gridwin()
-        try:
+        
+        #try:
             #self.gridwin.mriwin(workspace_data=self.data_file_selected)
-            obj=self.treedata[self.selecteditem];
-            res = (self.setup_helper(var=['hs'],obj=obj));
-            gridwin.headshape = res['hs']
-            gridwin.builder.get_object("filechooserbutton2").set_sensitive(False)
-            gridwin(callback=setgrid)
-        except (AttributeError, KeyError):
-            print('no data')
-            self.errordialog\
-            ('No data selected. Double Click a MEG filename')
+        obj=self.treedata[self.selecteditem];
+        res = (self.setup_helper(var=['hs'],obj=obj));
+        gridwin.headshape = res['hs']
+        gridwin.builder.get_object("filechooserbutton2").set_sensitive(False)
+        gridwin.datahandler(setgrid)
+        gridwin.window.show()# = grid.gridwin()
+        #except (AttributeError, KeyError):
+            #print('no data')
+            #self.errordialog\
+            #('No data selected. Double Click a MEG filename')
 
     def leadfieldcalc(self, widget):
         if self.checkreq() == -1:
                 print('caught error')
                 return
+                
+        obj=self.treedata[self.selecteditem];
+        par = self.treedata
+        res = (self.setup_helper(var=['channels','filename'],obj=obj,par=par));
+        grid = self.data_file_selected['grid']
+        self.lf = leadfield.calc(res['filename'], res['channels'],grid)
+        
+        
         try:
             self.data_file_selected['grid']
         except(AttributeError,KeyError):
