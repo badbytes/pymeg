@@ -170,9 +170,7 @@
         </child>
         <child type="tab">
           <object class="GtkLabel" id="label1">
-            <property name="has_focus">True</property>
             <property name="label" translatable="yes">MRI Source Space</property>
-            <property name="selectable">True</property>
           </object>
           <packing>
             <property name="tab_fill">False</property>
@@ -186,7 +184,7 @@
             <child>
               <object class="GtkLabel" id="label6">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">Center of Grid (meters):</property>
+                <property name="label" translatable="yes">Center of Grid (mm):</property>
               </object>
               <packing>
                 <property name="top_attach">1</property>
@@ -199,7 +197,7 @@
                 <property name="can_focus">True</property>
                 <property name="tooltip_text" translatable="yes">xyz coordinates</property>
                 <property name="invisible_char">&#x25CF;</property>
-                <property name="text" translatable="yes">0,0,.04</property>
+                <property name="text" translatable="yes">0,0,40</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -251,7 +249,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="invisible_char">&#x25CF;</property>
-                <property name="text" translatable="yes">.01</property>
+                <property name="text" translatable="yes">10</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -346,11 +344,13 @@
               <placeholder/>
             </child>
           </object>
+          <packing>
+            <property name="position">1</property>
+          </packing>
         </child>
         <child type="tab">
           <object class="GtkLabel" id="label2">
             <property name="label" translatable="yes">Manual Grid</property>
-            <property name="selectable">True</property>
           </object>
           <packing>
             <property name="position">1</property>

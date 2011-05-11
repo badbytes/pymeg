@@ -84,7 +84,7 @@ def mri2meg(translation,rotation, mrixyz):
 
 def scalesourcespace(headshape, megxyz, lpa, rpa, nas, voxdim, brain='no'):
     print 'what are your units?', 'assuming cm'
-    scale = 1000 #from meters (hs.index points) to mm.
+    scale = 1 #from mm (hs.index points) to mm.
     #p=pdf.read(datapdf)
     hs = headshape
     sx=abs(hs.index_nasion[0])+abs(min(hs.hs_point[:,0])); #from nas to back of head

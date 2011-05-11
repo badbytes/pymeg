@@ -134,6 +134,10 @@ class read(initialize):
         '''chlabel = ['A1','A2']'''
         self.channels = channel_new.index(self.datapdf, labels=chlabels)
         update_data_header.cutchannels(self)
+        try:
+            self.channels.getposition()
+        except:
+            print('Error setting channel positions')
 
     def analyze(self):
         from meg import analyze

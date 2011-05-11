@@ -257,6 +257,14 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkMenuItem" id="dipoledensity">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Dipole Density</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_dipoledensity_activate"/>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkMenuItem" id="imagemenuitem6">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Calculate Grid</property>
@@ -302,6 +310,30 @@
                       </object>
                     </child>
                     <child>
+                      <object class="GtkMenuItem" id="menuitem6">
+                        <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">uses noisecov selected
+ and leadfield to 
+calculate power of 
+data for each grid point.</property>
+                        <property name="label" translatable="yes">Minimum Norm Solution</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_minimumnorm_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="hild_solution">
+                        <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">Hild, K.E.; Nagarajan, S.S.
+Source Localization of
+ EEG/MEG Data by 
+Correlating Columns of ICA Solution with 
+Lead Field Matrix</property>
+                        <property name="label" translatable="yes">Hild Solution</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkSeparatorMenuItem" id="separator2">
                         <property name="visible">True</property>
                       </object>
@@ -320,19 +352,19 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="dipoledensity">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">Dipole Density</property>
-                        <property name="use_underline">True</property>
-                        <signal name="activate" handler="on_dipoledensity_activate"/>
-                      </object>
-                    </child>
-                    <child>
                       <object class="GtkMenuItem" id="coregister">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Coregister MRI</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_coregister_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="solution_to_image">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Solution To Image</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_solution_to_image_activate"/>
                       </object>
                     </child>
                     <child>
@@ -885,7 +917,7 @@
                     <property name="width_request">50</property>
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x2022;</property>
-                    <property name="text" translatable="yes">.01</property>
+                    <property name="text" translatable="yes">1</property>
                   </object>
                   <packing>
                     <property name="fill">False</property>
@@ -896,7 +928,7 @@
                   <object class="GtkEntry" id="entry5">
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x2022;</property>
-                    <property name="text" translatable="yes">.01</property>
+                    <property name="text" translatable="yes">1</property>
                   </object>
                   <packing>
                     <property name="position">1</property>
@@ -906,7 +938,7 @@
                   <object class="GtkEntry" id="entry6">
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x2022;</property>
-                    <property name="text" translatable="yes">.01</property>
+                    <property name="text" translatable="yes">1</property>
                   </object>
                   <packing>
                     <property name="position">2</property>
@@ -916,7 +948,7 @@
                   <object class="GtkEntry" id="entry7">
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x2022;</property>
-                    <property name="text" translatable="yes">.01</property>
+                    <property name="text" translatable="yes">1</property>
                   </object>
                   <packing>
                     <property name="position">3</property>
@@ -926,7 +958,7 @@
                   <object class="GtkEntry" id="entry8">
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x2022;</property>
-                    <property name="text" translatable="yes">.01</property>
+                    <property name="text" translatable="yes">1</property>
                   </object>
                   <packing>
                     <property name="position">4</property>
@@ -936,7 +968,7 @@
                   <object class="GtkEntry" id="entry9">
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x2022;</property>
-                    <property name="text" translatable="yes">.01</property>
+                    <property name="text" translatable="yes">1</property>
                   </object>
                   <packing>
                     <property name="position">5</property>
@@ -946,7 +978,7 @@
                   <object class="GtkEntry" id="entry10">
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x2022;</property>
-                    <property name="text" translatable="yes">.01</property>
+                    <property name="text" translatable="yes">1</property>
                   </object>
                   <packing>
                     <property name="position">6</property>
@@ -956,7 +988,7 @@
                   <object class="GtkEntry" id="entry11">
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x2022;</property>
-                    <property name="text" translatable="yes">.01</property>
+                    <property name="text" translatable="yes">1</property>
                   </object>
                   <packing>
                     <property name="position">7</property>
@@ -966,7 +998,7 @@
                   <object class="GtkEntry" id="entry12">
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x2022;</property>
-                    <property name="text" translatable="yes">.01</property>
+                    <property name="text" translatable="yes">1</property>
                   </object>
                   <packing>
                     <property name="position">8</property>
@@ -976,7 +1008,7 @@
                   <object class="GtkEntry" id="entry13">
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x2022;</property>
-                    <property name="text" translatable="yes">.01</property>
+                    <property name="text" translatable="yes">1</property>
                   </object>
                   <packing>
                     <property name="position">9</property>
@@ -986,7 +1018,7 @@
                   <object class="GtkEntry" id="entry14">
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x2022;</property>
-                    <property name="text" translatable="yes">.01</property>
+                    <property name="text" translatable="yes">1</property>
                   </object>
                   <packing>
                     <property name="position">10</property>
@@ -996,7 +1028,7 @@
                   <object class="GtkEntry" id="entry15">
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x2022;</property>
-                    <property name="text" translatable="yes">.01</property>
+                    <property name="text" translatable="yes">1</property>
                   </object>
                   <packing>
                     <property name="position">11</property>
@@ -1006,7 +1038,7 @@
                   <object class="GtkEntry" id="entry16">
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x2022;</property>
-                    <property name="text" translatable="yes">.01</property>
+                    <property name="text" translatable="yes">1</property>
                   </object>
                   <packing>
                     <property name="position">12</property>
@@ -1016,7 +1048,7 @@
                   <object class="GtkEntry" id="entry17">
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x2022;</property>
-                    <property name="text" translatable="yes">.01</property>
+                    <property name="text" translatable="yes">1</property>
                   </object>
                   <packing>
                     <property name="position">13</property>
@@ -1026,7 +1058,7 @@
                   <object class="GtkEntry" id="entry18">
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x2022;</property>
-                    <property name="text" translatable="yes">.01</property>
+                    <property name="text" translatable="yes">1</property>
                   </object>
                   <packing>
                     <property name="position">14</property>
@@ -1036,7 +1068,7 @@
                   <object class="GtkEntry" id="entry19">
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x2022;</property>
-                    <property name="text" translatable="yes">.01</property>
+                    <property name="text" translatable="yes">1</property>
                   </object>
                   <packing>
                     <property name="position">15</property>
@@ -1046,7 +1078,7 @@
                   <object class="GtkEntry" id="entry20">
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x2022;</property>
-                    <property name="text" translatable="yes">.01</property>
+                    <property name="text" translatable="yes">1</property>
                   </object>
                   <packing>
                     <property name="position">16</property>
@@ -1056,7 +1088,7 @@
                   <object class="GtkEntry" id="entry21">
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x2022;</property>
-                    <property name="text" translatable="yes">.01</property>
+                    <property name="text" translatable="yes">1</property>
                   </object>
                   <packing>
                     <property name="position">17</property>
@@ -1066,7 +1098,7 @@
                   <object class="GtkEntry" id="entry22">
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x2022;</property>
-                    <property name="text" translatable="yes">.01</property>
+                    <property name="text" translatable="yes">1</property>
                   </object>
                   <packing>
                     <property name="position">18</property>
@@ -1076,7 +1108,7 @@
                   <object class="GtkEntry" id="entry23">
                     <property name="can_focus">True</property>
                     <property name="invisible_char">&#x2022;</property>
-                    <property name="text" translatable="yes">.01</property>
+                    <property name="text" translatable="yes">1</property>
                   </object>
                   <packing>
                     <property name="position">19</property>
@@ -1512,6 +1544,12 @@
     <property name="opacity">0.90000000000000002</property>
     <signal name="close" handler="gtk_widget_hide"/>
     <signal name="cancel" handler="gtk_widget_hide"/>
+    <child>
+      <placeholder/>
+    </child>
+    <child>
+      <placeholder/>
+    </child>
     <child>
       <placeholder/>
     </child>

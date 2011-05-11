@@ -24,7 +24,7 @@ import os
 class read:
     def __init__(self, fid):
         align.check(fid);
-        self.position = fread(fid, 3, 'd', 'd', 1);
+        self.position = fread(fid, 3, 'd', 'd', 1)*1000; #convert to mm
         self.direction = fread(fid, 3, 'd', 'd', 1);
         self.radius = fread(fid, 1, 'd', 'd', 1);
         self.wire_radius = fread(fid, 1, 'd', 'd', 1);
@@ -37,7 +37,7 @@ class write:
     def __init__(self, fid, loop_data):
         align.check(fid);
         
-        fwrite(fid, 3, loop_data.position, 'd', 1);
+        fwrite(fid, 3, loop_data.position, 'd', 1)/1000; #convert to meters
         fwrite(fid, 3, loop_data.direction, 'd', 1);
         fwrite(fid, 1, loop_data.radius, 'd', 1);
         fwrite(fid, 1, loop_data.wire_radius, 'd', 1);

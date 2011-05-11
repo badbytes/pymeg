@@ -83,6 +83,7 @@ class setup_gui:
             "on_toolbutton_load_clicked" : self.load_data,
             "on_menu_offset_correct_clicked" : self.offset_correct,
             "on_button_epoch_clicked" : self.add_selections_to_event_process,
+            "on_store_event_clicked" : self.store_event,
 
             }
 
@@ -589,8 +590,10 @@ class setup_gui:
     def load_data_callback(self):
         print 'DONE!'
         p = self.data_assist.pdfdata #4D MEG file format
-        self.data_handler(p.data.data_block,p.hdr.header_data.sample_period, \
-        p.data.wintime,p.data.channels.labellist,p.data.channels.chanlocs)
+        input_dict = {'data_block':p.data.data_block,'srate':p.data.srate,'wintime':p.data.wintime,'labellist':p.data.channels.labellist,'chanlocs':p.data.channels.chanlocs}
+        #self.data_handler(p.data.data_block,p.hdr.header_data.sample_period, \
+        #p.data.wintime,p.data.channels.labellist,p.data.channels.chanlocs)
+        self.data_handler(input_dict)
 
 
 
@@ -615,8 +618,7 @@ class setup_gui:
         wintime = input_dict['wintime']
         chanlabels = input_dict['labellist']
         chanlocs = input_dict['chanlocs']
-
-
+        
         print type(data),srate,type(wintime),type(chanlabels),type(chanlocs)
         print len(chanlabels),size(data,1),len(wintime),size(data,0),\
         size(chanlocs,1)
@@ -645,10 +647,17 @@ class setup_gui:
         self.data_loaded_setup()
         self.data2plot = self.data
         self.display_apply(None)
+        
+        
+        try: callback(); self.callback = callback
+        except TypeError: print('no callback')
+        
+    def store_event(self,widget):
         self.callback()
 
-    def callback(self):
-        pass
+
+    #def callback(self):
+        #pass
 
     def offset_correct(self,widget):
         print self.get_time_selection(widget)

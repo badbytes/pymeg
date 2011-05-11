@@ -133,6 +133,7 @@ def vtkwindow():
     ### Mouse interaction
     ##style = vtk.vtkInteractorStyleTrackballCamera()
     ##iren.SetInteractorStyle(style)
+    
     ren.SetBackground(0, 0, 0)
     renWin.SetSize(500, 500)
 
@@ -198,14 +199,16 @@ def display(data, datascalevec=None, radius=None, color=None, shape_type=None):
         color = defcolor
 
     [ren,renWin,iren]=vtkwindow()
+    print 'ln',len(data.keys())
     for k in range(0,len(data.keys())):
         print shape(data[data.keys()[k]])#, len(data[k]), shape(color)
 
         if k == -1:
             [sdata, scalefactor]=scaledata(float_(data[data.keys()[k]]))
+            print 'scaled data'
         else:
             sdata = float_(data[data.keys()[k]])
-
+            
         points = vtk.vtkPoints()
         math = vtk.vtkMath()
         #some 2 pnts of fake data at 0,0,0
@@ -262,8 +265,18 @@ def display(data, datascalevec=None, radius=None, color=None, shape_type=None):
             ren.AddActor(ballActor) # Add the actors to the renderer, set the background and size
     
 
+    #outline = vtk.vtkOutlineFilter()
+    #outline.SetInput(mapBalls.GetOutput())
 
+    #outlineMapper = vtk.vtkPolyDataMapper()
+    #outlineMapper.SetInput(outline.GetOutput())
+
+    #outlineActor = vtk.vtkActor()
+    #outlineActor.SetMapper(outlineMapper)
+    #outlineActor.GetProperty().SetColor(1,1,1)
+    
     iren.Initialize()
+    ren.ResetCamera()
     renWin.Render()
     iren.Start()
     
@@ -277,5 +290,4 @@ if __name__ == '__main__':
     d = {'data':points}#,'color':[255,0,0],'radius':[.01,.01,.01]}
     display(d, color={'color':[255,0,0]}, radius={'radius':.01},shape_type={'disks':dirs})
     quit
-    #renWin.Render()
-    #iren.Start()
+

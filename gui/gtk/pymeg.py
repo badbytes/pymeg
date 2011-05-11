@@ -45,10 +45,11 @@ from matplotlib.backends.backend_gtk import show
 
 #load required methods
 from pdf2py import pdf, readwrite,lA2array
-from numpy import shape, random, sort, array, append, size, arange, ndarray,vstack,mean,zeros
+from numpy import shape, random, sort, array, append, size, arange, ndarray,vstack,mean,zeros, dot
 from meg import dipole,plotvtk,plot2dgtk,leadfield,signalspaceprojection,nearest
 from mri import img_nibabel as img
-
+from mri import sourcesolution2img
+from beamformers import minimumnorm
 #gui modules
 from gui.gtk import filter, offset_correct, errordialog, preferences,\
 dipoledensity, coregister, timef, data_editor, event_process, parse_instance, \
@@ -115,6 +116,8 @@ class maingui:
             "on_menu_contour_plot_activate" : self.contour_plot,
             "on_menu_epoch_data_activated" : self.epoch_data,
             "on_power_spectral_density_activate" : self.power_spectral_density,
+            "on_minimumnorm_activate" : self.minimunnorm_handler,
+            "on_solution_to_image_activate" : self.sourcesolution2img_handler,
             "on_test" : self.test,
         }
 
@@ -556,51 +559,114 @@ class maingui:
         if type(var) == str:
             var = [var] #make list
 
-
+        def instance_search(item):
+            try:
+                print 'looking for child'
+                out = eval('item.'+ii)
+                print('found as child instance', ii)
+            except:
+                try:
+                    for i in inspect.getmembers(item):
+                        if i[0] == ii:
+                            out = i[1]
+                            print('found', i[0])
+                        if isinstance(i[1], types.InstanceType):
+                            for j in inspect.getmembers(i[1]):
+                                if j[0] == ii:
+                                    out = j[1]
+                                    print('found', j[0])
+                except:
+                    print('cant find instance', ii)
+            return out
+        def dict_search(item):
+            print('dict search')
+            try:
+                out = item[ii]
+                print('found as child dict', ii)
+            except:
+                try:
+                    for i in item:
+                        print('i',i, type(item[i]))
+                        if type(item[i]) == dict:
+                            try:
+                                out = item[i][ii]
+                                print('found',ii)
+                            except: pass
+                        if obj[i] == ii:
+                            out = item[i]
+                            print('found', i)
+                        if isinstance(item[i], types.InstanceType):
+                            print 'searching deeper'
+                            try: out = instance_search(item[i])
+                            except: pass
+                except:
+                    print('cant find instance', ii)
+            return out
+                    
         for ii in var:
             print('look for dependency',ii),type(obj)
             if type(obj) == dict:
-                print('dict search')
-                try:
-                    out = obj[ii]
-                    print('found as child dict', ii)
-                except:
-                    try:
-                        for i in obj:
-                            print('i',i, type(obj[i]))
-                            if type(obj[i]) == dict:
-                                try:
-                                    out = obj[i][ii]
-                                    print('found',ii)
-                                except: pass
-
-                            if obj[i] == ii:
-                                out = obj[i]
-                                print('found', i)
-                    except:
-                        print('cant find instance', ii)
+                try: 
+                    v[ii] = dict_search(obj)
+                except UnboundLocalError: 
+                    print('couldnt find required data: ',ii)
+                    self.errordialog('couldnt find required data: '+ii)
 
             if isinstance(obj, types.InstanceType):
-                print('instance..')
                 try:
-                    out = eval('obj.'+ii)
-                    print('found as child instance', ii)
-                except:
-                    try:
-                        for i in inspect.getmembers(obj):
-                            if i[0] == ii:
-                                out = i[1]
-                                print('found', i[0])
-                            if isinstance(i[1], types.InstanceType):
-                                for j in inspect.getmembers(i[1]):
-                                    if j[0] == ii:
-                                        out = j[1]
-                                        print('found', j[0])
-                    except:
-                        print('cant find instance', ii)
+                    v[ii] = instance_search(obj)
+                except UnboundLocalError: 
+                    print('couldnt find required data: ',ii)
+                    self.errordialog('couldnt find required data: '+ii)
+
+            #if type(obj) == dict:
+                #print('dict search')
+                #try:
+                    #out = obj[ii]
+                    #print('found as child dict', ii)
+                #except:
+                    #try:
+                        #for i in obj:
+                            #print('i',i, type(obj[i]))
+                            #if type(obj[i]) == dict:
+                                #try:
+                                    #out = obj[i][ii]
+                                    #print('found',ii)
+                                #except: pass
+
+                            #if obj[i] == ii:
+                                #out = obj[i]
+                                #print('found', i)
+                    #except:
+                        
+                        #print('cant find instance', ii)
+
+            #if isinstance(obj, types.InstanceType):
+                #print('instance..')
+                #try:
+                    #print 'looking for child'
+                    #out = eval('obj.'+ii)
+                    #print('found as child instance', ii)
+                #except:
+                    #try:
+                        #for i in inspect.getmembers(obj):
+                            #if i[0] == ii:
+                                #out = i[1]
+                                #print('found', i[0])
+                            #if isinstance(i[1], types.InstanceType):
+                                #for j in inspect.getmembers(i[1]):
+                                    #if j[0] == ii:
+                                        #out = j[1]
+                                        #print('found', j[0])
+                    #except:
+                        #print('cant find instance', ii)
 
             #v.extend([out]);
-            v[ii] = out
+            #try: 
+                #v[ii] = out
+            #except UnboundLocalError: 
+                #print('couldnt find required data: ',ii)
+                #self.errordialog('couldnt find required data: '+ii)
         if len(v) != len(var):
             print('missing items requested')
             raise KeyError
@@ -674,8 +740,14 @@ class maingui:
         vtkview.show()
         
     def gridcalc(self, widget):
-        def setgrid(grid):
-            self.data_file_selected['grid'] = grid
+        def setgrid(grid,mr=None):
+            self.data_file_selected['grid'] = grid #in mm
+            mr.nifti = []
+            self.data_file_selected['source_space'] = mr #in mm
+            self.treegohome(None)
+            gridwin.window.hide()
+            self.updatestatusbar('grid calculation complete')
+
         if self.checkreq() == -1:
             print('caught error')
             return
@@ -685,7 +757,7 @@ class maingui:
         
         #try:
             #self.gridwin.mriwin(workspace_data=self.data_file_selected)
-        obj=self.treedata[self.selecteditem];
+        obj=self.treedata#[self.selecteditem];
         res = (self.setup_helper(var=['hs'],obj=obj));
         gridwin.headshape = res['hs']
         gridwin.builder.get_object("filechooserbutton2").set_sensitive(False)
@@ -701,13 +773,11 @@ class maingui:
                 print('caught error')
                 return
                 
-        obj=self.treedata[self.selecteditem];
-        par = self.treedata
-        res = (self.setup_helper(var=['channels','filename'],obj=obj,par=par));
-        grid = self.data_file_selected['grid']
-        self.lf = leadfield.calc(res['filename'], res['channels'],grid)
-        
-        
+        obj=self.treedata;#[self.selecteditem];
+        res = (self.setup_helper(var=['channels','grid'],obj=obj));
+        #grid = self.data_file_selected['grid']
+        print 'grid print',res['grid']
+
         try:
             self.data_file_selected['grid']
         except(AttributeError,KeyError):
@@ -722,14 +792,42 @@ class maingui:
                 print('create or load grid first')
                 self.gridcalc(None)
                 return
-
-        self.lf = leadfield.calc(self.data_file_selected['data'].filename, self.data_file_selected['data'].channels, \
-        self.data_file_selected['grid'])
-        print('lf shape', self.data_file_selected['grid'].shape)
-        print('saving leadfield in workspace')
+                
+        self.lf = leadfield.calc(res['channels'],self.data_file_selected['grid'])
         self.data_file_selected['leadfield'] = self.lf
-        self.data_file_selected['leadfield'].channels = self.data_file_selected['data'].channels
-        self.data_file_selected['leadfield'].leadfields_transposed = self.lf.lp.T
+        self.data_file_selected['leadfield'].channels = res['channels']
+        #self.data_file_selected['leadfield'].leadfields_transposed = self.lf.lp.T
+        self.treegohome(None)
+        self.updatestatusbar('leadfield calculation complete')
+
+
+        #self.lf = leadfield.calc(self.data_file_selected['data'].filename, self.data_file_selected['data'].channels, \
+        #self.data_file_selected['grid'])
+        #print('lf shape', self.data_file_selected['grid'].shape)
+        #print('saving leadfield in workspace')
+        #self.data_file_selected['leadfield'] = self.lf
+        #self.data_file_selected['leadfield'].channels = self.data_file_selected['data'].channels
+        #self.data_file_selected['leadfield'].leadfields_transposed = self.lf.lp.T
+
+    def minimunnorm_handler(self,widget):
+        obj=self.treedata;
+        res = (self.setup_helper(var=['data_block','leadfield','data_selection','channels'],obj=obj));
+        noisecov = dot(res['data_selection'].T,res['data_selection'])
+        minnormpow,w = minimumnorm.calc(res['data_block'],res['leadfield'],noisecov)
+        print 'Min Norm Done'
+        self.data_file_selected['minimum_norm_solution'] = {'power':minnormpow,'source_weights':w,'channels':res['channels']}
+        self.updatestatusbar('minimum norm solution complete')
+    
+    def sourcesolution2img_handler(self,widget):
+        #obj=self.treedata;
+        #res = (self.setup_helper(var=['source_space'],obj=obj));
+        solution = self.treedata[self.selecteditem]
+        source_space = self.data_file_selected['source_space']
+
+        c = sourcesolution2img.build(solution,source_space)
+        #solution = self.data_file_selected['source_space']
+        self.data_file_selected['solution_image'] = {'result':c}
+        self.updatestatusbar('solution to image complete')
 
     def dipoledensityhandle(self,widget):
         self.dd = dipoledensity.density() #window
@@ -870,7 +968,7 @@ class maingui:
 
         self.mc.fig.clf()
 
-        chanlocs = self.setup_helper(var='chanlocs',obj=self.treedata['channels'])['chanlocs']
+        chanlocs = self.setup_helper(var='chanlocs',obj=self.treedata)['chanlocs']
         self.mc.display(self.treedata[self.selecteditem],chanlocs, subplot='on')
 
     def result_helper(self,newobj,var):
@@ -931,6 +1029,22 @@ class maingui:
         self.ed.set_passed_filename(filepath,callback=epoch_callback)
 
     def data_editor(self, widget):
+        def data_editor_callback():
+            print ('Done')
+            try:
+                print ('selection list', self.de.selections)
+                self.de.time
+                liststore,iter = self.de.SelView.get_selection().get_selected_rows()
+                for i in iter:
+                    print ('highlighted', liststore[i][1])
+                    self.de.get_time_selection(widget,current=False)
+                    print ('indices',self.de.sel_ind)
+                    data = self.de.data
+                    self.data_file_selected['data_selection'] = data[self.de.sel_ind]
+                
+            except:
+                print 'DE ERROR'
+                
         try:
             obj=self.treedata[self.selecteditem];
             r = (self.setup_helper(var=['data_block','srate','wintime',
@@ -947,13 +1061,13 @@ class maingui:
         try:
             self.de = data_editor.setup_gui()
             #self.de.data_handler(r[0],r[1],r[2],r[3],r[4], callback=self.data_editor_callback)
-            self.de.data_handler(input_dict=r, callback=self.data_editor_callback)
+            self.de.data_handler(input_dict=r, callback=data_editor_callback)
             self.de.window.show()
         except RuntimeError:
             self.errordialog("Can't do that Dave");
-
-    def data_editor_callback(self):
-        print ('Done')
+            
+    #def data_editor_callback(self):
+        #print ('Done')
     
     def power_spectral_density(self,widget):
         obj=self.treedata[self.selecteditem];
@@ -962,9 +1076,6 @@ class maingui:
         self.psd.datahandler(res)
         self.psd.window.show()
         
-        
-
-
 
     def testhandler(self, widget):
         self.prnt(None)

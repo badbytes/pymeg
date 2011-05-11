@@ -144,7 +144,7 @@ class gridwin():
         #self.workspace_data.results.grid = transform.scalesourcespace(self.workspace_data.data.filepath, dec, brain=braintype)/1000
         self.grid = (transform.scalesourcespace
         (self.headshape, self.mr.megxyz, self.mr.lpa,self.mr.rpa,self.mr.nas,
-        self.mr.pixdim,brain=braintype)/1000)
+        self.mr.pixdim,brain=braintype))
         #(datapdf, megxyz, lpa, rpa, nas, voxdim, brain='no')
         print 'grid shape', shape(self.grid) #shape(self.workspace_data.results.grid)
         print self.callback
@@ -186,7 +186,7 @@ class gridwin():
         
     def gridcallback(self):
         if self.callback != None:
-            self.callback(self.grid)
+            self.callback(self.grid,mr=self.mr)
         else:
             return self.grid
 

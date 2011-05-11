@@ -749,11 +749,25 @@ Selected Events</property>
                     <signal name="clicked" handler="on_button_epoch_clicked"/>
                   </object>
                   <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">4</property>
                   </packing>
                 </child>
                 <child>
-                  <placeholder/>
+                  <object class="GtkButton" id="button10">
+                    <property name="label" translatable="yes">Store Event
+ with Data</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <signal name="clicked" handler="on_store_event_clicked"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
+                    <property name="position">5</property>
+                  </packing>
                 </child>
                 <child>
                   <object class="GtkButton" id="button3">
@@ -784,6 +798,7 @@ Selected Events</property>
         <child type="tab">
           <object class="GtkLabel" id="label6">
             <property name="visible">True</property>
+            <property name="has_focus">True</property>
             <property name="label" translatable="yes">Data Selections</property>
           </object>
           <packing>
