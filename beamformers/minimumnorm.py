@@ -1,41 +1,51 @@
-#fn = '/home/danc/python/data/0611/0611SEF/e,rfhp1.0Hz,n,x,baha001-1SEF,f50lp'
-#from pdf2py import pdf
+#       minimumnorm.py
+#       
+#       Copyright 2011 danc <danc@badbytes.net>
+#       
+#       This program is free software; you can redistribute it and/or modify
+#       it under the terms of the GNU General Public License as published by
+#       the Free Software Foundation; either version 2 of the License, or
+#       (at your option) any later version.
+#       
+#       This program is distributed in the hope that it will be useful,
+#       but WITHOUT ANY WARRANTY; without even the implied warranty of
+#       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#       GNU General Public License for more details.
+#       
+#       You should have received a copy of the GNU General Public License
+#       along with this program; if not, write to the Free Software
+#       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#       MA 02110-1301, USA.
 
-#p = pdf.read(fn)
+'''pow, weight = minimumnorm.calc(data,leadfields,noisecovariance)
 
-#p.data.setchannels('meg')
-#p.data.getdata(0,p.data.pnts_in_file)
-#from mri import img_nibabel
-
-#i = img_nibabel.loadimage('/home/danc/python/data/standardmri/ch3_brain.nii.gz')
-#i.decimate(50)
-#from meg import leadfield
-
-#lf = leadfield.calc(p.data.channels, grid=i.megxyz)
-
+ex.
+mr = img_nibabel.loadimage('/path/skullstrippedbrain.nii.gz')
+mr.decimate(10)
+lf = leadfield.calc(channels, grid=mr.megxyz)
+noisecovariance = dot(data_block[0:50].T,data_block[0:50])
+'''
 
 from numpy import *;
 from scipy.linalg import *
 from meg import leadfield
 
-#noisecov = dot(p.data.data_block[0:50].T,p.data.data_block[0:50])
-
-
 def calc(data,lf,noisecov):
+    
     
     Nsource = size(lf.leadfield,2)*size(lf.leadfield,0)
     sourcecov = eye(Nsource,Nsource);#sourcecov = sparse.eye(Nsource,Nsource);
     
     #squeeze directional vector and num of sources and then reshape NumOfCh X NumSources*LeadfieldDir, ie 248X48
     lfr = swapaxes(lf.leadfield,1,2).reshape((size(lf.leadfield,0)*size(lf.leadfield,2),size(lf.leadfield,1)),order='F').T
-    #return lfr
-    #REDuce rank
-    [u, s, v] = svd(lfr);
-    s = diag(s) #make square
-    r = diag(s); #take diag
-    s[:] = 0;
-    for j in range(0,2):
-        s[j,j] = r[j];
+    
+    ##Reduce rank
+    #[u, s, v] = svd(lfr);
+    #s = diag(s) #make square
+    #r = diag(s); #take diag
+    #s[:] = 0;
+    #for j in range(0,2):
+        #s[j,j] = r[j];
     
     ##% recompose the leadfield with reduced rank
     #tmp = zeros((size(lfr,0),size(lfr,1))) #make not square
@@ -48,7 +58,7 @@ def calc(data,lf,noisecov):
     nrm = sum(lfr**2)**.5 #normfact
     lfn = lfr / nrm
     
-    A = lfr;
+    #A = lfr;
     A = lfn
     R = sourcecov; #Nsources X Nsources
     C = noisecov;
@@ -61,6 +71,3 @@ def calc(data,lf,noisecov):
     momp = sqrt(momr[0]**2 + momr[1]**2 + momr[2]**2)
     return momp.T, w.T
 
-
-#w = dot(dot(R , A.T).T , inv((dot(dot( A , R).T , A) + dot(lambd**2 , C));
-  #w = R * A' * inv( A * R * A' + (lambda^2) * C);

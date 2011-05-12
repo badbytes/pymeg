@@ -823,10 +823,13 @@ class maingui:
         #res = (self.setup_helper(var=['source_space'],obj=obj));
         solution = self.treedata[self.selecteditem]
         source_space = self.data_file_selected['source_space']
-
         c = sourcesolution2img.build(solution,source_space)
         #solution = self.data_file_selected['source_space']
-        self.data_file_selected['solution_image'] = {'result':c}
+        self.data_file_selected['source_space'] = copy(source_space)
+        self.data_file_selected['source_space']['data'] = c
+        self.data_file_selected['source_space']['pixdim'] = self.data_file_selected['source_space']['pixdim']*self.data_file_selected['source_space']['factor']
+        self.datadict[self.data_filename_selected] = self.data_file_selected
+        #self.treegohome(None)
         self.updatestatusbar('solution to image complete')
 
     def dipoledensityhandle(self,widget):
