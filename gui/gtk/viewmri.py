@@ -193,11 +193,11 @@ class setup_gui:
         self.im1.axes.figure.canvas.draw()
 
     def update2(self):
-        self.im2.set_data(self.data[:,self.ind2,:].T)
+        self.im2.set_data(self.data[:,self.ind2,:])
         self.im2.axes.figure.canvas.draw()
 
     def update3(self):
-        self.im3.set_data(self.data[self.ind3,:,:].T)
+        self.im3.set_data(self.data[self.ind3,:,:])
         self.im3.axes.figure.canvas.draw()
 
     def click(self,event, pixdim=None):

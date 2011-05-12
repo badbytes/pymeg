@@ -36,7 +36,7 @@ try:
 except:
     print("GTK import error")
     sys.exit(1)
-    
+
 #pylab methods
 from matplotlib import use;use('GTK')
 from matplotlib.figure import Figure
@@ -45,7 +45,7 @@ from matplotlib.backends.backend_gtk import show
 
 #load required methods
 from pdf2py import pdf, readwrite,lA2array
-from numpy import shape, random, sort, array, append, size, arange, ndarray,vstack,mean,zeros, dot
+from numpy import * #shape, random, sort, array, append, size, arange, ndarray,vstack,mean,zeros, dot
 from meg import dipole,plotvtk,plot2dgtk,leadfield,signalspaceprojection,nearest
 from mri import img_nibabel as img
 from mri import sourcesolution2img
@@ -53,7 +53,7 @@ from beamformers import minimumnorm
 #gui modules
 from gui.gtk import filter, offset_correct, errordialog, preferences,\
 dipoledensity, coregister, timef, data_editor, event_process, parse_instance, \
-meg_assistant, errordialog, viewmri, power_spectral_density
+meg_assistant, errordialog, viewmri, power_spectral_density, progressbar
 from gui.gtk import contour as contour_gtk
 
 #from IPython.Shell import IPShellEmbed
@@ -61,7 +61,7 @@ from gui.gtk import contour as contour_gtk
 #ipshell() # this call anywhere in your program will start IPython
 
 class maingui:
-    wTree = None 
+    wTree = None
     def __init__(self):
         self.builder = gtk.Builder()
         self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
@@ -70,6 +70,7 @@ class maingui:
         self.statusbar_cid = self.statusbar.get_context_id("")
         #self.memorybar = self.builder.get_object("memorybar")
         #self.progressbar = self.builder.get_object("progressbar")
+        self.progressbar = progressbar.setup()
         self.datatree(self)
 
         dic = {
@@ -141,7 +142,7 @@ class maingui:
         menu.show_all(); menu.hide()
         menu.set_tearoff_state(True)
 
-    def updatestatusbar(self,string): 
+    def updatestatusbar(self,string):
         self.statusbar.push(self.statusbar_cid, string)
 
     def showpopupmenu(self,widget,event):
@@ -301,12 +302,13 @@ class maingui:
 
     def saveselected(self,widget):
         fcd = self.builder.get_object("filechooserdialog2")
+        filename_without_ext = fnstrip = os.path.splitext(fcd.get_filename())[0]
         try:
-            readwrite.writedata(self.treedata[self.selecteditem], fcd.get_filename())
+            readwrite.writedata(self.treedata[self.selecteditem], fnstrip)
         except AttributeError:
-            readwrite.writedata(self.datadict[self.selecteditem], fcd.get_filename())
+            readwrite.writedata(self.datadict[self.selecteditem], fnstrip)
         except KeyError:
-            readwrite.writedata(self.data_file_selected, fcd.get_filename())
+            readwrite.writedata(self.data_file_selected, fnstrip)
         fcd.hide()
 
     def quit(self, widget):
@@ -384,6 +386,7 @@ class maingui:
         print('you selected position',c[0])
         print('length of tree', len(self.treedict))
         if len(self.treedict) == 0:
+            self.level = 0
             print('at home')
             self.treedata = self.parseddatadict[self.dataList.get_value(iter,0)]
             try: self.treedict[self.treedict.keys()[-1]+1] = self.treedata
@@ -396,6 +399,7 @@ class maingui:
             print('Data File Selected:')#,self.data_file_selected
         else:
             print('lower lvl')
+            self.level = self.level + 1
             try: self.treedict[self.treedict.keys()[-1]+1] = self.treedata[self.dataList.get_value(iter,0)]
             except AttributeError: self.treedict = {0 :self.treedata[self.dataList.get_value(iter,0)]}
             self.data2parse = self.treedict[self.treedict.keys()[-1]]
@@ -409,12 +413,26 @@ class maingui:
     def deleteselected(self, widget):
         liststore,iter = self.View.get_selection().get_selected()
         self.selectedvar = self.dataList.get_value(iter,0)
-        self.datadict.pop(self.selecteditem)
-        self.parseddatadict.pop(self.selecteditem)
-        self.treegohome(None)
+        try:
+            #delete whole dataset
+            self.datadict.pop(self.selecteditem)
+            self.parseddatadict.pop(self.selecteditem)
+            self.treegohome(self)
+        except KeyError:
+            #delete item
+            self.treedata.pop(self.selecteditem)
+            self.dataList.clear()
+            self.populatetree(self.treedata)
+        #self.treegohome(None)
+
+    def refreshtree(self):
+            self.dataList.clear()
+            self.populatetree(self.treedata)
+            self.datadict[self.data_filename_selected] = self.data_file_selected
 
     def treegohome(self,widget,resave=False):
         print('going home')
+        self.level = 0
         self.treedict = {};
         self.dataList.clear();
         for i in self.parseddatadict:
@@ -424,6 +442,7 @@ class maingui:
 
     def treeuplevel(self,widget):
         print('stepping up a level')
+        self.level = self.level - 1
         try:
             self.treedict.pop(self.treedict.keys()[-1])
         except IndexError:
@@ -472,10 +491,10 @@ class maingui:
 
         for i in range(0, len(self.labeldict.keys())):
             c[i].set_label(self.labeldict[self.labeldict.keys()[i]])
-            c[i].show(); 
+            c[i].show();
             e[i].show();
             e[i].activate();
-            col[i].show(); 
+            col[i].show();
             shape_type[i].show()
 
     def fill_combo_entries(self,widget):
@@ -602,20 +621,20 @@ class maingui:
                 except:
                     print('cant find instance', ii)
             return out
-                    
+
         for ii in var:
             print('look for dependency',ii),type(obj)
             if type(obj) == dict:
-                try: 
+                try:
                     v[ii] = dict_search(obj)
-                except UnboundLocalError: 
+                except UnboundLocalError:
                     print('couldnt find required data: ',ii)
                     self.errordialog('couldnt find required data: '+ii)
 
             if isinstance(obj, types.InstanceType):
                 try:
                     v[ii] = instance_search(obj)
-                except UnboundLocalError: 
+                except UnboundLocalError:
                     print('couldnt find required data: ',ii)
                     self.errordialog('couldnt find required data: '+ii)
 
@@ -638,7 +657,7 @@ class maingui:
                                 #out = obj[i]
                                 #print('found', i)
                     #except:
-                        
+
                         #print('cant find instance', ii)
 
             #if isinstance(obj, types.InstanceType):
@@ -662,9 +681,9 @@ class maingui:
                         #print('cant find instance', ii)
 
             #v.extend([out]);
-            #try: 
+            #try:
                 #v[ii] = out
-            #except UnboundLocalError: 
+            #except UnboundLocalError:
                 #print('couldnt find required data: ',ii)
                 #self.errordialog('couldnt find required data: '+ii)
         if len(v) != len(var):
@@ -721,11 +740,30 @@ class maingui:
         self.prefs = self.prefinit.prefs
 
     def plot2Dmri(self, widget):
-        vm = viewmri.setup_gui()
-        vm.window.show()
+        try:
+            self.vm.fig.clf()
+            if self.vm.window.get_property('visible') == False:
+                self.vm.window.show()
+        except AttributeError, NameError:
+            self.vm = viewmri.setup_gui()
+            self.vm.window.show()
         #print(self.treedata[self.selecteditem].data)
         #try:
-        self.mrimousepos = vm.display(self.treedata[self.selecteditem].data.T,pixdim=self.treedata[self.selecteditem].pixdim)
+
+        obj=self.treedata#[self.selecteditem];
+        try:
+            if self.treedata[self.selecteditem].__module__.split('.')[0] == 'mri':
+                print('displaying default MR: data')
+                obj=self.treedata[self.selecteditem];
+                res = (self.setup_helper(var=['pixdim','data'],obj=obj));
+                data = res['data']
+        except AttributeError:
+            print('displaying custom data:',self.selecteditem)
+            obj=self.treedata;
+            res = (self.setup_helper(var=['pixdim'],obj=obj));
+            data = self.treedata[self.selecteditem];
+
+        self.mrimousepos = self.vm.display(data,pixdim=res['pixdim'])
 
         #except:# (AttributeError, KeyError):
             #try:
@@ -738,15 +776,21 @@ class maingui:
     def plot3DMRIhandle(self, widget):
         from mri import vtkview
         vtkview.show()
-        
+
     def gridcalc(self, widget):
         def setgrid(grid,mr=None):
             self.data_file_selected['grid'] = grid #in mm
-            mr.nifti = []
-            self.data_file_selected['source_space'] = mr #in mm
-            self.treegohome(None)
+            #mr.nifti = []
+            if mr != None:
+                self.data_file_selected['source_space'] = {'pixdim':mr.pixdim*mr.factor,'data':mr.img,'ind':mr.ind,'megxyz':mr.megxyz} #in mm
+                #ss = self.data_file_selected['source_space']
+                #print ss['pixdim']
+                #ss['pixdim'] =  ss['pixdim']*ss['factor']
+                #ss['origmri'] = ss['data']
+                #ss['data'] = ss['img']
+            self.refreshtree() # self.treegohome(None)
             gridwin.window.hide()
-            self.updatestatusbar('grid calculation complete')
+            self.updatestatusbar('grid calculation of '+str(size(grid,1))+' points complete')
 
         if self.checkreq() == -1:
             print('caught error')
@@ -754,7 +798,7 @@ class maingui:
 
         from gui.gtk import grid
         gridwin = grid.gridwin()
-        
+
         #try:
             #self.gridwin.mriwin(workspace_data=self.data_file_selected)
         obj=self.treedata#[self.selecteditem];
@@ -772,7 +816,7 @@ class maingui:
         if self.checkreq() == -1:
                 print('caught error')
                 return
-                
+
         obj=self.treedata;#[self.selecteditem];
         res = (self.setup_helper(var=['channels','grid'],obj=obj));
         #grid = self.data_file_selected['grid']
@@ -784,7 +828,7 @@ class maingui:
             print('grid not detected')
             self.errordialog('No grid detected');
             return -1
-            
+
             if self.treedata[self.selecteditem] == 'grid':
                 print('using selected grid')
             else:
@@ -792,12 +836,15 @@ class maingui:
                 print('create or load grid first')
                 self.gridcalc(None)
                 return
-                
+
+        self.progressbar.window.show()
+        self.progressbar.widget.set_fraction(0)
         self.lf = leadfield.calc(res['channels'],self.data_file_selected['grid'])
+        self.progressbar.window.hide()
         self.data_file_selected['leadfield'] = self.lf
         self.data_file_selected['leadfield'].channels = res['channels']
         #self.data_file_selected['leadfield'].leadfields_transposed = self.lf.lp.T
-        self.treegohome(None)
+        self.refreshtree()
         self.updatestatusbar('leadfield calculation complete')
 
 
@@ -815,19 +862,23 @@ class maingui:
         noisecov = dot(res['data_selection'].T,res['data_selection'])
         minnormpow,w = minimumnorm.calc(res['data_block'],res['leadfield'],noisecov)
         print 'Min Norm Done'
-        self.data_file_selected['minimum_norm_solution'] = {'power':minnormpow,'source_weights':w,'channels':res['channels']}
-        self.updatestatusbar('minimum norm solution complete')
-    
+
+        mndict = {'minimumnorm_power':minnormpow,'minimumnorm_weights':w,'channels':res['channels']}
+        self.data_file_selected['source_space'].update(mndict)
+        self.updatestatusbar('minimum norm solution complete. added result to source_space.')
+        self.refreshtree()
+
     def sourcesolution2img_handler(self,widget):
-        #obj=self.treedata;
-        #res = (self.setup_helper(var=['source_space'],obj=obj));
+        obj=self.treedata;
+        res = (self.setup_helper(var=['ind'],obj=obj));
         solution = self.treedata[self.selecteditem]
-        source_space = self.data_file_selected['source_space']
+        #source_space = self.data_file_selected['source_space']
         c = sourcesolution2img.build(solution,source_space)
         #solution = self.data_file_selected['source_space']
-        self.data_file_selected['source_space'] = copy(source_space)
-        self.data_file_selected['source_space']['data'] = c
-        self.data_file_selected['source_space']['pixdim'] = self.data_file_selected['source_space']['pixdim']*self.data_file_selected['source_space']['factor']
+        #self.data_file_selected['source_space'] = copy(source_space)
+        #self.data_file_selected['source_space'][self.selecteditem] = c
+        self.data_file_selected['source_space']['total_power'] = mean(c,axis=0);
+        #self.data_file_selected['source_space']['pixdim'] = self.data_file_selected['source_space']['pixdim']*self.data_file_selected['source_space']['factor']
         self.datadict[self.data_filename_selected] = self.data_file_selected
         #self.treegohome(None)
         self.updatestatusbar('solution to image complete')
@@ -904,7 +955,7 @@ class maingui:
             self.data_file_selected['signal_projection']['signal_weights'] = data[self.de.sel_ind]
 
     def signal_space_filter(self,widget):
-        
+
         self.datadict[self.data_filename_selected] = self.data_file_selected
         #sp = self.data_file_selected['signal_projection']
         #obj = self.treedata[self.selecteditem]
@@ -941,7 +992,7 @@ class maingui:
         obj = self.treedata[self.selecteditem]
         res = (self.setup_helper(var,obj=obj));
         self.result_helper(sp,res)
-        
+
         #sp['channels'] = {}
         labels = []
         for i in range(0,size(ssp,1)):
@@ -1044,10 +1095,11 @@ class maingui:
                     print ('indices',self.de.sel_ind)
                     data = self.de.data
                     self.data_file_selected['data_selection'] = data[self.de.sel_ind]
-                
+
             except:
                 print 'DE ERROR'
-                
+            self.refreshtree()
+
         try:
             obj=self.treedata[self.selecteditem];
             r = (self.setup_helper(var=['data_block','srate','wintime',
@@ -1068,17 +1120,17 @@ class maingui:
             self.de.window.show()
         except RuntimeError:
             self.errordialog("Can't do that Dave");
-            
+
     #def data_editor_callback(self):
         #print ('Done')
-    
+
     def power_spectral_density(self,widget):
         obj=self.treedata[self.selecteditem];
         res = (self.setup_helper(var=['data_block','srate','labellist','chanlocs'],obj=obj));
         self.psd = power_spectral_density.setup_gui()
         self.psd.datahandler(res)
         self.psd.window.show()
-        
+
 
     def testhandler(self, widget):
         self.prnt(None)

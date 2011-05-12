@@ -16,7 +16,7 @@
 #       along with this program; if not, write to the Free Software
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
-import sys,time,os
+import sys,os
 
 try:
     import pygtk
@@ -30,40 +30,24 @@ except:
     print("GTK Not Availible")
     sys.exit(1)
 
-class template:
+class setup:
     def __init__(self):
         self.builder = gtk.Builder()
         self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
-        spin = self.builder.get_object("spinner1")
-        #spin.start()
-        #self.window = builder.add_objects_from_file("/home/danc/python/pymeg/gui/gtk/spinner.glade",['window2'])
-        self.window = self.builder.get_object("window")
-        #self.spin = self.builder.get_object("buttonbox1")
-
+        self.window = self.builder.get_object("window1")
+        self.widget = self.builder.get_object("progressbar")
+        #self.progressbar.set_fraction(.5)
         dic = {
             "on_button1_clicked" : self.test,
             }
 
         self.builder.connect_signals(dic)
 
-
-    def test(self,widget,null):
+    def test(self,widget):
         print 'test'
-        #self.builder.get_object("spinner1").stop()
-
-    def datahandler(data=None):
-        pass
-
 
 if __name__ == "__main__":
     mainwindow = template()
     mainwindow.window.show()
-
-    print 'started'
-
     print 'testing'
     gtk.main()
-    print 'done'
-
-    #time.sleep(5)
-    #spin.stop()
