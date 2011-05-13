@@ -27,14 +27,19 @@ try:
 except ImportError:
     from scipy import ndimage
 
-def build(sourcedata, sourcespace, hisample=None):
+def build(sourcedata, sourcespace=None, ind=None, origimg=None, img=None, hisample=None):
     '''[decimg, hiresimg] = sourcesolution2img(w.corr_mat, dec)'''
     '''sourcedata = w.corr_mat
     sourcespace = dec
     ie, dec = img.decimate(nimstripped, 20)
     lf = leadfield.calc(p.data.channels, grid=i.megxyz)
     '''
-    if size(sourcedata,1) != size(sourcespace.ind,1):
+    if sourcespace != None:
+        ind = sourcespace.ind
+        origimg = sourcespace.origimg
+        img = sourcespace.img
+        
+    if size(sourcedata,1) != size(ind,1):
         print('mismatch between sourcedata and sourcespace indices. They are diff lengths and this wont make sense. exiting.')
         return
 
@@ -42,34 +47,27 @@ def build(sourcedata, sourcespace, hisample=None):
         sourcedata = array([sourcedata])
 
     print 'size of new sourcedata is', shape(sourcedata)
-    print (size(sourcespace.img,0),size(sourcespace.img,1),size(sourcespace.img,2), size(sourcedata,0))
-    print 'size of new sourcespace is', shape(sourcespace.img)
+    print (size(img,0),size(img,1),size(img,2), size(sourcedata,0))
+    print 'size of new sourcespace is', shape(img)
 
-    newimg = zeros((size(sourcedata,0), size(sourcespace.img,0),size(sourcespace.img,1),size(sourcespace.img,2)))
+    newimg = zeros((size(sourcedata,0), size(img,0),size(img,1),size(img,2)))
     print 'size of new img is', shape(newimg)
-
-
-    #for ii in range(0, size(sourcedata,0)): #for each component
 
     for j in range(0, size(sourcedata,0)): #for each component
         print 'processing component',j
         for i in range(0, size(sourcedata,1)): #for each location
-            newimg[j,sourcespace.ind[0,i],sourcespace.ind[1,i],sourcespace.ind[2,i]] = sourcedata[j,i];
-    #del sourcedata#, sourcespace.mrixyz, sourcespace.ind, sourcespace.img
+            newimg[j,ind[0,i],ind[1,i],ind[2,i]] = sourcedata[j,i];
     #resample back to original resolution
-    newshape = [size(newimg,0),sourcespace.data.shape[0],sourcespace.data.shape[1],\
-    sourcespace.data.shape[2]]
-
-
+    newshape = [size(newimg,0),origimg.shape[0],origimg.shape[1],origimg.shape[2]]
 
 
     if hisample != None:
-        print 'resampling back to original. From', shape(newimg), 'to', size(newimg,0),sourcespace.data.shape
+        print 'resampling back to original. From', shape(newimg), 'to', size(newimg,0),origimg.shape
         hiresimg = zeros((newshape));print shape(hiresimg)
         print shape(hiresimg)
         for k in range(0,size(newimg,0)):
             print 'hires resample of index', k, 'of', size(newimg,0)
-            hiresimg[k,:,:,:] = interp_array.rebin(squeeze(newimg[k,:,:,:]), sourcespace.data.shape)
+            hiresimg[k,:,:,:] = interp_array.rebin(squeeze(newimg[k,:,:,:]), origimg.shape)
         #return hiresimg
         print 'filtering image'
         return newimg, hiresimg#f

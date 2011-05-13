@@ -84,6 +84,8 @@ class setup_gui:
             "on_menu_offset_correct_clicked" : self.offset_correct,
             "on_button_epoch_clicked" : self.add_selections_to_event_process,
             "on_store_event_clicked" : self.store_event,
+            "on_menu_save_noise_activate" : self.store_noise,
+            "on_menu_save_event_activate" : self.store_event,
 
             }
 
@@ -97,6 +99,13 @@ class setup_gui:
 
     def printtest(self,widget):
         print 'something'
+    
+    def store_noise(self,widget):
+        print widget,'wid',widget.get_parent().get_name()
+        self.callback(widget)
+    def store_event(self,widget):
+        print widget,'wid',widget.get_parent().get_name()
+        self.callback(widget)
 
     def create_draw_frame(self,widget):
         self.fig = Figure(figsize=[100,100], dpi=40)
@@ -421,8 +430,6 @@ class setup_gui:
                     self.View.get_selection().select_path(i)
 
 
-
-
     def selections_tree(self,widget):
         try:
             if self.win_prefs.get_property('visible') == True:
@@ -464,7 +471,7 @@ class setup_gui:
             m.popup(None,None,None,3,0)
 
     def get_time_selection(self,widget,current=True):
-        #print 'name',widget.get_parent().get_name()
+        print 'name',widget.get_parent().get_name()
         sel_ind = []
         sel_onset_ind = []
         def selection_to_ind(sels,sele,inc):
@@ -477,19 +484,19 @@ class setup_gui:
             return sel_ind
         #print 'parent',widget.get_title()
         if widget.get_parent().get_name() == 'GtkMenu' and current == True: #call from editor menu
-            print 'call from menu'
+            print 'call from right click menu'
             try:
                 self.sel_ind = selection_to_ind(self.selections[-1][0],\
                 self.selections[-1][1],self.t[1]-self.t[0])
             except AttributeError:
                 print 'no selections yet'
-                self.builder.get_object("messagedialog1").format_secondary_text\
-                ('No Selections Created Yet')
-                self.builder.get_object("messagedialog1").show()
+                #self.builder.get_object("messagedialog1").format_secondary_text\
+                #('No Selections Created Yet')
+                #self.builder.get_object("messagedialog1").show()
                 return -1
 
         else: #call from selector
-            print 'call from selector win'
+            print 'call from selector window'
             liststore,iter = self.SelView.get_selection().get_selected_rows()
             for i in iter:
                 j = int(liststore[i][0])
@@ -587,18 +594,18 @@ class setup_gui:
             print 'something wrong with load'
             return -1
 
-    def load_data_callback(self):
+    def load_data_callback(self, widget):
         print 'DONE!'
         p = self.data_assist.pdfdata #4D MEG file format
         input_dict = {'data_block':p.data.data_block,'srate':p.data.srate,'wintime':p.data.wintime,'labellist':p.data.channels.labellist,'chanlocs':p.data.channels.chanlocs}
         #self.data_handler(p.data.data_block,p.hdr.header_data.sample_period, \
         #p.data.wintime,p.data.channels.labellist,p.data.channels.chanlocs)
-        self.data_handler(input_dict)
+        self.data_handler(widget, input_dict)
 
 
 
     #def data_handler(self,data,srate,wintime,chanlabels,chanlocs, callback=None):
-    def data_handler(self,input_dict, callback=None):
+    def data_handler(self, widget, input_dict, callback=None):
         '''
         datahandler(data,srate,wintime,chanlabels,chanlocs)
         -
@@ -649,11 +656,11 @@ class setup_gui:
         self.display_apply(None)
         
         
-        try: callback(); self.callback = callback
-        except TypeError: print('no callback')
+        try: callback(widget); self.callback = callback
+        except TypeError, NameError: print('no callback')
         
-    def store_event(self,widget):
-        self.callback()
+    #def store_event(self,widget):
+        #self.callback()
 
 
     #def callback(self):
@@ -669,6 +676,8 @@ class setup_gui:
             return -1
         self.data = self.data - average(self.data[self.sel_ind,:],axis=0)
         self.display_apply(None)
+        print widget,'wid:',widget.get_label()
+        self.callback(widget)
 
     def add_selections_to_event_process(self,widget):
         try:

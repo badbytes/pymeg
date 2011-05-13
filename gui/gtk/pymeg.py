@@ -130,7 +130,13 @@ class maingui:
         self.treedict = {} #initialize the treeview dictionary.
         #self.queue_store = gtk.ListStore(str)
         self.dataselected = [] #tree item currently selected
-
+        
+        #turn off function menu
+        menufunctions = self.builder.get_object('menufunctions').get_children()
+        for m in menufunctions:
+            if m.get_name() ==  'GtkMenuItem':
+                m.set_sensitive(False)
+                
         #preference data
         try: self.prefs = readwrite.readdata(os.getenv('HOME')+'/.pymeg.pym')
         except IOError: pass
@@ -170,7 +176,7 @@ class maingui:
     def meg_assist(self):
         self.data_assist = meg_assistant.setup(path = self.fn, callback=self.load_megdata_callback)
 
-    def load_megdata_callback(self):
+    def load_megdata_callback(self,widget=None):
         path = self.data_assist.pdfdata.data.filepath
         self.datadict[path] = self.data_assist.pdfdata
         self.readMEG()
@@ -375,6 +381,7 @@ class maingui:
         print('you selected item:', self.dataList.get_value(iter,0))#, self.dataList.get_value(iter,1)
         self.selecteditem = self.dataList.get_value(iter,0)
         self.dataselected = self.selecteditem
+        self.prerequisite(itemtype='selecteditem')
 
     def treeclicked(self,b,c,d):
         print(b,c,d)
@@ -405,10 +412,11 @@ class maingui:
             self.data2parse = self.treedict[self.treedict.keys()[-1]]
             self.parseinstance(self.data2parse)
             self.treedata = self.parseddata.out
-
+        
         self.dataList.clear()
         self.populatetree(self.treedata)
         self.builder.get_object('treebutton2').set_sensitive(True)
+        self.prerequisite(itemtype='generalitem')
 
     def deleteselected(self, widget):
         liststore,iter = self.View.get_selection().get_selected()
@@ -429,6 +437,7 @@ class maingui:
             self.dataList.clear()
             self.populatetree(self.treedata)
             self.datadict[self.data_filename_selected] = self.data_file_selected
+            self.prerequisite(itemtype='generalitem')
 
     def treegohome(self,widget,resave=False):
         print('going home')
@@ -439,6 +448,7 @@ class maingui:
             iter = self.dataList.append([i,type(self.parseddatadict[i])])#, 'Data File'])
             print('data items...',i)
         self.builder.get_object('treebutton2').set_sensitive(False)
+        self.prerequisite(itemtype='generalitem')
 
     def treeuplevel(self,widget):
         print('stepping up a level')
@@ -462,6 +472,7 @@ class maingui:
             self.parseinstance(self.data2parse)
             self.treedata = self.parseddata.out
         self.populatetree(self.treedata)
+        self.prerequisite(itemtype='generalitem')
 
     def treeadd2workspace(self,widget):
         liststore,iter = self.View.get_selection().get_selected()
@@ -573,6 +584,7 @@ class maingui:
         so it doesn't have to be statically defined all the time.
         '''
         import copy, types, inspect
+        
         #v = [];
         v = {}
         if type(var) == str:
@@ -580,63 +592,67 @@ class maingui:
 
         def instance_search(item):
             try:
-                print 'looking for child'
+                #print 'looking for child'
                 out = eval('item.'+ii)
-                print('found as child instance', ii)
+                #print('found as child instance', ii)
             except:
                 try:
                     for i in inspect.getmembers(item):
                         if i[0] == ii:
                             out = i[1]
-                            print('found', i[0])
+                            #print('found', i[0])
                         if isinstance(i[1], types.InstanceType):
                             for j in inspect.getmembers(i[1]):
                                 if j[0] == ii:
                                     out = j[1]
-                                    print('found', j[0])
+                                    #print('found', j[0])
                 except:
-                    print('cant find instance', ii)
+                    pass
+                    #print('cant find instance', ii)
             return out
         def dict_search(item):
-            print('dict search')
+            #print('dict search')
             try:
                 out = item[ii]
-                print('found as child dict', ii)
+                #print('found as child dict', ii)
             except:
                 try:
                     for i in item:
-                        print('i',i, type(item[i]))
+                        #print('i',i, type(item[i]))
                         if type(item[i]) == dict:
                             try:
                                 out = item[i][ii]
-                                print('found',ii)
+                                #print('found',ii)
                             except: pass
                         if obj[i] == ii:
                             out = item[i]
-                            print('found', i)
+                            #print('found', i)
                         if isinstance(item[i], types.InstanceType):
-                            print 'searching deeper'
+                            #print 'searching deeper'
                             try: out = instance_search(item[i])
                             except: pass
                 except:
-                    print('cant find instance', ii)
+                    pass
+                    #print('cant find instance', ii)
             return out
 
         for ii in var:
-            print('look for dependency',ii),type(obj)
+            #print('look for dependency',ii),type(obj)
             if type(obj) == dict:
                 try:
                     v[ii] = dict_search(obj)
                 except UnboundLocalError:
-                    print('couldnt find required data: ',ii)
-                    self.errordialog('couldnt find required data: '+ii)
+                    pass
+                    #print('couldnt find required data: ',ii)
+                    #self.errordialog('couldnt find required data: '+ii)
 
             if isinstance(obj, types.InstanceType):
                 try:
                     v[ii] = instance_search(obj)
                 except UnboundLocalError:
-                    print('couldnt find required data: ',ii)
-                    self.errordialog('couldnt find required data: '+ii)
+                    pass
+                    #print('couldnt find required data: ',ii)
+                    #self.errordialog('couldnt find required data: '+ii)
 
             #if type(obj) == dict:
                 #print('dict search')
@@ -687,7 +703,7 @@ class maingui:
                 #print('couldnt find required data: ',ii)
                 #self.errordialog('couldnt find required data: '+ii)
         if len(v) != len(var):
-            print('missing items requested')
+            #print('missing items requested')
             raise KeyError
 
         return v
@@ -782,7 +798,7 @@ class maingui:
             self.data_file_selected['grid'] = grid #in mm
             #mr.nifti = []
             if mr != None:
-                self.data_file_selected['source_space'] = {'pixdim':mr.pixdim*mr.factor,'data':mr.img,'ind':mr.ind,'megxyz':mr.megxyz} #in mm
+                self.data_file_selected['source_space'] = {'pixdim':mr.pixdim*mr.factor,'data':mr.img,'ind':mr.ind,'megxyz':mr.megxyz,'origimg':mr.origimg,'img':mr.img} #in mm
                 #ss = self.data_file_selected['source_space']
                 #print ss['pixdim']
                 #ss['pixdim'] =  ss['pixdim']*ss['factor']
@@ -858,9 +874,9 @@ class maingui:
 
     def minimunnorm_handler(self,widget):
         obj=self.treedata;
-        res = (self.setup_helper(var=['data_block','leadfield','data_selection','channels'],obj=obj));
-        noisecov = dot(res['data_selection'].T,res['data_selection'])
-        minnormpow,w = minimumnorm.calc(res['data_block'],res['leadfield'],noisecov)
+        res = (self.setup_helper(var=['selection_event','leadfield','selection_noise','channels'],obj=obj));
+        noisecov = dot(res['selection_noise'].T,res['selection_noise'])
+        minnormpow,w = minimumnorm.calc(res['selection_event'],res['leadfield'],noisecov)
         print 'Min Norm Done'
 
         mndict = {'minimumnorm_power':minnormpow,'minimumnorm_weights':w,'channels':res['channels']}
@@ -870,10 +886,10 @@ class maingui:
 
     def sourcesolution2img_handler(self,widget):
         obj=self.treedata;
-        res = (self.setup_helper(var=['ind'],obj=obj));
+        res = (self.setup_helper(var=['ind','origimg','img'],obj=obj));
         solution = self.treedata[self.selecteditem]
         #source_space = self.data_file_selected['source_space']
-        c = sourcesolution2img.build(solution,source_space)
+        c = sourcesolution2img.build(solution,ind=res['ind'],origimg=res['origimg'],img=res['img'])
         #solution = self.data_file_selected['source_space']
         #self.data_file_selected['source_space'] = copy(source_space)
         #self.data_file_selected['source_space'][self.selecteditem] = c
@@ -1081,27 +1097,95 @@ class maingui:
         self.ed.window.show()
         print ('sending file:'+'file://'+filepath)
         self.ed.set_passed_filename(filepath,callback=epoch_callback)
+        
+    def prerequisite(self,itemtype):
+        print 'Item finder searching'
+        predict = {}
+        try:
+            if itemtype == 'selecteditem':
+                obj=self.treedata[self.selecteditem]
+                predict['Data Editor'] = ['data_block','srate','wintime','labellist','chanlocs']
+                predict['Time Freq Transform'] = ['data_block','labellist','srate','frames','numofepochs','eventtime']
+                predict['Power Spectral Density'] = ['data_block','srate','labellist','chanlocs']
+            if itemtype == 'generalitem':
+                obj=self.treedata
+                predict['Calculate Grid'] = ['hs']
+                predict['Leadfield Calc'] = ['channels','grid']
+                predict['Minimum Norm Solution'] = ['selection_event','leadfield','selection_noise','channels']
+                predict['Solution To Image'] = ['ind','origimg','img']
+                predict['Plot MRI'] = ['pixdim','data']
+                predict['Contour Plot'] = ['chanlocs']
+                #predict['Plot'] = True
+                
+                
+        except AttributeError:
+            #probably at home. no treedata to parse
+            for j in menufunctions:
+                if j.get_name() ==  'GtkMenuItem':
+                    j.set_sensitive(False)
+        
+        menufunctions = self.builder.get_object('menufunctions').get_children()
+        #predict['Data Editor'] = ['data_block','srate','wintime','labellist','chanlocs']
+        #predict['Calculate Grid'] = ['hs']
+        #predict['Leadfield Calc'] = ['channels','grid']
+        for i in predict.keys():
+            predict[i]
+            try:
+                r = self.setup_helper(var=predict[i],obj=obj);
+                for j in menufunctions:
+                    if j.get_name() ==  'GtkMenuItem' and j.get_label() == i:
+                        j.set_sensitive(True)
+                        #try: j.get_parent().set_sensive(True)
+                        #except AttributeError: pass
+            except KeyError:
+                for j in menufunctions:
+                    if j.get_name() ==  'GtkMenuItem' and j.get_label() == i:
+                        j.set_sensitive(False)
+        
+        if type(self.treedata[self.selecteditem]) == ndarray:
+            for j in menufunctions:
+                if j.get_label() == 'Plot':
+                    j.set_sensitive(True)
+        else:
+            for j in menufunctions:
+                if j.get_label() == 'Plot':
+                    j.set_sensitive(False)
 
     def data_editor(self, widget):
-        def data_editor_callback():
-            print ('Done')
+        def data_editor_callback(widget):
+            print ('de calling back'), widget.get_label()
             try:
-                print ('selection list', self.de.selections)
-                self.de.time
-                liststore,iter = self.de.SelView.get_selection().get_selected_rows()
-                for i in iter:
-                    print ('highlighted', liststore[i][1])
-                    self.de.get_time_selection(widget,current=False)
-                    print ('indices',self.de.sel_ind)
-                    data = self.de.data
-                    self.data_file_selected['data_selection'] = data[self.de.sel_ind]
+                #self.de.get_time_selection(widget,current=True)
+                data = self.de.data
+                if widget.get_label() == 'Save As Event':
+                    self.de.get_time_selection(widget,current=True)
+                    self.data_file_selected['selection_event'] = data[self.de.sel_ind]
+                if widget.get_label() == 'Save As Noise':
+                    self.de.get_time_selection(widget,current=True)
+                    self.data_file_selected['selection_noise'] = data[self.de.sel_ind]
+                print 'saved selection....'
+                if widget.get_label() == 'Offset Correct':
+                    print 'replacing data with offset correction'
+                    obj=self.treedata;#[self.selecteditem];
+                    r = (self.setup_helper(var=['data_block'],obj=obj));
+                    r['data_block'] = []#data
+                    print 'replaced'
+                #print ('selection list', self.de.selections)
+                #self.de.time
+                #liststore,iter = self.de.SelView.get_selection().get_selected_rows()
+                #for i in iter:
+                    #print ('highlighted', liststore[i][1])
+                    #self.de.get_time_selection(widget,current=False)
+                    #print ('indices',self.de.sel_ind)
+                    #data = self.de.data
+                    #self.data_file_selected['data_selection'] = data[self.de.sel_ind]
 
             except:
-                print 'DE ERROR'
+                pass
             self.refreshtree()
 
         try:
-            obj=self.treedata[self.selecteditem];
+            obj=self.treedata;#[self.selecteditem];
             r = (self.setup_helper(var=['data_block','srate','wintime',
             'labellist','chanlocs'],obj=obj));
             print (len(r))
@@ -1116,7 +1200,7 @@ class maingui:
         try:
             self.de = data_editor.setup_gui()
             #self.de.data_handler(r[0],r[1],r[2],r[3],r[4], callback=self.data_editor_callback)
-            self.de.data_handler(input_dict=r, callback=data_editor_callback)
+            self.de.data_handler(widget, input_dict=r, callback=data_editor_callback)
             self.de.window.show()
         except RuntimeError:
             self.errordialog("Can't do that Dave");

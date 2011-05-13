@@ -68,7 +68,7 @@ class setup:
             self.builder.get_object("entry30").set_text(str(self.pdfdata.data.pnts_in_file[0]))
         self.path = path
 
-    def read_data(self,path=None):
+    def read_data(self,widget, path=None):
 
         chlabels = []
         for c in self.chanlist:
@@ -98,7 +98,7 @@ class setup:
         self.pdfdata.data.numofepochs = numofepochs
         self.pdfdata.data.pnts_in_file = endpnt-startpnt
         self.builder.get_object("assistant1").hide()
-        self.callback()
+        self.callback(widget)
         return self.pdfdata
         sys.exit(0)
 

@@ -33,8 +33,8 @@ class loadimage():
         print 'reading',filepath
         self.nifti = nibabel.load(filepath)
         dirpath = os.path.dirname(filepath)
-        self.data = self.nifti.get_data().T
-        self.nifti.data = self.data
+        self.origimg = self.nifti.get_data().T
+        self.nifti.origimg = self.origimg
         h = self.nifti.get_header()
         self.pixdim = h['pixdim'][0:3]
         if os.path.isfile(filepath+'.pym') == True:
@@ -72,7 +72,7 @@ class loadimage():
             print xstartval,
             ystartval=ceil(dec[1]/2);
             zstartval=ceil(dec[2]/2);
-            decimg=array(nim.data[xstartval::dec[0],:,:][:,ystartval::dec[1],:][:,:,zstartval::dec[2]])
+            decimg=array(nim.origimg[xstartval::dec[0],:,:][:,ystartval::dec[1],:][:,:,zstartval::dec[2]])
             nonz = where(decimg > 0)
             x = ((nonz[0])*dec[0])+(dec[0])
             y = ((nonz[1])*dec[1])+(dec[1])
@@ -81,7 +81,7 @@ class loadimage():
         else:
             print 'uniform decimation'
             startval=ceil(dec/2);
-            decimg=array(nim.data[startval::dec,:,:][:,startval::dec,:][:,:,startval::dec])
+            decimg=array(nim.origimg[startval::dec,:,:][:,startval::dec,:][:,:,startval::dec])
             nonz = where(decimg > 0)
             x = ((nonz[0]+1)*dec)#-(dec)
             y = ((nonz[1]+1)*dec)#-(dec)
@@ -172,9 +172,9 @@ class decimate:
         "dec is the decimation factor"
 
         self.filename = nim.filename.rsplit('/')[-1]
-        xend=shape(nim.data)[0]
-        yend=shape(nim.data)[1]
-        zend=shape(nim.data)[2]
+        xend=shape(nim.origimg)[0]
+        yend=shape(nim.origimg)[1]
+        zend=shape(nim.origimg)[2]
 
         if type(dec) != float and type(dec) != int:
             print 'nonuniform decimation'
@@ -182,7 +182,7 @@ class decimate:
             print xstartval,
             ystartval=ceil(dec[1]/2);
             zstartval=ceil(dec[2]/2);
-            decimg=array(nim.data[xstartval::dec[0],:,:][:,ystartval::dec[1],:][:,:,zstartval::dec[2]])
+            decimg=array(nim.origimg[xstartval::dec[0],:,:][:,ystartval::dec[1],:][:,:,zstartval::dec[2]])
             nonz = where(decimg > 0)
             x = ((nonz[0])*dec[0])+(dec[0])
             y = ((nonz[1])*dec[1])+(dec[1])
@@ -191,7 +191,7 @@ class decimate:
         else:
             print 'uniform decimation'
             startval=ceil(dec/2);
-            decimg=array(nim.data[startval::dec,:,:][:,startval::dec,:][:,:,startval::dec])
+            decimg=array(nim.origimg[startval::dec,:,:][:,startval::dec,:][:,:,startval::dec])
             nonz = where(decimg > 0)
             x = ((nonz[0]+1)*dec)#-(dec)
             y = ((nonz[1]+1)*dec)#-(dec)

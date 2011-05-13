@@ -871,6 +871,7 @@ Selected Events</property>
     <child>
       <object class="GtkMenuItem" id="menu_contour_plot">
         <property name="visible">True</property>
+        <property name="tooltip_text" translatable="yes">Plot selected period as topographical map.</property>
         <property name="label" translatable="yes">Contour Plot</property>
         <property name="use_underline">True</property>
         <signal name="activate" handler="on_plot_contour_activate"/>
@@ -879,9 +880,28 @@ Selected Events</property>
     <child>
       <object class="GtkMenuItem" id="menu_offset_correct">
         <property name="visible">True</property>
+        <property name="tooltip_text" translatable="yes">Create offset correction on selection.</property>
         <property name="label" translatable="yes">Offset Correct</property>
         <property name="use_underline">True</property>
         <signal name="activate" handler="on_menu_offset_correct_clicked"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="save_noise">
+        <property name="visible">True</property>
+        <property name="tooltip_text" translatable="yes">Use selected as noise period</property>
+        <property name="label" translatable="yes">Save As Noise</property>
+        <property name="use_underline">True</property>
+        <signal name="activate" handler="on_menu_save_noise_activate"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="save_event">
+        <property name="visible">True</property>
+        <property name="tooltip_text" translatable="yes">Save as event period.</property>
+        <property name="label" translatable="yes">Save As Event</property>
+        <property name="use_underline">True</property>
+        <signal name="activate" handler="on_menu_save_event_activate"/>
       </object>
     </child>
   </object>
