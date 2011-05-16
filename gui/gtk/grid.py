@@ -35,10 +35,13 @@ from numpy import array, ndarray, float
 from pdf2py import readwrite,pdf
 from meg import grid
 from gui.gtk import coregister
+from gui.gtk import progressbar
 
 class gridwin():
     def __init__(self):
         #self.callback = callback
+        MT = progressbar.MainThread()
+        #
         self.datahandler()
         self.builder = gtk.Builder()
         self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
@@ -66,7 +69,7 @@ class gridwin():
             self.builder.get_object("filechooserbutton1").set_filename(self.prevdata['brain.nii.gz'])
             self.mr = img.loadimage(self.prevdata['brain.nii.gz'])
             self.statusbar.push(self.statusbar_cid, 'Loading Previous MRI.')
-            
+
             try:
                 type(self.mr.lpa) == ndarray#type(eval(self.mr.description)[0]) == ndarray: #coregegistered mri
                 self.builder.get_object("button1").set_sensitive(True)
@@ -77,11 +80,11 @@ class gridwin():
             self.prevdata = {}
         except TypeError:
             pass
-            
+
     def datahandler(self,callback=None):
         self.callback = callback
         #if callback != None: self.callback = callback
-        
+
 
     def coregister_handler(self, widget):
         self.cr = coregister.setup() #window
@@ -93,7 +96,7 @@ class gridwin():
         p = pdf.read(self.builder.get_object("filechooserbutton2").get_filename())
         self.headshape = p.hs
         print self.headshape,'headshape'
-        
+
     def coregistercheck(self,widget):
         print 'filename ',self.builder.get_object("filechooserbutton1").get_filename()
         try:
@@ -121,35 +124,47 @@ class gridwin():
     #def mriwin(self,workspace_data=None):
         #self.workspace_data = workspace_data
         #self.builder.get_object('window1').show()
-        
-    def mrigrid(self,widget):
-        print 'MRI source space computing'
-        from numpy import shape
-        #dec = img.decimate(self.mr, int(self.builder.get_object('entry1').get_text()))
-        self.mr.decimate(int(self.builder.get_object('entry1').get_text()))
-        #print 'dec', dec
-        #lpa=self.mr.lpa#eval(dec.origimg.description)[0]
-        #rpa=eval(dec.origimg.description)[1]
-        #nas=eval(dec.origimg.description)[2]
-        #[t,r] = transform.meg2mri(self.mr.lpa,self.mr.rpa,self.mr.nas)
-        #dec.megxyz = transform.mri2meg(t,r,self.mr.mrixyz)
-        #print 'fn', self.workspace_data.data.filepath
-
+    def delay(self):
+        import time
         if self.builder.get_object('radiobutton4').get_active() == True:
             braintype = 'yes'
         else:
             braintype = 'no'
 
+        for i in range(1):
+            print i
+            #time.sleep(1)
+        from numpy import random
+        from pdf2py import pdf
+        from meg import leadfield
+        fn = '/home/danc/python/data/0611/0611SEF/e,rfhp1.0Hz,n,x,baha001-1SEF,f50lp'
+        p = pdf.read(fn);p.data.setchannels('meg')
 
-        #self.workspace_data.results.grid = transform.scalesourcespace(self.workspace_data.data.filepath, dec, brain=braintype)/1000
-        self.grid = (transform.scalesourcespace
-        (self.headshape, self.mr.megxyz, self.mr.lpa,self.mr.rpa,self.mr.nas,
-        self.mr.pixdim,brain=braintype))
-        #(datapdf, megxyz, lpa, rpa, nas, voxdim, brain='no')
-        print 'grid shape', shape(self.grid) #shape(self.workspace_data.results.grid)
-        print self.callback
-        self.gridcallback()
-        #self.callback
+        lf = leadfield.calc(p.data.channels, grid=random.randn(3,10))
+        self.mr.decimate(int(self.builder.get_object('entry1').get_text()))
+        self.grid = (transform.scalesourcespace(self.headshape, self.mr.megxyz,
+        self.mr.lpa,self.mr.rpa,self.mr.nas,self.mr.pixdim,brain=braintype))
+        gtk.main_quit()
+    def mrigrid(self,widget):
+        print 'MRI source space computing'
+        from numpy import shape
+        def gridthread():
+            if self.builder.get_object('radiobutton4').get_active() == True:
+                braintype = 'yes'
+            else:
+                braintype = 'no'
+            self.mr.decimate(int(self.builder.get_object('entry1').get_text()))
+            self.grid = (transform.scalesourcespace(self.headshape, self.mr.megxyz,
+            self.mr.lpa,self.mr.rpa,self.mr.nas,self.mr.pixdim,brain=braintype))
+            print 'grid shape', shape(self.grid) #shape(self.workspace_data.results.grid)
+            print self.callback
+            self.gridcallback()
+
+        MT = progressbar.MainThread()
+        MT.main(gridthread)
+
+
+
 
     def gridtypechanged(self, widget):
         print gtk.Buildable.get_name(widget)
@@ -177,13 +192,13 @@ class gridwin():
             float(self.builder.get_object("entry3").get_text()), \
             float(self.builder.get_object("entry4").get_text()))
             print 'done sphere'
-            
-        
+
+
         self.gridcallback()
 
         #self.window.hide()
-        
-        
+
+
     def gridcallback(self):
         if self.callback != None:
             self.callback(self.grid,mr=self.mr)

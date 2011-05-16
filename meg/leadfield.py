@@ -109,8 +109,9 @@ class calc:
         self.leadfield = leadfieldfinal
         self.grid = grid
 
+import threading
 
-class code():#threading.Thread):
+class code(threading.Thread):
 
     """grid=voxel location. dimensions: N X 3
     pos=position of channels. returned by pos.py
@@ -119,10 +120,10 @@ class code():#threading.Thread):
 
     def __init__(self, grid, pos, ori, cent):
         variable = 1
-        #threading.Thread.__init__(self) # init the thread
-        
+        threading.Thread.__init__(self) # init the thread
+
         #danc changed hdr read to convert to mm upfront.
-        #pos=pos*1000 #convert channel pos from meters to mm 
+        #pos=pos*1000 #convert channel pos from meters to mm
         self.grid=grid;self.pos=pos;self.ori=ori
         chp = pos - cent
         self.loc = grid - cent

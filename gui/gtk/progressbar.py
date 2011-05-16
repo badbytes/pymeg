@@ -35,40 +35,39 @@ class MainThread:
     def __init__(self):
         gtk.gdk.threads_init()
         self.builder = gtk.Builder()
-        self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
+        self.builder.add_from_file("progressbar.glade")
         self.window = self.builder.get_object("window1")
         self.progressbar = self.builder.get_object("progressbar")
-        
+
     def pulse(self):
         self.progressbar.pulse()
+        if self.still_working == False:
+            #gtk.main_quit()
+            self.window.hide()
+            print 'quiting'
         return self.still_working # 1 = repeat, 0 = stop
 
-    def test(self,widget):
-        pass
+    def fraction(self):
+        self.progressbar.set_fraction(10)
 
-    def main(self, handler=None):
-        if handler == None:
-            def handler():
-                time.sleep(.25)
-                gtk.main_quit()
-                self.window.hide()
-                
+    def main(self, function_passed=None, progresstype='pulse'):
         self.window.show()
         self.progressbar.show()
         self.window.connect('destroy', gtk.main_quit)
-        WT = WorkerThread(handler, self)
+        WT = WorkerThread(function_passed, self)
         WT.start()
-        gobject.timeout_add(100, self.pulse)
-
+        if progresstype == 'pulse':
+            gobject.timeout_add(100, self.pulse)
+        if progresstype == 'fraction':
+            self.fraction()
         gtk.main()
-        
-class WorkerThread(threading.Thread):
 
+class WorkerThread(threading.Thread):
     def __init__ (self, function, parent):
         threading.Thread.__init__(self)
         self.function = function
         self.parent = parent
- 
+
     def run(self): # when does "run" get executed?
         self.parent.still_working = True
         self.function()
@@ -78,9 +77,9 @@ class WorkerThread(threading.Thread):
 if __name__ == '__main__':
     MT = MainThread()
     def testfunction():
-        for i in range(0,10):
+        for i in range(0,50):
                 print i;
                 time.sleep(.1)
         gtk.main_quit()
     MT.main(testfunction)
-    
+

@@ -5,12 +5,15 @@
   <object class="GtkWindow" id="window1">
     <property name="type">popup</property>
     <property name="window_position">center</property>
-    <property name="opacity">0.90000000000000002</property>
     <child>
       <object class="GtkProgressBar" id="progressbar">
         <property name="width_request">500</property>
-        <property name="height_request">20</property>
+        <property name="height_request">30</property>
         <property name="visible">True</property>
+        <property name="show_text">True</property>
+        <property name="fraction">0.10000000000000001</property>
+        <property name="pulse_step">0.050000000000000003</property>
+        <property name="text" translatable="yes">Please Wait</property>
         <signal name="button_press_event" handler="on_button1_clicked"/>
       </object>
     </child>

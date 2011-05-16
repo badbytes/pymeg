@@ -20,7 +20,8 @@
 #       MA 02110-1301, USA.
 
 '''Main GUI Window'''
-import sys,os,subprocess
+import sys,os,subprocess,time,gobject
+import threading
 if sys.version >= '3':
     print ('Wrong Python Version. Only Python2 supported.')
     sys.exit(1)
@@ -60,7 +61,7 @@ from gui.gtk import contour as contour_gtk
 #ipshell = IPShellEmbed()
 #ipshell() # this call anywhere in your program will start IPython
 
-class maingui:
+class maingui():
     wTree = None
     def __init__(self):
         self.builder = gtk.Builder()
@@ -70,7 +71,7 @@ class maingui:
         self.statusbar_cid = self.statusbar.get_context_id("")
         #self.memorybar = self.builder.get_object("memorybar")
         #self.progressbar = self.builder.get_object("progressbar")
-        self.progressbar = progressbar.setup()
+        #self.progressbar = progressbar.setup()
         self.datatree(self)
 
         dic = {
@@ -130,13 +131,13 @@ class maingui:
         self.treedict = {} #initialize the treeview dictionary.
         #self.queue_store = gtk.ListStore(str)
         self.dataselected = [] #tree item currently selected
-        
+
         #turn off function menu
         menufunctions = self.builder.get_object('menufunctions').get_children()
         for m in menufunctions:
             if m.get_name() ==  'GtkMenuItem':
                 m.set_sensitive(False)
-                
+
         #preference data
         try: self.prefs = readwrite.readdata(os.getenv('HOME')+'/.pymeg.pym')
         except IOError: pass
@@ -150,7 +151,7 @@ class maingui:
 
     def updatestatusbar(self,string):
         self.statusbar.push(self.statusbar_cid, string)
-        
+
     def progresspulse(self):
         p = progressbar.MainThread()
         p.main(testfunction)
@@ -416,7 +417,7 @@ class maingui:
             self.parseinstance(self.data2parse)
             self.treedata = self.parseddata.out
         print 'dict level--------',self.treedict.keys()
-        
+
         self.refreshtree()
         #self.dataList.clear()
         #self.populatetree(self.treedata)
@@ -442,7 +443,7 @@ class maingui:
         #self.treegohome(None)
 
     def refreshtree(self):
-        
+
         print 'len',len(self.treedict.keys())
         if len(self.treedict.keys()) > 1: #bug in delete item. cant seem to delete higher than 2 dictionary items.
             self.builder.get_object('deleteselecteditem').set_sensitive(False)
@@ -484,7 +485,7 @@ class maingui:
         else:
             self.parseinstance(self.data2parse)
             self.treedata = self.parseddata.out
-        
+
         self.refreshtree()
         #print 'dict level--------',self.treedict.keys()
         #self.populatetree(self.treedata)
@@ -600,12 +601,12 @@ class maingui:
         so it doesn't have to be statically defined all the time.
         '''
         import copy, types, inspect
-        
+
         #v = [];
         v = {}
         if type(var) == str:
             var = [var] #make list
-        
+
         def instance_search(item):
             try:
                 #print 'looking for child'
@@ -811,6 +812,9 @@ class maingui:
 
     def gridcalc(self, widget):
         def setgrid(grid,mr=None):
+            #MT = MainThread()
+            #MT.start()
+            #print 'progress.....start'
             self.data_file_selected['grid'] = grid #in mm
             #mr.nifti = []
             if mr != None:
@@ -823,6 +827,7 @@ class maingui:
             self.refreshtree() # self.treegohome(None)
             gridwin.window.hide()
             self.updatestatusbar('grid calculation of '+str(size(grid,1))+' points complete')
+            #MT.terminate()
 
         if self.checkreq() == -1:
             print('caught error')
@@ -845,39 +850,51 @@ class maingui:
             #('No data selected. Double Click a MEG filename')
 
     def leadfieldcalc(self, widget):
-        if self.checkreq() == -1:
-                print('caught error')
-                return
+        def leadfieldthread():
+            if self.checkreq() == -1:
+                    print('caught error')
+                    return
 
-        obj=self.treedata;#[self.selecteditem];
-        res = (self.setup_helper(var=['channels','grid'],obj=obj));
-        #grid = self.data_file_selected['grid']
-        print 'grid print',res['grid']
+            obj=self.treedata;#[self.selecteditem];
+            res = (self.setup_helper(var=['channels','grid'],obj=obj));
+            #grid = self.data_file_selected['grid']
+            print 'grid print',res['grid']
 
-        try:
-            self.data_file_selected['grid']
-        except(AttributeError,KeyError):
-            print('grid not detected')
-            self.errordialog('No grid detected');
-            return -1
+            try:
+                self.data_file_selected['grid']
+            except(AttributeError,KeyError):
+                print('grid not detected')
+                self.errordialog('No grid detected');
+                return -1
 
-            if self.treedata[self.selecteditem] == 'grid':
-                print('using selected grid')
-            else:
-                print('no grid detected. giving up.')
-                print('create or load grid first')
-                self.gridcalc(None)
-                return
+                if self.treedata[self.selecteditem] == 'grid':
+                    print('using selected grid')
+                else:
+                    print('no grid detected. giving up.')
+                    print('create or load grid first')
+                    self.gridcalc(None)
+                    return
+            self.lf = leadfield.calc(res['channels'],self.data_file_selected['grid'])
+            self.data_file_selected['leadfield'] = self.lf
+            self.data_file_selected['leadfield'].channels = res['channels']
+            self.refreshtree()
+            self.updatestatusbar('leadfield calculation complete')
 
-        self.progressbar.window.show()
-        self.progressbar.widget.set_fraction(0)
-        self.lf = leadfield.calc(res['channels'],self.data_file_selected['grid'])
-        self.progressbar.window.hide()
-        self.data_file_selected['leadfield'] = self.lf
-        self.data_file_selected['leadfield'].channels = res['channels']
-        #self.data_file_selected['leadfield'].leadfields_transposed = self.lf.lp.T
-        self.refreshtree()
-        self.updatestatusbar('leadfield calculation complete')
+        MT = progressbar.MainThread()
+        MT.main(leadfieldthread)
+        ##self.progressbar.window.show()
+        ##self.progressbar.widget.set_fraction(0)
+        ##p = progressbar.MainThread()
+        ##p.main(leadfield.calc(res['channels'],self.data_file_selected['grid']))
+
+        #self.lf = leadfield.calc(res['channels'],self.data_file_selected['grid'])
+        ##MT.terminate()
+        ##self.progressbar.window.hide()
+        #self.data_file_selected['leadfield'] = self.lf
+        #self.data_file_selected['leadfield'].channels = res['channels']
+        ##self.data_file_selected['leadfield'].leadfields_transposed = self.lf.lp.T
+        #self.refreshtree()
+        #self.updatestatusbar('leadfield calculation complete')
 
 
         #self.lf = leadfield.calc(self.data_file_selected['data'].filename, self.data_file_selected['data'].channels, \
@@ -889,16 +906,19 @@ class maingui:
         #self.data_file_selected['leadfield'].leadfields_transposed = self.lf.lp.T
 
     def minimunnorm_handler(self,widget):
-        obj=self.treedata;
-        res = (self.setup_helper(var=['selection_event','leadfield','selection_noise','channels'],obj=obj));
-        noisecov = dot(res['selection_noise'].T,res['selection_noise'])
-        minnormpow,w = minimumnorm.calc(res['selection_event'],res['leadfield'],noisecov)
-        print 'Min Norm Done'
+        def minnormthread():
+            obj=self.treedata;
+            res = (self.setup_helper(var=['selection_event','leadfield','selection_noise','channels'],obj=obj));
+            noisecov = dot(res['selection_noise'].T,res['selection_noise'])
+            minnormpow,w = minimumnorm.calc(res['selection_event'],res['leadfield'],noisecov)
+            print 'Min Norm Done'
 
-        mndict = {'minimumnorm_power':minnormpow,'minimumnorm_weights':w,'channels':res['channels']}
-        self.data_file_selected['source_space'].update(mndict)
-        self.updatestatusbar('minimum norm solution complete. added result to source_space.')
-        self.refreshtree()
+            mndict = {'minimumnorm_power':minnormpow,'minimumnorm_weights':w,'channels':res['channels']}
+            self.data_file_selected['source_space'].update(mndict)
+            self.updatestatusbar('minimum norm solution complete. added result to source_space.')
+            self.refreshtree()
+        MT = progressbar.MainThread()
+        MT.main(minnormthread)
 
     def sourcesolution2img_handler(self,widget):
         obj=self.treedata;
@@ -1113,7 +1133,7 @@ class maingui:
         self.ed.window.show()
         print ('sending file:'+'file://'+filepath)
         self.ed.set_passed_filename(filepath,callback=epoch_callback)
-        
+
     def prerequisite(self,itemtype):
         print 'Item finder searching'
         menufunctions = self.builder.get_object('menufunctions').get_children()
@@ -1124,7 +1144,7 @@ class maingui:
                 predict['Data Editor'] = ['data_block','srate','wintime','labellist','chanlocs']
                 predict['Time Freq Transform'] = ['data_block','labellist','srate','frames','numofepochs','eventtime']
                 predict['Power Spectral Density'] = ['data_block','srate','labellist','chanlocs']
-                
+
             if itemtype == 'generalitem':
                 obj=self.treedata
                 predict['Calculate Grid'] = ['hs']
@@ -1133,17 +1153,17 @@ class maingui:
                 predict['Solution To Image'] = ['ind','origimg','img']
                 predict['Plot MRI'] = ['pixdim','data']
                 predict['Contour Plot'] = ['chanlocs']
-                
+
                 #predict['Plot'] = True
-                
-                
+
+
         except:
             #probably at home. no treedata to parse
             for j in menufunctions:
                 if j.get_name() ==  'GtkMenuItem':
                     j.set_sensitive(False)
-        
-        
+
+
         #predict['Data Editor'] = ['data_block','srate','wintime','labellist','chanlocs']
         #predict['Calculate Grid'] = ['hs']
         #predict['Leadfield Calc'] = ['channels','grid']
@@ -1160,7 +1180,7 @@ class maingui:
                 for j in menufunctions:
                     if j.get_name() ==  'GtkMenuItem' and j.get_label() == i:
                         j.set_sensitive(False)
-        
+
         try:
             if type(self.treedata[self.selecteditem]) == ndarray:
                 for j in menufunctions:
@@ -1193,9 +1213,9 @@ class maingui:
                     try:
                         self.obj.data_block = data
                         print 'replaced'
-                        
+
                         self.refreshtree()
-                        
+
                     except:
                         print 'error replacing'
                 #print ('selection list', self.de.selections)
@@ -1262,13 +1282,50 @@ class maingui:
             self.readMEG()
         #self.datadict[path].results = self.datadict[path].__class__
 
+class MainThread(threading.Thread):
+    def run(self):
+        gtk.gdk.threads_init()
+        self.builder = gtk.Builder()
+        self.builder.add_from_file("progressbar.glade")
+        self.pbwindow = self.builder.get_object("window1")
+        self.progressbar = self.builder.get_object("progressbar")
+        self.pbwindow.show()
+        self.progressbar.show()
+        self.pbwindow.connect('destroy', gtk.main_quit)
+
+        self.still_working = True
+        gobject.timeout_add(100, self.pulse)
+        self.tic = 0
+
+        gtk.main()
+
+    def pulse(self):
+        #self.tic = self.tic + 1
+        #while self.tic < 100:
+
+        self.progressbar.pulse()
+        return self.still_working # 1 = repeat, 0 = stop
+        #self.terminate()
+
+    def test(self,widget):
+        pass
+
+    def terminate(self):
+        self.still_working = False
+        #gtk.main_quit()
+        self.pbwindow.hide()
 if __name__ == "__main__":
     mainwindow = maingui()
     mainwindow.window.show()
     mainwindow.testload(None)
-
     i = 1
     #import code; code.interact(local=locals())
-    exit
+    #exit
+    MT = MainThread()
+    #MT.start()
+    #MR.terminate()
     gtk.main()
+
+
+
 
