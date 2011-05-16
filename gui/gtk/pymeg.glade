@@ -410,7 +410,7 @@ Lead Field Matrix</property>
                             <child>
                               <object class="GtkMenuItem" id="2DMRI1">
                                 <property name="visible">True</property>
-                                <property name="label" translatable="yes">2D MRI plot</property>
+                                <property name="label" translatable="yes">2D Plot</property>
                                 <signal name="activate" handler="on_2DMRI_activate"/>
                               </object>
                             </child>
@@ -1544,6 +1544,9 @@ Lead Field Matrix</property>
     <property name="opacity">0.90000000000000002</property>
     <signal name="close" handler="gtk_widget_hide"/>
     <signal name="cancel" handler="gtk_widget_hide"/>
+    <child>
+      <placeholder/>
+    </child>
     <child>
       <placeholder/>
     </child>

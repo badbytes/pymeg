@@ -150,6 +150,11 @@ class maingui:
 
     def updatestatusbar(self,string):
         self.statusbar.push(self.statusbar_cid, string)
+        
+    def progresspulse(self):
+        p = progressbar.MainThread()
+        p.main(testfunction)
+
 
     def showpopupmenu(self,widget,event):
         print('button ',event.button)
@@ -393,7 +398,6 @@ class maingui:
         print('you selected position',c[0])
         print('length of tree', len(self.treedict))
         if len(self.treedict) == 0:
-            self.level = 0
             print('at home')
             self.treedata = self.parseddatadict[self.dataList.get_value(iter,0)]
             try: self.treedict[self.treedict.keys()[-1]+1] = self.treedata
@@ -406,17 +410,18 @@ class maingui:
             print('Data File Selected:')#,self.data_file_selected
         else:
             print('lower lvl')
-            self.level = self.level + 1
             try: self.treedict[self.treedict.keys()[-1]+1] = self.treedata[self.dataList.get_value(iter,0)]
             except AttributeError: self.treedict = {0 :self.treedata[self.dataList.get_value(iter,0)]}
             self.data2parse = self.treedict[self.treedict.keys()[-1]]
             self.parseinstance(self.data2parse)
             self.treedata = self.parseddata.out
+        print 'dict level--------',self.treedict.keys()
         
-        self.dataList.clear()
-        self.populatetree(self.treedata)
+        self.refreshtree()
+        #self.dataList.clear()
+        #self.populatetree(self.treedata)
         self.builder.get_object('treebutton2').set_sensitive(True)
-        self.prerequisite(itemtype='generalitem')
+        #self.prerequisite(itemtype='generalitem')
 
     def deleteselected(self, widget):
         liststore,iter = self.View.get_selection().get_selected()
@@ -429,19 +434,28 @@ class maingui:
         except KeyError:
             #delete item
             self.treedata.pop(self.selecteditem)
-            self.dataList.clear()
-            self.populatetree(self.treedata)
+            #self.treedict[self.treedict.keys()[-1]] = self.treedata
+            #self.treedict = {0 :self.treedata}
+            #print self.dataList#.clear()
+            #self.populatetree(self.treedata)
+        self.refreshtree()
         #self.treegohome(None)
 
     def refreshtree(self):
-            self.dataList.clear()
-            self.populatetree(self.treedata)
-            self.datadict[self.data_filename_selected] = self.data_file_selected
-            self.prerequisite(itemtype='generalitem')
+        
+        print 'len',len(self.treedict.keys())
+        if len(self.treedict.keys()) > 1: #bug in delete item. cant seem to delete higher than 2 dictionary items.
+            self.builder.get_object('deleteselecteditem').set_sensitive(False)
+        else:
+            self.builder.get_object('deleteselecteditem').set_sensitive(True)
+        self.dataList.clear()
+        print 'level',self.treedict.keys()
+        self.populatetree(self.treedata)
+        self.datadict[self.data_filename_selected] = self.data_file_selected
+        self.prerequisite(itemtype='generalitem')
 
     def treegohome(self,widget,resave=False):
         print('going home')
-        self.level = 0
         self.treedict = {};
         self.dataList.clear();
         for i in self.parseddatadict:
@@ -452,7 +466,6 @@ class maingui:
 
     def treeuplevel(self,widget):
         print('stepping up a level')
-        self.level = self.level - 1
         try:
             self.treedict.pop(self.treedict.keys()[-1])
         except IndexError:
@@ -471,8 +484,11 @@ class maingui:
         else:
             self.parseinstance(self.data2parse)
             self.treedata = self.parseddata.out
-        self.populatetree(self.treedata)
-        self.prerequisite(itemtype='generalitem')
+        
+        self.refreshtree()
+        #print 'dict level--------',self.treedict.keys()
+        #self.populatetree(self.treedata)
+        #self.prerequisite(itemtype='generalitem')
 
     def treeadd2workspace(self,widget):
         liststore,iter = self.View.get_selection().get_selected()
@@ -589,7 +605,7 @@ class maingui:
         v = {}
         if type(var) == str:
             var = [var] #make list
-
+        
         def instance_search(item):
             try:
                 #print 'looking for child'
@@ -1100,6 +1116,7 @@ class maingui:
         
     def prerequisite(self,itemtype):
         print 'Item finder searching'
+        menufunctions = self.builder.get_object('menufunctions').get_children()
         predict = {}
         try:
             if itemtype == 'selecteditem':
@@ -1107,6 +1124,7 @@ class maingui:
                 predict['Data Editor'] = ['data_block','srate','wintime','labellist','chanlocs']
                 predict['Time Freq Transform'] = ['data_block','labellist','srate','frames','numofepochs','eventtime']
                 predict['Power Spectral Density'] = ['data_block','srate','labellist','chanlocs']
+                
             if itemtype == 'generalitem':
                 obj=self.treedata
                 predict['Calculate Grid'] = ['hs']
@@ -1115,16 +1133,17 @@ class maingui:
                 predict['Solution To Image'] = ['ind','origimg','img']
                 predict['Plot MRI'] = ['pixdim','data']
                 predict['Contour Plot'] = ['chanlocs']
+                
                 #predict['Plot'] = True
                 
                 
-        except AttributeError:
+        except:
             #probably at home. no treedata to parse
             for j in menufunctions:
                 if j.get_name() ==  'GtkMenuItem':
                     j.set_sensitive(False)
         
-        menufunctions = self.builder.get_object('menufunctions').get_children()
+        
         #predict['Data Editor'] = ['data_block','srate','wintime','labellist','chanlocs']
         #predict['Calculate Grid'] = ['hs']
         #predict['Leadfield Calc'] = ['channels','grid']
@@ -1142,14 +1161,17 @@ class maingui:
                     if j.get_name() ==  'GtkMenuItem' and j.get_label() == i:
                         j.set_sensitive(False)
         
-        if type(self.treedata[self.selecteditem]) == ndarray:
-            for j in menufunctions:
-                if j.get_label() == 'Plot':
-                    j.set_sensitive(True)
-        else:
-            for j in menufunctions:
-                if j.get_label() == 'Plot':
-                    j.set_sensitive(False)
+        try:
+            if type(self.treedata[self.selecteditem]) == ndarray:
+                for j in menufunctions:
+                    if j.get_label() == 'Plot' or j.get_label() == 'Contour Plot':
+                        j.set_sensitive(True)
+            else:
+                for j in menufunctions:
+                    if j.get_label() == 'Plot' or j.get_label() == 'Contour Plot':
+                        j.set_sensitive(False)
+        except:
+            pass
 
     def data_editor(self, widget):
         def data_editor_callback(widget):
@@ -1166,10 +1188,16 @@ class maingui:
                 print 'saved selection....'
                 if widget.get_label() == 'Offset Correct':
                     print 'replacing data with offset correction'
-                    obj=self.treedata;#[self.selecteditem];
-                    r = (self.setup_helper(var=['data_block'],obj=obj));
-                    r['data_block'] = []#data
-                    print 'replaced'
+                    #obj=self.treedata;#[self.selecteditem];
+                    #r = (self.setup_helper(var=['data_block'],obj=obj));
+                    try:
+                        self.obj.data_block = data
+                        print 'replaced'
+                        
+                        self.refreshtree()
+                        
+                    except:
+                        print 'error replacing'
                 #print ('selection list', self.de.selections)
                 #self.de.time
                 #liststore,iter = self.de.SelView.get_selection().get_selected_rows()
@@ -1182,10 +1210,10 @@ class maingui:
 
             except:
                 pass
-            self.refreshtree()
+            #self.refreshtree()
 
         try:
-            obj=self.treedata;#[self.selecteditem];
+            self.obj = obj=self.treedata[self.selecteditem];
             r = (self.setup_helper(var=['data_block','srate','wintime',
             'labellist','chanlocs'],obj=obj));
             print (len(r))

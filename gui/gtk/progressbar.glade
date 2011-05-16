@@ -11,6 +11,7 @@
         <property name="width_request">500</property>
         <property name="height_request">20</property>
         <property name="visible">True</property>
+        <signal name="button_press_event" handler="on_button1_clicked"/>
       </object>
     </child>
   </object>

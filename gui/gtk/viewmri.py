@@ -19,7 +19,7 @@
 
 from pylab import *
 from numpy import *
-import sys,nibabel,os
+import sys,nibabel,os,inspect
 try:
     sys.path.index('/usr/lib/python2.6')
 except ValueError:
@@ -126,6 +126,8 @@ class setup_gui:
         #self.sp.imshow(data[100])#,shading='interp',cmap=cm.jet)
 
     def IndexTracker(self, data, ax1, ax2, ax3, colormap, pixdim, overlay):#, coord):
+        try: colormap = self.color_sel
+        except: pass
         self.overlay = overlay
         self.ax1 = ax1
         ax1.set_title('Axial')
@@ -193,11 +195,11 @@ class setup_gui:
         self.im1.axes.figure.canvas.draw()
 
     def update2(self):
-        self.im2.set_data(self.data[:,self.ind2,:])
+        self.im2.set_data(self.data[:,self.ind2,:].T)
         self.im2.axes.figure.canvas.draw()
 
     def update3(self):
-        self.im3.set_data(self.data[self.ind3,:,:])
+        self.im3.set_data(self.data[self.ind3,:,:].T)
         self.im3.axes.figure.canvas.draw()
 
     def click(self,event, pixdim=None):
@@ -237,6 +239,7 @@ class setup_gui:
             m.popup(None,None,None,3,0)
 
     def display(self,data=None, orient='LPS', overlay=None, colormap=cm.gray, pixdim=None):
+        self.get_color_maps()
         #self.sp = self.fig.add_subplot(111);
         #self.plot_data(data)
         #if labels != None:
@@ -263,6 +266,54 @@ class setup_gui:
         print 'plot done'
 
         return tracker
+        
+    def get_color_maps(self):
+        self.color_list = []
+        m = inspect.getmembers(cm)
+        for i in m:
+            try:
+                if i[1].__module__ == 'matplotlib.colors':
+                    self.color_list.append(i[0])
+            except:
+                pass
+        self.populate_combo(colorlabels=self.color_list)
+
+        
+        
+    def populate_combo(self, colorlabels=None):
+        print 'populating channel list'
+        #if colorlabels == None:
+            #colorlabels = arange(50)
+        combobox = self.builder.get_object("combobox1")
+        combobox.clear()
+        liststore = gtk.ListStore(str)
+        cell = gtk.CellRendererText()
+        combobox.pack_start(cell)
+        combobox.add_attribute(cell, 'text', 0)
+        combobox.set_wrap_width(int(ceil(sqrt(len(colorlabels)))))
+
+        for n in colorlabels: #range(50):
+            liststore.append([n])
+        combobox.set_model(liststore)
+        combobox.connect('changed', self.changed_cb)
+        combobox.set_active(0)
+        return
+
+    def changed_cb(self, combobox):
+        model = combobox.get_model()
+        index = combobox.get_active()
+        if index > -1:
+            print model[index][0], 'selected','index',index
+            #self.chan_ind = index
+            self.color_sel = str(model[index][0])
+        #self.im1.axes.clear()
+        self.im1.set_cmap(self.color_sel)
+        self.im1.axes.figure.canvas.draw()
+        self.im2.set_cmap(self.color_sel)
+        self.im2.axes.figure.canvas.draw()
+        self.im3.set_cmap(self.color_sel)
+        self.im3.axes.figure.canvas.draw()
+        return
 
 if __name__ == "__main__":
     mainwindow = setup_gui()
@@ -270,7 +321,11 @@ if __name__ == "__main__":
     from pdf2py import pdf
     fn = '/home/danc/python/data/standardmri/ch3.nii.gz'
     img = nibabel.load(fn)
+    
     t = mainwindow.display(img.get_data().T)
+    mainwindow.get_color_maps()
+    
+    
     #ion()
     #gtk.set_interactive(1)
     gtk.main()
