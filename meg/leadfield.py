@@ -94,12 +94,18 @@ class calc:
             print 'reshaping grid'
         print 'Calculating Lower Coil LeadFields for', size(grid,0), 'grid points\n'
         lowerlf = code(grid, chlpos ,chldir, cent = self.spherecenter)
+
+        te = time()
+        print 'elapsed time', te-ts, 'seconds'
+        return
+
         print 'Calculating Upper Coil LeadFields for', size(grid,0), 'grid points\n'
         upperlf = code(grid, chupos ,chudir, cent = self.spherecenter)
 
 
         sizegrid=len(grid)
         leadfieldfinal=(lowerlf.lf+upperlf.lf)
+        print shape(leadfieldfinal),sizegrid,len(leadfieldfinal)
 
         leadfieldfinal=leadfieldfinal.reshape([sizegrid, len(leadfieldfinal)/3/sizegrid,3])#,sizegrid], order='FORTRAN') #need to double check result to make sure rows and columns are right
         te = time()
@@ -119,8 +125,8 @@ class code(threading.Thread):
 
 
     def __init__(self, grid, pos, ori, cent):
+        threading.Thread.__init__(self)
         variable = 1
-        threading.Thread.__init__(self) # init the thread
 
         #danc changed hdr read to convert to mm upfront.
         #pos=pos*1000 #convert channel pos from meters to mm
