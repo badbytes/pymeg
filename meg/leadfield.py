@@ -95,9 +95,9 @@ class calc:
         print 'Calculating Lower Coil LeadFields for', size(grid,0), 'grid points\n'
         lowerlf = code(grid, chlpos ,chldir, cent = self.spherecenter)
 
-        te = time()
-        print 'elapsed time', te-ts, 'seconds'
-        return
+        #te = time()
+        #print 'elapsed time', te-ts, 'seconds'
+        #return
 
         print 'Calculating Upper Coil LeadFields for', size(grid,0), 'grid points\n'
         upperlf = code(grid, chupos ,chudir, cent = self.spherecenter)

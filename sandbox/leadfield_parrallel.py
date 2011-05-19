@@ -45,57 +45,58 @@ class shared_data:
 
 class calc:
     #def __init__(self,datapdf,channelinstance,grid, centerofsphere=None):
-    def __init__(self,channelinstance=None,grid=None,centerofsphere=None,chlpos=None,chupos=None,chldir=None,chudir=None):
-        #'''calc leadfield script to use pos.py and getlf class to get the sum of upper and lower coils
-        #returns leadfield
-        #grid=voxel location. dimensions: N X 3'''
-        #self.ext = 'pymlf'
-
-        #if channelinstance == None:
-            #if chlpos == None or chupos == None or chldir == None or chudir == None:
-                #print('if channelobject not supplied, you need to supply ch position and direction for upper and lower coil')
-                #raise Exception('InputError')
-        #else:
-            #chlpos=channelinstance.chlpos;
-            #chldir=channelinstance.chldir;
-            #chupos=channelinstance.chupos;
-            #chudir=channelinstance.chudir;
-
-
-        ##check grid and guess if units are correct
-        #if grid.max() < 15 and grid.min() > -15:
-            #print ''
-            #print 'Warning...!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-            #print 'Warning...!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-            #print 'Warning...!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n'
-            #print 'Your grid point values are small. Max ==', grid.max(), 'Are you sure they are in mm\n'
-
-        #ts = time()
-        #coilsperch=2; #gradiometer config
-        #channelinstance.getposition()
-
-        #if centerofsphere == None:
-            #self.spherecenter = array([0,0,40])#c=cos.center()
-            ##self.spherecenter = c.spherecenter
-        #else:
-            #self.spherecenter = centerofsphere
-
-        #if array(self.spherecenter).max() < 10:
-            #print 'COS Warning!!! Your center of sphere is quite close to 0,0,0. Make sure your units are in mm'
+    def __init__(self,channelinstance=None,grid=None,centerofsphere=None,chlowerpos=None,chupperpos=None,chlowerdir=None,chupperdir=None):
+        '''calc leadfield script to use pos.py and getlf class to get the sum of upper and lower coils
+        returns leadfield
+        grid=voxel location. dimensions: N X 3'''
+        self.ext = 'pymlf'
+        global chlpos,chldir,cos,chupos,chudir
+        if channelinstance == None:
+            if chlpos == None or chupos == None or chldir == None or chudir == None:
+                print('if channelobject not supplied, you need to supply ch position and direction for upper and lower coil')
+                raise Exception('InputError')
+        else:
+            chlpos=channelinstance.chlpos;
+            chldir=channelinstance.chldir;
+            chupos=channelinstance.chupos;
+            chudir=channelinstance.chudir;
 
 
+        #check grid and guess if units are correct
+        if grid.max() < 15 and grid.min() > -15:
+            print ''
+            print 'Warning...!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+            print 'Warning...!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+            print 'Warning...!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n'
+            print 'Your grid point values are small. Max ==', grid.max(), 'Are you sure they are in mm\n'
 
-        #gridshape=shape(grid)
-        #if len(shape(grid)) == 1:
-            #grid = grid.reshape([1,3])
+        ts = time()
+        coilsperch=2; #gradiometer config
+        channelinstance.getposition()
 
-        #print 'make sure your grid units are in mm'
-        #if size(grid,1) != 3: #check grid dimensions
-            #if size(grid,0) != 3:
-                #print 'grid dimensions wrong'
-                #return
-            #grid = grid.transpose()
-            #print 'reshaping grid'
+        if centerofsphere == None:
+            self.spherecenter = array([0,0,40])#c=cos.center()
+            #self.spherecenter = c.spherecenter
+        else:
+            self.spherecenter = centerofsphere
+
+        if array(self.spherecenter).max() < 10:
+            print 'COS Warning!!! Your center of sphere is quite close to 0,0,0. Make sure your units are in mm'
+        cos = self.spherecenter
+
+
+
+        gridshape=shape(grid)
+        if len(shape(grid)) == 1:
+            grid = grid.reshape([1,3])
+
+        print 'make sure your grid units are in mm'
+        if size(grid,1) != 3: #check grid dimensions
+            if size(grid,0) != 3:
+                print 'grid dimensions wrong'
+                return
+            grid = grid.transpose()
+            print 'reshaping grid'
 
         ##--------------------------------
         import logging,multiprocessing
@@ -104,24 +105,24 @@ class calc:
         mgr = multiprocessing.Manager()
         namespace = mgr.Namespace()
         from Queue import Queue
-        x = 1
-        global x
-        pool = Pool(processes=2)#,initializer=code)              # start 4 worker processes
+        
+        global x;x = 1
+        
+        pool = Pool(processes=multiprocessing.cpu_count())#,initializer=code)              # start 4 worker processes
         q = Queue()
         a = 1;b = 2
 
         #result = pool.apply_async(code, args=(q,))#, args=([grid,chlpos,chldir,cos],[grid,chupos,chudir,cos]))#, args=(grid,chlpos,chupos,cos))     # evaluate "f(10)" asynchronously
         #result = Process(target=code)
         #print result.get(timeout=1)           # prints "100" unless your computer is *very* slow
-        pool.map(code, ['a','b'])#(grid,chlpos,chupos,cos), [2])          # prints "[0, 1, 4,..., 81]"
+        pool.map(code, grid)#(grid,chlpos,chupos,cos), [2])          # prints "[0, 1, 4,..., 81]"
         print 'done'
-        return
         #print 'Calculating Lower Coil LeadFields for', size(grid,0), 'grid points\n'
         #lowerlf = code(grid, chlpos ,chldir, cent = self.spherecenter)
 
-        #te = time()
-        #print 'elapsed time', te-ts, 'seconds'
-        #return
+        te = time()
+        print 'elapsed time', te-ts, 'seconds'
+        return
 
         #print 'Calculating Upper Coil LeadFields for', size(grid,0), 'grid points\n'
         #upperlf = code(grid, chupos ,chudir, cent = self.spherecenter)
@@ -141,73 +142,76 @@ class calc:
 
 import threading
 import os
-def code(grid=None, pos=None, ori=None, cent=None):
+def code(grid):#=None, pos=None, ori=None, cent=None):
     #t = shared_data()
     #print 'shared', t.grid
-    print("Task(%s) processid = %s" % ('layer', os.getpid()))
+    
+    print 'NEED TO MAKE UPPER AND LOWER VAR LOOP'
+    #print("Task(%s) processid = %s" % ('layer', os.getpid()))
     """grid=voxel location. dimensions: N X 3
     pos=position of channels. returned by pos.py
     ori=orientation of channels. returned by pos.py"""
 
-    print grid, 'grid',pos
+    #print grid, 'grid'
 
-    print 'x', x
+    #print 'x', x #chlpos.max(),cos
 
     #fn = '/home/danc/python/data/0611/0611SEF/e,rfhp1.0Hz,n,x,baha001-1SEF,f50lp'
     #from pdf2py import pdf
     #p = pdf.read(fn)
-    return
+    #return
 
     #def cut
-        ##danc changed hdr read to convert to mm upfront.
-        ##pos=pos*1000 #convert channel pos from meters to mm
-        ##self.grid=grid;self.pos=pos;self.ori=ori
-        #print type(grid),type(pos),type(ori),type(cent)
-        #chp = pos - cent
-        #loc = grid - cent
-        #print 'center of sphere', cent
+    #danc changed hdr read to convert to mm upfront.
+    #pos=pos*1000 #convert channel pos from meters to mm
+    #self.grid=grid;self.pos=pos;self.ori=ori
+    #print type(grid),type(pos),type(ori),type(cent)
+    chp = chupos - cos
+    loc = grid - cos;#print 'l',loc,'loc'
+    ori = chudir
+    #print 'center of sphere', cos
+    
+    gridshape=shape(loc)
+    if len(gridshape) == 1:
+        loc=array([loc])#[1,3]
+    
+    lf=array([])
+    pbar = progressbar.ProgressBar().start()
+    for j in range(0,len(loc)): #for each grid point
+        "for each R point (chp) calculate the leadfield"
+        #sys.stdout.flush()
+        pbar.update((float(j)/float(len(loc)))*100)
+        nchans = len(chp)
+        R=loc[j,:]
+        position=chp;position=chp
+        orientation=ori;orientation=ori
+        lftmp = zeros((nchans,3),float);
+        tmp2 = norm(R);
 
-        #gridshape=shape(self.loc)
-        #if len(gridshape) == 1:
-            #self.loc.shape=self.loc[1,3]
+        for i in range(0,nchans):
+            t = position[i]
+            o = orientation[i]
+            tmp1 = norm(t);
+            tmp3 = norm(t-R);
+            tmp4 = dot(t,R);
+            tmp5 = dot(t,t-R);
+            tmp6 = dot(R,t-R);
+            tmp7 = (tmp1*tmp2)**2 - tmp4**2; #% cross(r,R)**2
+            #tmp7=tmp7
+            alpha = 1 / (-tmp3 * (tmp1*tmp3+tmp5));
+            A = 1/tmp3 - 2*alpha*tmp2**2 - 1/tmp1;
+            B = 2*alpha*tmp4;
+            C = -tmp6/(tmp3**3);
+            beta = dot(A*t + B*R + C*(t-R), o)/tmp7;
+            lftmp[i,:] = cross(alpha*o  + beta*t, R);
 
-        #self.lf=array([])
-        #pbar = progressbar.ProgressBar().start()
-        #for j in range(0,len(self.loc)): #for each grid point
-            #"for each R point (chp) calculate the leadfield"
-            #sys.stdout.flush()
-            #pbar.update((float(j)/float(len(self.loc)))*100)
-            #self.nchans = len(chp)
-            #R=self.loc[j,:]
-            #self.position=chp;position=chp
-            #self.orientation=ori;orientation=ori
-            #lftmp = zeros((self.nchans,3),float);
-            #tmp2 = norm(R);
-
-            #for i in range(0,self.nchans):
-                #t = position[i]
-                #o = orientation[i]
-                #tmp1 = norm(t);
-                #tmp3 = norm(t-R);
-                #tmp4 = dot(t,R);
-                #tmp5 = dot(t,t-R);
-                #tmp6 = dot(R,t-R);
-                #tmp7 = (tmp1*tmp2)**2 - tmp4**2; #% cross(r,R)**2
-                ##tmp7=tmp7
-                #self.alpha = 1 / (-tmp3 * (tmp1*tmp3+tmp5));
-                #A = 1/tmp3 - 2*self.alpha*tmp2**2 - 1/tmp1;
-                #B = 2*self.alpha*tmp4;
-                #C = -tmp6/(tmp3**3);
-                #self.beta = dot(A*t + B*R + C*(t-R), o)/tmp7;
-                #lftmp[i,:] = cross(self.alpha*o  + self.beta*t, R);
-
-            #self.lf = append(self.lf, 1e-7*lftmp); #% multiply with u0/4pi
+        lf = append(lf, 1e-7*lftmp); #% multiply with u0/4pi
 if __name__ == '__main__':
     from numpy import *
     fn = '/home/danc/python/data/0611/0611SEF/e,rfhp1.0Hz,n,x,baha001-1SEF,f50lp'
     from pdf2py import pdf
     p = pdf.read(fn)
     p.data.setchannels('meg')
-    grid=random.randn(3,10)
+    grid=random.randn(3,1000)
     lft = calc(p.data.channels,grid)
 
