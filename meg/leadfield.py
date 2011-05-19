@@ -47,6 +47,8 @@ class calc:
         grid=voxel location. dimensions: N X 3'''
         self.ext = 'pymlf'
 
+        print 'For faster parallel computation, use leadfield_parallel.py'
+
         if channelinstance == None:
             if chlpos == None or chupos == None or chldir == None or chudir == None:
                 print('if channelobject not supplied, you need to supply ch position and direction for upper and lower coil')
@@ -94,6 +96,7 @@ class calc:
             print 'reshaping grid'
         print 'Calculating Lower Coil LeadFields for', size(grid,0), 'grid points\n'
         lowerlf = code(grid, chlpos ,chldir, cent = self.spherecenter)
+        self.lower = lowerlf
 
         #te = time()
         #print 'elapsed time', te-ts, 'seconds'

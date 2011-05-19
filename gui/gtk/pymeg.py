@@ -47,7 +47,8 @@ from matplotlib.backends.backend_gtk import show
 #load required methods
 from pdf2py import pdf, readwrite,lA2array
 from numpy import * #shape, random, sort, array, append, size, arange, ndarray,vstack,mean,zeros, dot
-from meg import dipole,plotvtk,plot2dgtk,leadfield,signalspaceprojection,nearest
+from meg import dipole,plotvtk,plot2dgtk,signalspaceprojection,nearest
+from meg import leadfield_parallel as leadfield
 from mri import img_nibabel as img
 from mri import sourcesolution2img
 from beamformers import minimumnorm
