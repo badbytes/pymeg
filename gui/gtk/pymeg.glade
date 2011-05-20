@@ -62,21 +62,21 @@
                     <child>
                       <object class="GtkMenuItem" id="loadmeg1">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">Load MEG</property>
-                        <signal name="activate" handler="on_menuLoadMEG_activate"/>
+                        <property name="label" translatable="yes">Load 4D MEG</property>
+                        <signal name="activate" handler="on_loadmeg_activate"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="loadmri1">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">Load MRI</property>
+                        <property name="label" translatable="yes">Load MRI Nifti</property>
                         <signal name="activate" handler="on_loadmri_activate"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="loadpythondata1">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">Load Python Data</property>
+                        <property name="label" translatable="yes">Load Python File</property>
                         <signal name="activate" handler="on_loadpythondata_activate"/>
                       </object>
                     </child>
@@ -86,6 +86,14 @@
                         <property name="label" translatable="yes">Load Dipole File</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_loaddipolefile_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="loadmatlab1">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Load Matlab File</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_loadmatlabdata_activate"/>
                       </object>
                     </child>
                     <child>
@@ -1544,6 +1552,9 @@ Lead Field Matrix</property>
     <property name="opacity">0.90000000000000002</property>
     <signal name="close" handler="gtk_widget_hide"/>
     <signal name="cancel" handler="gtk_widget_hide"/>
+    <child>
+      <placeholder/>
+    </child>
     <child>
       <placeholder/>
     </child>

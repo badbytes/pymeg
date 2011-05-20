@@ -37,6 +37,7 @@ class loadimage():
         self.nifti.origimg = self.origimg
         h = self.nifti.get_header()
         self.pixdim = h['pixdim'][0:3]
+        self.gettransform(h)
         if os.path.isfile(filepath+'.pym') == True:
             print('loading index points found in file',filepath+'.pym')
             self.fiddata = readwrite.readdata(filepath+'.pym')
@@ -54,6 +55,12 @@ class loadimage():
         self.lpa = self.fiddata['lpa']
         self.rpa = self.fiddata['rpa']
         self.nas = self.fiddata['nas']
+
+    def gettransform(self,header):
+        print 'Affine Transform is'
+        print header.get_base_affine()
+        self.transform = header.get_base_affine()
+        self.translation = self.transform[0:3,3]#[::-1]
 
     def decimate(self, dec):
         '''nim is the mri data in python format

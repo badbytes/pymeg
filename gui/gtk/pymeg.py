@@ -52,6 +52,7 @@ from meg import leadfield_parallel as leadfield
 from mri import img_nibabel as img
 from mri import sourcesolution2img
 from beamformers import minimumnorm
+from scipy import io
 #gui modules
 from gui.gtk import filter, offset_correct, errordialog, preferences,\
 dipoledensity, coregister, timef, data_editor, event_process, parse_instance, \
@@ -73,13 +74,15 @@ class maingui():
         #self.memorybar = self.builder.get_object("memorybar")
         #self.progressbar = self.builder.get_object("progressbar")
         #self.progressbar = progressbar.setup()
+
         self.datatree(self)
 
         dic = {
-            "on_menuLoadMEG_activate" : self.fileOpenMEG,
+            "on_loadmeg_activate" : self.fileOpenMEG,
             "on_loadmri_activate" : self.fileOpenMRI,
             "on_loadpythondata_activate" : self.fileOpenPYM,
             "on_loaddipolefile_activate" : self.fileOpenDIP,
+            "on_loadmatlabdata_activate" : self.fileOpenMAT,
             "on_toolbutton1_clicked" : self.testhandler,
             "on_menuQuit_activate" : self.quit,
             "on_filedialogLoad_clicked" : self.fileLoad,
@@ -247,6 +250,16 @@ class maingui():
         fcd.show()
         self.filetype = 'DIP'
 
+    def fileOpenMAT(self, widget):
+        fcd = self.builder.get_object("filechooserdialog1")
+        filter = gtk.FileFilter()
+        filter.set_name("Matlab Files")
+        filter.add_pattern("*.mat")
+        self.clear_filters()
+        fcd.add_filter(filter)
+        fcd.show()
+        self.filetype = 'MAT'
+
     def clear_filters(self):
         fcd = self.builder.get_object("filechooserdialog1")
         for i in fcd.list_filters():
@@ -278,6 +291,13 @@ class maingui():
         if self.filetype == 'PYM':
             print('filetype PYTHON')
             d = readwrite.readdata(self.fn)
+            self.datadict[self.fn] = d
+            self.refreshdatasummary()
+            self.treegohome(None)
+
+        if self.filetype == 'MAT':
+            print('filetype MATLAB')
+            d = io.loadmat(self.fn)
             self.datadict[self.fn] = d
             self.refreshdatasummary()
             self.treegohome(None)
@@ -1315,14 +1335,19 @@ class MainThread(threading.Thread):
         self.still_working = False
         #gtk.main_quit()
         self.pbwindow.hide()
+
+    def interaction_shell(self,widget):
+        import code; code.interact(local=locals()) #Interactive Shell
+
 if __name__ == "__main__":
     mainwindow = maingui()
     mainwindow.window.show()
     mainwindow.testload(None)
     i = 1
-    #import code; code.interact(local=locals())
+    import code; code.interact(local=locals()) #Interactive Shell
+
     #exit
-    MT = MainThread()
+    #MT = MainThread()
     #MT.start()
     #MR.terminate()
     gtk.main()

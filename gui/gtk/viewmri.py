@@ -58,7 +58,7 @@ class setup_gui:
         self.window = self.builder.get_object("window1")
 
         dic = {
-            "on_checkbutton1_toggled" : self.test,
+            #"on_checkbutton1_toggled" : self.test,
             "gtk_widget_hide" : self.hideinsteadofdelete,
             "on_menu_load_data_activate" : self.load_data,
             "on_menu_load_channels_activate" : self.load_channel_positions,
@@ -83,22 +83,22 @@ class setup_gui:
     def load_channel_positions(self,widget):
         pass
 
-    def test(self,widget):
-        print 'check'
-        circle = Circle((self.ind2,self.ind3), 5)
-        self.ax1.add_patch(circle)
-        self.update()
+    #def test(self,widget):
+        #print 'check'
+        #circle = Circle((self.ind2,self.ind3), 5)
+        #self.ax1.add_patch(circle)
+        #self.update()
 
 
 
-    def test2(self,widget):
+    #def test2(self,widget):
 
-        self.fig.clf()
-        self.display(self.data,self.chanlocs,animate='on')
-    def test3(self,widget):
+        #self.fig.clf()
+        #self.display(self.data,self.chanlocs,animate='on')
+    #def test3(self,widget):
 
-        self.fig.clf()
-        self.display(self.data,self.chanlocs,data2=self.data[0],quiver='on')
+        #self.fig.clf()
+        #self.display(self.data,self.chanlocs,data2=self.data[0],quiver='on')
 
     def hideinsteadofdelete(self,widget,ev=None):
         print 'hiding',widget
@@ -125,7 +125,7 @@ class setup_gui:
 
         #self.sp.imshow(data[100])#,shading='interp',cmap=cm.jet)
 
-    def IndexTracker(self, data, ax1, ax2, ax3, colormap, pixdim, overlay):#, coord):
+    def IndexTracker(self, data, ax1, ax2, ax3, colormap, pixdim, overlay, translation):#, coord):
         try: colormap = self.color_sel
         except: pass
         self.overlay = overlay
@@ -142,14 +142,19 @@ class setup_gui:
         rows,self.slices2,cols = data.shape
         self.slices3,rows,cols = data.shape
 
+        print self.slices1,self.slices2,self.slices3, translation
+        coord1 = (translation[1]+self.slices2,translation[1],translation[2]+self.slices3,translation[2])#(-100,100,-100,1000)
+        coord2 = (translation[0]-self.slices3,translation[0],translation[1]-self.slices1,self.slices1)
+        coord3 = (translation[0]-self.slices3,translation[0],translation[1]-self.slices1,self.slices1)
+
         self.ind1 = self.slices1/2
         self.ind2 = self.slices2/2
         self.ind3 = self.slices3/2
-        print data.shape
 
-        self.im1 = ax1.imshow(self.data[:,:,self.ind1], aspect = 'auto',cmap=colormap); ax1.set_ylim(ax1.get_ylim()[::-1]);
-        self.im2 = ax2.imshow(self.data[:,self.ind2,:].T, aspect = 'auto',cmap=colormap); ax2.set_ylim(ax2.get_ylim()[::-1]);
-        self.im3 = ax3.imshow(self.data[self.ind3,:,:].T, aspect = 'auto',cmap=colormap); ax3.set_ylim(ax3.get_ylim()[::-1]);
+
+        self.im1 = ax1.imshow(self.data[:,:,self.ind1], aspect = 'auto',cmap=colormap, extent=coord1); ax1.set_ylim(ax1.get_ylim()[::-1]);
+        self.im2 = ax2.imshow(self.data[:,self.ind2,:].T, aspect = 'auto',cmap=colormap,extent=coord2); ax2.set_ylim(ax2.get_ylim()[::-1]);
+        self.im3 = ax3.imshow(self.data[self.ind3,:,:].T, aspect = 'auto',cmap=colormap,extent=coord3); ax3.set_ylim(ax3.get_ylim()[::-1]);
 
         #self.coord = coord
 
@@ -238,7 +243,7 @@ class setup_gui:
             m.show_all()
             m.popup(None,None,None,3,0)
 
-    def display(self,data=None, orient='LPS', overlay=None, colormap=cm.gray, pixdim=None):
+    def display(self,data=None, orient='LPS', overlay=None, colormap=cm.gray, pixdim=None, translation=None):
         self.get_color_maps()
         #self.sp = self.fig.add_subplot(111);
         #self.plot_data(data)
@@ -249,6 +254,11 @@ class setup_gui:
             #p.colorbar(cm)
         #self.sp.axes.axis('off')
         #self.canvas.draw()
+
+        if translation == None:
+            translation == [0,0,0]
+
+
         if pixdim == None:
             pixdim = [1.0,1.0,1.0]; #unitless
         ax1 = self.fig.add_subplot(221);#axis('off')
@@ -259,14 +269,14 @@ class setup_gui:
         ax3 = self.fig.add_subplot(223);#axis('off')
         xlabel('Infererior (I->S 3rd dim)');ylabel('Right (R->L 2nd Dim)')
         #coord = self.fig.add_subplot(224);axis('off')
-        tracker = self.IndexTracker(data, ax1, ax2, ax3, colormap, pixdim, overlay)#, coord)
+        tracker = self.IndexTracker(data, ax1, ax2, ax3, colormap, pixdim, overlay, translation)#, coord)
         self.fig.canvas.mpl_connect('scroll_event', self.onscroll)
         self.fig.canvas.mpl_connect('button_press_event', self.click)
         #ax1.imshow(data[100])
         print 'plot done'
 
         return tracker
-        
+
     def get_color_maps(self):
         self.color_list = []
         m = inspect.getmembers(cm)
@@ -278,8 +288,8 @@ class setup_gui:
                 pass
         self.populate_combo(colorlabels=self.color_list)
 
-        
-        
+
+
     def populate_combo(self, colorlabels=None):
         print 'populating channel list'
         #if colorlabels == None:
@@ -319,13 +329,14 @@ if __name__ == "__main__":
     mainwindow = setup_gui()
     mainwindow.window.show()
     from pdf2py import pdf
+    from mri import img_nibabel
     fn = '/home/danc/python/data/standardmri/ch3.nii.gz'
-    img = nibabel.load(fn)
-    
-    t = mainwindow.display(img.get_data().T)
+    img = img_nibabel.loadimage(fn)
+
+    t = mainwindow.display(img.origimg,pixdim=img.pixdim,translation=img.translation)
     mainwindow.get_color_maps()
-    
-    
+
+
     #ion()
     #gtk.set_interactive(1)
     gtk.main()
