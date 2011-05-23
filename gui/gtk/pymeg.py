@@ -809,7 +809,7 @@ class maingui():
             if self.treedata[self.selecteditem].__module__.split('.')[0] == 'mri':
                 print('displaying default MR: data')
                 obj=self.treedata[self.selecteditem];
-                res = (self.setup_helper(var=['pixdim','data'],obj=obj));
+                res = (self.setup_helper(var=['pixdim','data','translation'],obj=obj));
                 data = res['data']
         except AttributeError:
             print('displaying custom data:',self.selecteditem)
@@ -817,7 +817,7 @@ class maingui():
             res = (self.setup_helper(var=['pixdim'],obj=obj));
             data = self.treedata[self.selecteditem];
 
-        self.mrimousepos = self.vm.display(data,pixdim=res['pixdim'])
+        self.mrimousepos = self.vm.display(data,pixdim=res['pixdim'],translation=res['translation'])
 
         #except:# (AttributeError, KeyError):
             #try:

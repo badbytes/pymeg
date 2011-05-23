@@ -93,7 +93,7 @@ class IndexTracker:
         self.update1();self.update2();self.update3()
 
     def update1(self):
-        self.im1.set_data(self.data[:,:,self.ind1])
+        self.im1.set_data(self.data[:,:,self.ind1].T)
         self.im1.axes.figure.canvas.draw()
 
     def update2(self):

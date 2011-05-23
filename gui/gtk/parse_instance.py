@@ -11,7 +11,11 @@ class run:
                 self.out[i] = data[i]
 
         elif data.__class__ == ndarray:
-            self.out['ndarray'] = data
+            if verbose == True:
+                for i in inspect.getmembers(data):
+                    self.out[i[0]] = i[1]
+            else:
+                self.out['ndarray'] = data
         else:
             for i in inspect.getmembers(data):
                 self.out[i[0]] = i[1]

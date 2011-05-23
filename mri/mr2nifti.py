@@ -3,7 +3,7 @@ mr = mr2nifti.start(dataarray, filename2saveas)
 '''
 
 
-from nifti import *
+#from nifti import *
 from numpy import argmax, array, abs, int16, shape, float32, flipud, fliplr \
 ,swapaxes, round_, zeros, sum, reshape, append, tile, copy
 

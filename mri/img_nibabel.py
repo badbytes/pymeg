@@ -33,11 +33,12 @@ class loadimage():
         print 'reading',filepath
         self.nifti = nibabel.load(filepath)
         dirpath = os.path.dirname(filepath)
-        self.origimg = self.nifti.get_data().T
-        self.nifti.origimg = self.origimg
+        self.data = self.nifti.get_data()#.T
+        self.nifti.data = self.data
         h = self.nifti.get_header()
         self.pixdim = h['pixdim'][0:3]
         self.gettransform(h)
+        #self.reorient()
         if os.path.isfile(filepath+'.pym') == True:
             print('loading index points found in file',filepath+'.pym')
             self.fiddata = readwrite.readdata(filepath+'.pym')
@@ -50,7 +51,34 @@ class loadimage():
                 print('got fiducal info from description field in header')
             except NameError2:
                 print 'no fiducal file or info found. you will not be able to perform any transforms with other data.'
+    #def reorient(self):
+        #'''27 possible combinations of orientations
+        #('LAI' or 'LIA' or 'ALI' or 'AIL' or 'ILA' or 'IAL' or 'LAS' or 'LSA' or 'ALS' or 'ASL' or 'SLA' or 'SAL' or 'LPI' or 'LIP' or 'PLI' or 'PIL' or 'ILP' or 'IPL' or 'LPS' or 'LSP' or 'PLS' or 'PSL' or 'SLP' or 'SPL' or 'RAI' or 'RIA' or 'ARI' or 'AIR' or 'IRA' or 'IAR' or 'RAS' or 'RSA' or 'ARS' or 'ASR' or 'SRA' or 'SAR' or 'RPI' or 'RIP' or 'PRI' or 'PIR' or 'IRP' or 'IPR' or 'RPS' or 'RSP' or 'PRS' or 'PSR' or 'SRP' or 'SPR')'''
+        #print 'transform',self.transform[:,0],abs(self.transform[:,0]).argmax()
+        #rot = self.transform[0:3,0:3]
+        #arot = abs(rot)
+        #print arot
+        #if abs(rot[:,0]).argmax() == 0: #RL first dim
+            #if rot[0,0] < 0:
+                #self.origimg = self.origimg[::-1,:,:]
+                #rot[0,0] = rot[0,0] * -1
+                #print 'flipping'
+            #print 'swapping'
+            #self.origimg = self.origimg.swapaxes(0,1)
+            ##rot[0,:] = rot[0,]
+        #if arot[:,0].argmax() == 1: #AP first dim
+            ##self.origimg = self.origimg.swapaxes(0,1)
+            #pass
 
+        #if arot[:,1].argmax() == 1: #AP second dim
+            #if rot[0,1] < 0:
+                #self.origimg = self.origimg[::-1,:,:]
+            #pass
+        #if arot[:,2].argmax() == 2: #IS third dim
+            #pass
+        #if self.transform[:,0:4].argmax() == 2: #IS first dim
+            #pass
+        
     def getfiducals(self,header):
         self.lpa = self.fiddata['lpa']
         self.rpa = self.fiddata['rpa']
@@ -60,7 +88,7 @@ class loadimage():
         print 'Affine Transform is'
         print header.get_base_affine()
         self.transform = header.get_base_affine()
-        self.translation = self.transform[0:3,3]#[::-1]
+        self.translation = self.transform[0:3,3][::-1]
 
     def decimate(self, dec):
         '''nim is the mri data in python format
@@ -79,7 +107,7 @@ class loadimage():
             print xstartval,
             ystartval=ceil(dec[1]/2);
             zstartval=ceil(dec[2]/2);
-            decimg=array(nim.origimg[xstartval::dec[0],:,:][:,ystartval::dec[1],:][:,:,zstartval::dec[2]])
+            decimg=array(nim.data[xstartval::dec[0],:,:][:,ystartval::dec[1],:][:,:,zstartval::dec[2]])
             nonz = where(decimg > 0)
             x = ((nonz[0])*dec[0])+(dec[0])
             y = ((nonz[1])*dec[1])+(dec[1])
@@ -88,7 +116,7 @@ class loadimage():
         else:
             print 'uniform decimation'
             startval=ceil(dec/2);
-            decimg=array(nim.origimg[startval::dec,:,:][:,startval::dec,:][:,:,startval::dec])
+            decimg=array(nim.data[startval::dec,:,:][:,startval::dec,:][:,:,startval::dec])
             nonz = where(decimg > 0)
             x = ((nonz[0]+1)*dec)#-(dec)
             y = ((nonz[1]+1)*dec)#-(dec)
@@ -218,7 +246,7 @@ class decimate:
         self.img = decimg
         self.factor = dec
         self.ind = array(nonz)
-        self.origimg = nim
+        self.data = nim
 
 if __name__ == "__main__":
     def __init__(self):

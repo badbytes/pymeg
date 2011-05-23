@@ -101,7 +101,7 @@ def scalesourcespace(headshape, megxyz, lpa, rpa, nas, voxdim, brain='no'):
     sourcespacescaledmegz=megxyz[2,:]*scalemegz;
     sourcespacescaledmeg=array([sourcespacescaledmegx,sourcespacescaledmegy,sourcespacescaledmegz]);
     if brain == 'yes':
-        print 'your using a brain sourcespace. adding additional scaling factor of 1.1'
+        print 'your using a brain sourcespace. adding additional scaling factor reduction of 1.1'
         sourcespacescaledmeg = sourcespacescaledmeg/1.1
     else:
         print 'your using a full head sourcespace (not a skullstripped image). no additional scaling'

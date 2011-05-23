@@ -58,7 +58,7 @@ class setup_gui:
         self.window = self.builder.get_object("window1")
 
         dic = {
-            #"on_checkbutton1_toggled" : self.test,
+            "on_checkbutton1_toggled" : self.test,
             "gtk_widget_hide" : self.hideinsteadofdelete,
             "on_menu_load_data_activate" : self.load_data,
             "on_menu_load_channels_activate" : self.load_channel_positions,
@@ -83,11 +83,11 @@ class setup_gui:
     def load_channel_positions(self,widget):
         pass
 
-    #def test(self,widget):
-        #print 'check'
-        #circle = Circle((self.ind2,self.ind3), 5)
-        #self.ax1.add_patch(circle)
-        #self.update()
+    def test(self,widget):
+        print 'check'
+        circle = Circle((self.ind2,self.ind3), 5)
+        self.ax1.add_patch(circle)
+        self.update()
 
 
 
@@ -126,6 +126,7 @@ class setup_gui:
         #self.sp.imshow(data[100])#,shading='interp',cmap=cm.jet)
 
     def IndexTracker(self, data, ax1, ax2, ax3, colormap, pixdim, overlay, translation):#, coord):
+        
         try: colormap = self.color_sel
         except: pass
         self.overlay = overlay
@@ -138,23 +139,25 @@ class setup_gui:
         #coord.set_title('\n\n\n\ncoord')
 
         self.data = (data)
-        rows,cols,self.slices1 = data.shape
+        rows,cols,self.slices3 = data.shape
         rows,self.slices2,cols = data.shape
-        self.slices3,rows,cols = data.shape
+        self.slices1,rows,cols = data.shape
 
-        print self.slices1,self.slices2,self.slices3, translation
-        coord1 = (translation[1]+self.slices2,translation[1],translation[2]+self.slices3,translation[2])#(-100,100,-100,1000)
-        coord2 = (translation[0]-self.slices3,translation[0],translation[1]-self.slices1,self.slices1)
-        coord3 = (translation[0]-self.slices3,translation[0],translation[1]-self.slices1,self.slices1)
+        print self.slices3,self.slices2,self.slices1, translation, data.shape
+        self.translation = translation
+        coord1 = (-1000,100,-100,1000)
+        coord1 = (translation[1]+self.slices2,translation[1],translation[0]+self.slices3,translation[0])
+        coord2 = (translation[0]+self.slices3,translation[0],translation[2]-self.slices1,self.slices1-translation[2])
+        coord3 = (translation[1]+self.slices2,translation[1],translation[2]-self.slices1,self.slices1-translation[2])
 
-        self.ind1 = self.slices1/2
+        self.ind1 = self.slices3/2
         self.ind2 = self.slices2/2
-        self.ind3 = self.slices3/2
+        self.ind3 = self.slices1/2
 
 
-        self.im1 = ax1.imshow(self.data[:,:,self.ind1], aspect = 'auto',cmap=colormap, extent=coord1); ax1.set_ylim(ax1.get_ylim()[::-1]);
-        self.im2 = ax2.imshow(self.data[:,self.ind2,:].T, aspect = 'auto',cmap=colormap,extent=coord2); ax2.set_ylim(ax2.get_ylim()[::-1]);
-        self.im3 = ax3.imshow(self.data[self.ind3,:,:].T, aspect = 'auto',cmap=colormap,extent=coord3); ax3.set_ylim(ax3.get_ylim()[::-1]);
+        self.im1 = ax1.imshow(self.data[:,:,self.ind1].T, aspect = 'auto',cmap=colormap); ax1.set_ylim(ax1.get_ylim()[::-1]);
+        self.im2 = ax2.imshow(self.data[:,self.ind2,:].T, aspect = 'auto',cmap=colormap); ax2.set_ylim(ax2.get_ylim()[::-1]);
+        self.im3 = ax3.imshow(self.data[self.ind3,:,:].T, aspect = 'auto',cmap=colormap); ax3.set_ylim(ax3.get_ylim()[::-1]);
 
         #self.coord = coord
 
@@ -196,7 +199,7 @@ class setup_gui:
         self.update1();self.update2();self.update3()
 
     def update1(self):
-        self.im1.set_data(self.data[:,:,self.ind1])
+        self.im1.set_data(self.data[:,:,self.ind1].T)
         self.im1.axes.figure.canvas.draw()
 
     def update2(self):
@@ -214,22 +217,28 @@ class setup_gui:
             return
 
         #print self.pixdim
-
+        def printcoord():
+            coordinates = round(self.ind3*self.pixdim[0]-abs(self.translation[0])), round(self.ind2*self.pixdim[1]-abs(self.translation[1])), round(self.ind1*self.pixdim[2]-abs(self.translation[2])), 'mm'
+            print coordinates
+            return coordinates
 
         if event.inaxes == self.ax1:
-            self.ind2=int(event.xdata)
-            self.ind3=int(event.ydata)
-            print round(self.ind3*self.pixdim[0]), round(self.ind2*self.pixdim[1]), round(self.ind1*self.pixdim[2]), 'mm'
+            self.ind2=int(event.ydata)
+            self.ind3=int(event.xdata)
+            #print round(self.ind3*self.pixdim[0]), round(self.ind2*self.pixdim[1]), round(self.ind1*self.pixdim[2]), 'mm'
+            printcoord()
             self.update()
         if event.inaxes == self.ax2:
             self.ind1=int(event.ydata)
             self.ind3=int(event.xdata)
-            print round(self.ind3*self.pixdim[0]), round(self.ind2*self.pixdim[1]), round(self.ind1*self.pixdim[2]), 'mm'
+            #print round(self.ind3*self.pixdim[0]), round(self.ind2*self.pixdim[1]), round(self.ind1*self.pixdim[2]), 'mm'
+            printcoord()
             self.update()
         if event.inaxes == self.ax3:
             self.ind1=int(event.ydata)
             self.ind2=int(event.xdata)
-            print round(self.ind3*self.pixdim[0]), round(self.ind2*self.pixdim[1]), round(self.ind1*self.pixdim[2]), 'mm'
+            #print round(self.ind3*self.pixdim[0]), round(self.ind2*self.pixdim[1]), round(self.ind1*self.pixdim[2]), 'mm'
+            printcoord()
             self.update()
         #print self.ind1,self.ind2,self.ind3
         #self.coord.title.set_text([round(self.ind3*self.pixdim[0]), round(self.ind2*self.pixdim[1]), round(self.ind1*self.pixdim[2])])
@@ -257,7 +266,6 @@ class setup_gui:
 
         if translation == None:
             translation == [0,0,0]
-
 
         if pixdim == None:
             pixdim = [1.0,1.0,1.0]; #unitless
