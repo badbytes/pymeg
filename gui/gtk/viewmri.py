@@ -174,26 +174,21 @@ class setup_gui:
                 self.ind1 = clip(self.ind1+1, 0, self.slices1-1)
             else:
                 self.ind1 = clip(self.ind1-1, 0, self.slices1-1)
-
             self.update()
-
+            
         if event.inaxes == self.ax2:
             if event.button=='up':
                 self.ind2 = clip(self.ind2+1, 0, self.slices2-1)
             else:
                 self.ind2 = clip(self.ind2-1, 0, self.slices2-1)
-
             self.update()
-
 
         if event.inaxes == self.ax3:
             if event.button=='up':
                 self.ind3 = clip(self.ind3+1, 0, self.slices3-1)
             else:
                 self.ind3 = clip(self.ind3-1, 0, self.slices3-1)
-
             self.update()
-
 
     def update(self):
         self.update1();self.update2();self.update3()
@@ -218,8 +213,9 @@ class setup_gui:
 
         #print self.pixdim
         def printcoord():
-            coordinates = round(self.ind3*self.pixdim[0]-abs(self.translation[0])), round(self.ind2*self.pixdim[1]-abs(self.translation[1])), round(self.ind1*self.pixdim[2]-abs(self.translation[2])), 'mm'
-            print coordinates
+            #coordinates = round(self.ind3*self.pixdim[0]+(self.translation[0])), round(self.ind2*self.pixdim[1]+(self.translation[1])), round(self.ind1*self.pixdim[2]+(self.translation[2])), 'mm'
+            coordinates = round(self.ind2*self.pixdim[1]+(self.translation[1])), round(self.ind3*self.pixdim[0]+(self.translation[0])), round(self.ind1*self.pixdim[2]+(self.translation[2])), 'mm'
+            print coordinates#, self.ind3, self.pixdim,(self.translation[0])
             return coordinates
 
         if event.inaxes == self.ax1:
@@ -266,6 +262,7 @@ class setup_gui:
 
         if translation == None:
             translation == [0,0,0]
+        print '------------',translation
 
         if pixdim == None:
             pixdim = [1.0,1.0,1.0]; #unitless
@@ -338,10 +335,19 @@ if __name__ == "__main__":
     mainwindow.window.show()
     from pdf2py import pdf
     from mri import img_nibabel
+    fn = '/home/danc/python/data/standardmri/colin_1mm.img'
     fn = '/home/danc/python/data/standardmri/ch3.nii.gz'
-    img = img_nibabel.loadimage(fn)
+    img = nibabel.load(fn)
+    h = img.get_header()
 
-    t = mainwindow.display(img.origimg,pixdim=img.pixdim,translation=img.translation)
+    pixdim = h['pixdim'][0:3]
+    transform = h.get_qform()[0:3,0:3];print transform
+    translation = h.get_qform()[0:3,3]
+    a = array([[1,0,0],[0,1,0],[0,0,1]])
+    d = squeeze(img.get_data())
+    r = nibabel.apply_orientation(d,a)#transform)#a[0:3,0:3])
+    
+    t = mainwindow.display(r,pixdim=pixdim,translation=translation)
     mainwindow.get_color_maps()
 
 

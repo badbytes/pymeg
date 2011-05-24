@@ -88,7 +88,7 @@ class loadimage():
         print 'Affine Transform is'
         print header.get_base_affine()
         self.transform = header.get_base_affine()
-        self.translation = self.transform[0:3,3][::-1]
+        self.translation = self.transform[0:3,3]#[::-1]
 
     def decimate(self, dec):
         '''nim is the mri data in python format
