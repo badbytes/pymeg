@@ -124,7 +124,9 @@ class maingui():
             "on_power_spectral_density_activate" : self.power_spectral_density,
             "on_minimumnorm_activate" : self.minimunnorm_handler,
             "on_solution_to_image_activate" : self.sourcesolution2img_handler,
-            "on_test" : self.test,
+            "on_treetest" : self.test,
+            "on_key_press_event" : self.key_press_event,
+            "on_rename_activate" : self.rename_item,
         }
 
         self.builder.connect_signals(dic)
@@ -162,12 +164,31 @@ class maingui():
 
 
     def showpopupmenu(self,widget,event):
-        print('button ',event.button)
-        if event.button == 3:
-            m = self.builder.get_object("menufunctions")
-            print(widget, event)
-            m.show_all()
-            m.popup(None,None,None,3,0)
+        try:
+            print('button ',event)#.button)
+            if event.button == 3:
+                m = self.builder.get_object("menufunctions")
+                print(widget, event)
+                m.show_all()
+                m.popup(None,None,None,3,0)
+        except:
+            pass
+
+    def key_press_event(self,widget,event):
+        #print('key ',event)#.button)
+        #print 'v',event.keyval, 's',event.string
+        #print type(event.string)
+        if event.keyval == 99:# and len(event.string) == 0:
+            print self.dataselected, 'copied item to clipboard'
+            self.clipboarddata = self.treedata[self.selecteditem]
+            self.clipboarditem = self.selecteditem
+        if event.keyval == 118:# and len(event.string) == 0:
+            print 'pasting item',self.dataselected
+            self.treedata[self.clipboarditem] = self.clipboarddata
+            self.refreshtree()
+
+    def rename_item(self,widget):
+        print 'renaming', self.selecteditem
 
     def data_editor_handler(self,widget):
         self.de = data_editor.setup_gui() #window
@@ -204,7 +225,7 @@ class maingui():
 
         for i in self.parseddatadict:
             print('appending model', i)
-            iter = self.dataList.append([i, self.datadict[path]])
+            iter = self.dataList.append([i, self.datadict[path]])#,True])
 
     def refreshdatasummary(self):
         self.parseinstance(self.datadict[self.fn])
@@ -212,7 +233,10 @@ class maingui():
         self.parseddatadict[self.fn] = self.parseddata.out
 
     def fileOpenMEG(self,widget):
-        self.builder.get_object("filechooserdialog1").show()
+        fcd = self.builder.get_object("filechooserdialog1")
+        fcd.show()
+        try:fcd.set_current_folder(self.prefs['LastMEGPath'])
+        except: pass
         self.filetype = '4DMEG'
         self.clear_filters()
 
@@ -224,6 +248,8 @@ class maingui():
         filter.add_pattern("*nii")
         self.clear_filters()
         fcd.add_filter(filter)
+        try:fcd.set_current_folder(self.prefs['LastMRIPath'])
+        except: pass
         fcd.show()
         self.filetype = 'MRI'
 
@@ -236,6 +262,8 @@ class maingui():
         filter.add_pattern("*.pymlf")
         self.clear_filters()
         fcd.add_filter(filter)
+        try:fcd.set_current_folder(self.prefs['LastPYMPath'])
+        except: pass
         fcd.show()
         self.filetype = 'PYM'
 
@@ -247,6 +275,8 @@ class maingui():
         filter.add_pattern("*.drf")
         self.clear_filters()
         fcd.add_filter(filter)
+        try:fcd.set_current_folder(self.prefs['LastDIPPath'])
+        except: pass
         fcd.show()
         self.filetype = 'DIP'
 
@@ -257,6 +287,8 @@ class maingui():
         filter.add_pattern("*.mat")
         self.clear_filters()
         fcd.add_filter(filter)
+        try:fcd.set_current_folder(self.prefs['LastMATPath'])
+        except: pass
         fcd.show()
         self.filetype = 'MAT'
 
@@ -267,6 +299,7 @@ class maingui():
 
     def fileLoad(self,widget):
         self.fn = self.builder.get_object("filechooserdialog1").get_filename()
+        pathtofile = os.path.dirname(self.fn)
         self.builder.get_object("filechooserdialog1").hide()
         self.updatestatusbar('loading file'+self.fn)
         if self.parseddatadict.get(self.fn, False) != False:
@@ -285,6 +318,8 @@ class maingui():
         if self.filetype == 'MRI':
             print('filetype MRI')
             self.datadict[self.fn] = {'nifti':img.loadimage(self.fn)}
+            self.prefs['LastMRIPath'] = pathtofile
+            readwrite.writedata(self.prefs, os.getenv('HOME')+'/.pymeg')
             self.refreshdatasummary()
             self.treegohome(None)
 
@@ -292,6 +327,8 @@ class maingui():
             print('filetype PYTHON')
             d = readwrite.readdata(self.fn)
             self.datadict[self.fn] = d
+            self.prefs['LastPYMPath'] = pathtofile
+            readwrite.writedata(self.prefs, os.getenv('HOME')+'/.pymeg')
             self.refreshdatasummary()
             self.treegohome(None)
 
@@ -300,6 +337,8 @@ class maingui():
             d = io.loadmat(self.fn)
             self.datadict[self.fn] = d
             self.refreshdatasummary()
+            self.prefs['LastMATPath'] = pathtofile
+            readwrite.writedata(self.prefs, os.getenv('HOME')+'/.pymeg')
             self.treegohome(None)
 
         if self.filetype == 'DIP':
@@ -366,11 +405,17 @@ class maingui():
         self.View = self.builder.get_object("treeview2")
         self.AddListColumn('Variable', 0)
         self.AddListColumn('Data', 1)
+        self.AddListColumn('Data', True)
         self.dataList = gtk.ListStore(str,str)
         self.View.set_model(self.dataList)
 
     def AddListColumn(self, title, columnId):
-        column = gtk.TreeViewColumn(title, gtk.CellRendererText(), text=columnId)
+        def cell_edited_callback():
+            print 'editing'
+        cell = gtk.CellRendererText()
+        cell.connect('edited', cell_edited_callback)
+        cell.set_property('editable', True)
+        column = gtk.TreeViewColumn(title, gtk.CellRendererText(), text=columnId)#, editable=2)#, active=0,activatable=0)
         column.set_resizable(True)
         column.set_sort_column_id(columnId)
         self.View.append_column(column)
@@ -406,8 +451,7 @@ class maingui():
     def itemselect(self, widget):
         model,iter = self.builder.get_object("treeview2").get_selection().get_selected()
         print('you selected item:', self.dataList.get_value(iter,0))#, self.dataList.get_value(iter,1)
-        self.selecteditem = self.dataList.get_value(iter,0)
-        self.dataselected = self.selecteditem
+        self.dataselected = self.selecteditem = self.dataList.get_value(iter,0)
         self.prerequisite(itemtype='selecteditem')
 
     def treeclicked(self,b,c,d):

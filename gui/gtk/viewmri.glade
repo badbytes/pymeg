@@ -168,13 +168,13 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="draw_indicator">True</property>
-                <signal name="toggled" handler="on_checkbutton1_toggled"/>
+                <signal name="toggled" handler="on_lpa_toggled"/>
                 <child>
-                  <object class="GtkLabel" id="label3">
+                  <object class="GtkLabel" id="label4">
                     <property name="visible">True</property>
                     <property name="label" translatable="yes">LPA</property>
                     <attributes>
-                      <attribute name="foreground" value="#24170000ffff"/>
+                      <attribute name="foreground" value="#310114a2ef5b"/>
                     </attributes>
                   </object>
                 </child>
@@ -191,6 +191,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="draw_indicator">True</property>
+                <signal name="toggled" handler="on_rpa_toggled"/>
                 <child>
                   <object class="GtkLabel" id="label1">
                     <property name="visible">True</property>
@@ -213,6 +214,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="draw_indicator">True</property>
+                <signal name="toggled" handler="on_nas_toggled"/>
                 <child>
                   <object class="GtkLabel" id="label2">
                     <property name="visible">True</property>
@@ -227,6 +229,20 @@
                 <property name="expand">False</property>
                 <property name="fill">False</property>
                 <property name="position">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="button1">
+                <property name="label" translatable="yes">Save</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <signal name="clicked" handler="on_buttonsavecoreg_activate"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">3</property>
               </packing>
             </child>
           </object>
@@ -256,7 +272,7 @@
         <child>
           <object class="GtkImage" id="image2">
             <property name="visible">True</property>
-            <property name="pixbuf">MRI_CorrectView.png</property>
+            <property name="stock">gtk-missing-image</property>
           </object>
           <packing>
             <property name="position">2</property>

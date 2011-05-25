@@ -24,9 +24,8 @@ from numpy.linalg import norm
 from pdf2py import pdf
 
 '''dip = N X 3
-lpa rps and nas = 1X3
-###make sure coords are in mm and not cm
-NOT SURE ABOUT UNITS HERE. is mm or cm important'''
+lpa rps and nas = 3X3
+make sure coords are in mm and not cm'''
 
 def generic(p1,p2,p3):
     '''return generic transform matrix from 3 points'''
@@ -44,7 +43,7 @@ def generic(p1,p2,p3):
     return transformvector,transformmatrix #ie translation and rotation
 
 def meg2mri(lpa,rpa,nas, dipole=None):
-    'requires lpa, rpa, and nas. Dipole is optional (dipole=NX3)'
+    'requires MRI lpa, rpa, and nas. Dipole is optional (dipole=NX3)'
     print 'what are your units of your dipole and lpa,rpa,nas?, should be in mm'
     origin = mean([[lpa],[rpa]],0)
     x = nas - origin;

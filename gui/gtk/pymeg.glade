@@ -135,6 +135,33 @@
                   <object class="GtkMenu" id="menu6">
                     <property name="visible">True</property>
                     <child>
+                      <object class="GtkMenuItem" id="menuitem9">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Paste</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="menuitem8">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Copy</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="menuitem7">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Rename</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_rename_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparatorMenuItem" id="&lt;seperator&gt;">
+                        <property name="visible">True</property>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkMenuItem" id="imagemenuitem8">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Preferences</property>
@@ -621,21 +648,23 @@ Lead Field Matrix</property>
                 <property name="visible">True</property>
                 <property name="app_paintable">True</property>
                 <property name="can_focus">True</property>
-                <property name="events">GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_STRUCTURE_MASK</property>
+                <property name="events">GDK_EXPOSURE_MASK | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_MOTION_MASK | GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK | GDK_BUTTON3_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK | GDK_FOCUS_CHANGE_MASK | GDK_STRUCTURE_MASK | GDK_PROPERTY_CHANGE_MASK | GDK_VISIBILITY_NOTIFY_MASK | GDK_PROXIMITY_IN_MASK | GDK_PROXIMITY_OUT_MASK | GDK_SUBSTRUCTURE_MASK | GDK_SCROLL_MASK</property>
                 <property name="extension_events">all</property>
                 <property name="border_width">1</property>
                 <property name="model">liststore1</property>
                 <property name="reorderable">True</property>
                 <property name="rules_hint">True</property>
-                <property name="search_column">2</property>
+                <property name="search_column">0</property>
                 <property name="level_indentation">8</property>
                 <property name="rubber_banding">True</property>
                 <property name="enable_grid_lines">vertical</property>
                 <property name="enable_tree_lines">True</property>
-                <signal name="button_press_event" handler="showpopupmenu"/>
-                <signal name="cursor_changed" handler="itemselect"/>
+                <signal name="key_press_event" handler="on_key_press_event"/>
+                <signal name="drag_drop" handler="on_treetest"/>
                 <signal name="selection_get" handler="itemselect"/>
+                <signal name="button_press_event" handler="showpopupmenu"/>
                 <signal name="row_activated" handler="on_treeview2_row_activated"/>
+                <signal name="cursor_changed" handler="itemselect"/>
                 <signal name="selection_received" handler="itemselect"/>
               </object>
             </child>
@@ -1487,8 +1516,14 @@ Lead Field Matrix</property>
   </object>
   <object class="GtkFileChooserDialog" id="filechooserdialog2">
     <property name="border_width">5</property>
+    <property name="type">popup</property>
+    <property name="title" translatable="yes">File Load</property>
+    <property name="modal">True</property>
+    <property name="window_position">center</property>
     <property name="type_hint">normal</property>
-    <property name="opacity">0.95999999999999996</property>
+    <property name="skip_taskbar_hint">True</property>
+    <property name="skip_pager_hint">True</property>
+    <property name="has_separator">True</property>
     <property name="action">save</property>
     <property name="do_overwrite_confirmation">True</property>
     <child internal-child="vbox">
@@ -1860,9 +1895,13 @@ Lead Field Matrix</property>
   </object>
   <object class="GtkFileChooserDialog" id="filechooserdialog1">
     <property name="border_width">5</property>
+    <property name="type">popup</property>
     <property name="modal">True</property>
+    <property name="window_position">center</property>
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">normal</property>
+    <property name="skip_taskbar_hint">True</property>
+    <property name="skip_pager_hint">True</property>
     <property name="deletable">False</property>
     <property name="do_overwrite_confirmation">True</property>
     <property name="select_multiple">True</property>
