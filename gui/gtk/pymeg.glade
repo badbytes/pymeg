@@ -135,17 +135,19 @@
                   <object class="GtkMenu" id="menu6">
                     <property name="visible">True</property>
                     <child>
-                      <object class="GtkMenuItem" id="menuitem9">
-                        <property name="visible">True</property>
-                        <property name="label" translatable="yes">Paste</property>
-                        <property name="use_underline">True</property>
-                      </object>
-                    </child>
-                    <child>
                       <object class="GtkMenuItem" id="menuitem8">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Copy</property>
                         <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_copy_activate"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="menuitem9">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Paste</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_paste_activate"/>
                       </object>
                     </child>
                     <child>
@@ -263,7 +265,7 @@
                 <property name="label" translatable="yes">Functions</property>
                 <property name="stock_id">gtk-execute</property>
                 <property name="menu">menufunctions</property>
-                <signal name="clicked" handler="on_test"/>
+                <signal name="clicked" handler="on_function_menu_clicked"/>
                 <child>
                   <object class="GtkMenu" id="menufunctions">
                     <property name="visible">True</property>
@@ -571,7 +573,6 @@ Lead Field Matrix</property>
               <object class="GtkToolButton" id="deleteselecteditem">
                 <property name="visible">True</property>
                 <property name="label" translatable="yes">Delete Item</property>
-                <property name="use_underline">True</property>
                 <property name="stock_id">gtk-delete</property>
                 <signal name="clicked" handler="on_deletedselecteditem_clicked"/>
               </object>
@@ -648,24 +649,21 @@ Lead Field Matrix</property>
                 <property name="visible">True</property>
                 <property name="app_paintable">True</property>
                 <property name="can_focus">True</property>
-                <property name="events">GDK_EXPOSURE_MASK | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_MOTION_MASK | GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK | GDK_BUTTON3_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK | GDK_FOCUS_CHANGE_MASK | GDK_STRUCTURE_MASK | GDK_PROPERTY_CHANGE_MASK | GDK_VISIBILITY_NOTIFY_MASK | GDK_PROXIMITY_IN_MASK | GDK_PROXIMITY_OUT_MASK | GDK_SUBSTRUCTURE_MASK | GDK_SCROLL_MASK</property>
-                <property name="extension_events">all</property>
-                <property name="border_width">1</property>
+                <property name="events">GDK_POINTER_MOTION_MASK | GDK_BUTTON_MOTION_MASK | GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK | GDK_BUTTON3_MOTION_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_STRUCTURE_MASK</property>
+                <property name="border_width">2</property>
                 <property name="model">liststore1</property>
                 <property name="reorderable">True</property>
                 <property name="rules_hint">True</property>
                 <property name="search_column">0</property>
                 <property name="level_indentation">8</property>
                 <property name="rubber_banding">True</property>
-                <property name="enable_grid_lines">vertical</property>
+                <property name="enable_grid_lines">both</property>
                 <property name="enable_tree_lines">True</property>
                 <signal name="key_press_event" handler="on_key_press_event"/>
-                <signal name="drag_drop" handler="on_treetest"/>
-                <signal name="selection_get" handler="itemselect"/>
-                <signal name="button_press_event" handler="showpopupmenu"/>
-                <signal name="row_activated" handler="on_treeview2_row_activated"/>
-                <signal name="cursor_changed" handler="itemselect"/>
-                <signal name="selection_received" handler="itemselect"/>
+                <signal name="selection_get" handler="on_selection"/>
+                <signal name="button_press_event" handler="on_button_press_event"/>
+                <signal name="row_activated" handler="on_row_activated"/>
+                <signal name="selection_received" handler="on_selection"/>
               </object>
             </child>
           </object>
@@ -1963,5 +1961,75 @@ Lead Field Matrix</property>
   <object class="GtkImage" id="image1">
     <property name="visible">True</property>
     <property name="pixbuf">WaveformButtonSmall.png</property>
+  </object>
+  <object class="GtkDialog" id="dialog1">
+    <property name="border_width">5</property>
+    <property name="title" translatable="yes">Rename Item</property>
+    <property name="window_position">mouse</property>
+    <property name="type_hint">normal</property>
+    <property name="skip_taskbar_hint">True</property>
+    <property name="skip_pager_hint">True</property>
+    <property name="decorated">False</property>
+    <property name="deletable">False</property>
+    <child internal-child="vbox">
+      <object class="GtkVBox" id="dialog-vbox9">
+        <property name="visible">True</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child>
+          <object class="GtkEntry" id="rename_entry">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="invisible_char">&#x25CF;</property>
+          </object>
+          <packing>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child internal-child="action_area">
+          <object class="GtkHButtonBox" id="dialog-action_area9">
+            <property name="visible">True</property>
+            <property name="layout_style">end</property>
+            <child>
+              <object class="GtkButton" id="button2">
+                <property name="label" translatable="yes">Cancel</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <signal name="clicked" handler="on_rename_activate"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="button3">
+                <property name="label" translatable="yes">Save</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <signal name="clicked" handler="on_rename_activate"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <action-widgets>
+      <action-widget response="0">button2</action-widget>
+      <action-widget response="0">button3</action-widget>
+    </action-widgets>
   </object>
 </interface>

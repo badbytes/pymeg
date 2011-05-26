@@ -361,7 +361,14 @@
           <placeholder/>
         </child>
         <child type="tab">
-          <placeholder/>
+          <object class="GtkLabel" id="label8">
+            <property name="visible">True</property>
+            <property name="label" translatable="yes">Use Selected Item</property>
+          </object>
+          <packing>
+            <property name="position">2</property>
+            <property name="tab_fill">False</property>
+          </packing>
         </child>
       </object>
     </child>

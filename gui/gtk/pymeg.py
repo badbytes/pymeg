@@ -88,14 +88,14 @@ class maingui():
             "on_filedialogLoad_clicked" : self.fileLoad,
             "on_filedialogCancel_clicked" : self.fileCancel,
             "on_menuAbout_activate" : self.about,
-            "on_treeview2_row_activated" : self.treeclicked,
+            "on_row_activated" : self.treeclicked,
             "on_treebutton1_clicked" : self.treegohome,
             "on_treebutton2_clicked" : self.treeuplevel,
             "on_checkbutton_toggled" : self.meg_assist,
             "on_aboutdialog1_hide" : self.abouthide,
             "on_treebutton3_clicked" : self.treeadd2workspace,
             "on_treeview2_buttonpress" : self.treeclicked,
-            "itemselect" : self.itemselect,
+            "on_selection" : self.itemselect,
             "on_toolbutton4_clicked" : self.add2plot,
             "on_buttonplot_activate" : self.plotdata,
             "on_2Dplot_clicked" : self.plot2D,
@@ -114,7 +114,7 @@ class maingui():
             "on_dipoledensity_activate" : self.dipoledensityhandle,
             "on_coregister_activate" : self.coregister_handler,
             "on_3DMRI_activate" : self.plot3DMRIhandle,
-            "showpopupmenu" : self.showpopupmenu ,
+            "on_button_press_event" : self.button_press_event ,
             "on_tftplot_activate" : self.tftplot,
             "on_timef_activate" : self.timef_handler ,
             "on_data_editor_clicked" : self.data_editor,
@@ -124,8 +124,10 @@ class maingui():
             "on_power_spectral_density_activate" : self.power_spectral_density,
             "on_minimumnorm_activate" : self.minimunnorm_handler,
             "on_solution_to_image_activate" : self.sourcesolution2img_handler,
-            "on_treetest" : self.test,
+            "on_function_menu_clicked" : self.menu_tearoff,
             "on_key_press_event" : self.key_press_event,
+            "on_copy_activate" : self.copy_item,
+            "on_paste_activate" : self.paste_item,
             "on_rename_activate" : self.rename_item,
         }
 
@@ -149,7 +151,7 @@ class maingui():
         except IOError: pass
         self.fill_combo_entries(None)
 
-    def test(self,widget): #dev default function
+    def menu_tearoff(self,widget): #dev default function
         print 'tested'
         menu = self.builder.get_object("menufunctions")
         menu.show_all(); menu.hide()
@@ -162,8 +164,7 @@ class maingui():
         p = progressbar.MainThread()
         p.main(testfunction)
 
-
-    def showpopupmenu(self,widget,event):
+    def button_press_event(self,widget,event):
         try:
             print('button ',event)#.button)
             if event.button == 3:
@@ -171,24 +172,46 @@ class maingui():
                 print(widget, event)
                 m.show_all()
                 m.popup(None,None,None,3,0)
+            if event.button == 1:
+                self.itemselect(None)
         except:
             pass
 
+    def copy_item(self, widget):
+        print self.dataselected, 'copied item to clipboard'
+        self.clipboarddata = self.treedata[self.selecteditem]
+        self.clipboarditem = self.selecteditem
+
+    def paste_item(self, widget):
+        print 'pasting item',self.dataselected
+        self.treedata[self.clipboarditem] = self.clipboarddata
+        self.refreshtree()
+
     def key_press_event(self,widget,event):
-        #print('key ',event)#.button)
-        #print 'v',event.keyval, 's',event.string
-        #print type(event.string)
-        if event.keyval == 99:# and len(event.string) == 0:
-            print self.dataselected, 'copied item to clipboard'
-            self.clipboarddata = self.treedata[self.selecteditem]
-            self.clipboarditem = self.selecteditem
-        if event.keyval == 118:# and len(event.string) == 0:
-            print 'pasting item',self.dataselected
-            self.treedata[self.clipboarditem] = self.clipboarddata
-            self.refreshtree()
+        if event.keyval == 99:# or widget.get_label() == 'Copy':# and len(event.string) == 0:
+            self.copy_item(None)
+        if event.keyval == 118:# or widget.get_label() == 'Paste':# and len(event.string) == 0:
+            self.paste_item(None)
 
     def rename_item(self,widget):
         print 'renaming', self.selecteditem
+        print widget.get_label()
+        if widget.get_label() == 'Rename':
+            self.rename_win = self.builder.get_object('dialog1')
+            self.rename_win.show()
+        if widget.get_label() == 'Save':
+            print 'renaming item'
+            entryfield = self.builder.get_object('rename_entry')
+            newname = str(entryfield.get_text())
+            self.treedata[newname] = self.treedata[self.selecteditem]
+            self.treedata.pop(self.selecteditem)
+            self.rename_win.hide()
+            self.refreshtree()
+        if widget.get_label() == 'Cancel':
+            print 'canceling'
+            self.rename_win.hide()
+
+
 
     def data_editor_handler(self,widget):
         self.de = data_editor.setup_gui() #window
@@ -405,7 +428,7 @@ class maingui():
         self.View = self.builder.get_object("treeview2")
         self.AddListColumn('Variable', 0)
         self.AddListColumn('Data', 1)
-        self.AddListColumn('Data', True)
+        #self.AddListColumn('Data', True)
         self.dataList = gtk.ListStore(str,str)
         self.View.set_model(self.dataList)
 
@@ -481,13 +504,10 @@ class maingui():
             self.data2parse = self.treedict[self.treedict.keys()[-1]]
             self.parseinstance(self.data2parse)
             self.treedata = self.parseddata.out
-        print 'dict level--------',self.treedict.keys()
+        print 'current level in tree:',self.treedict.keys()
 
         self.refreshtree()
-        #self.dataList.clear()
-        #self.populatetree(self.treedata)
         self.builder.get_object('treebutton2').set_sensitive(True)
-        #self.prerequisite(itemtype='generalitem')
 
     def deleteselected(self, widget):
         liststore,iter = self.View.get_selection().get_selected()
@@ -500,12 +520,8 @@ class maingui():
         except KeyError:
             #delete item
             self.treedata.pop(self.selecteditem)
-            #self.treedict[self.treedict.keys()[-1]] = self.treedata
-            #self.treedict = {0 :self.treedata}
-            #print self.dataList#.clear()
-            #self.populatetree(self.treedata)
+
         self.refreshtree()
-        #self.treegohome(None)
 
     def refreshtree(self):
 
@@ -552,9 +568,6 @@ class maingui():
             self.treedata = self.parseddata.out
 
         self.refreshtree()
-        #print 'dict level--------',self.treedict.keys()
-        #self.populatetree(self.treedata)
-        #self.prerequisite(itemtype='generalitem')
 
     def treeadd2workspace(self,widget):
         liststore,iter = self.View.get_selection().get_selected()
@@ -676,116 +689,51 @@ class maingui():
             try:
                 #print 'looking for child'
                 out = eval('item.'+ii)
-                #print('found as child instance', ii)
             except:
                 try:
                     for i in inspect.getmembers(item):
                         if i[0] == ii:
                             out = i[1]
-                            #print('found', i[0])
                         if isinstance(i[1], types.InstanceType):
                             for j in inspect.getmembers(i[1]):
                                 if j[0] == ii:
                                     out = j[1]
-                                    #print('found', j[0])
                 except:
                     pass
-                    #print('cant find instance', ii)
             return out
         def dict_search(item):
-            #print('dict search')
             try:
                 out = item[ii]
-                #print('found as child dict', ii)
             except:
                 try:
                     for i in item:
-                        #print('i',i, type(item[i]))
                         if type(item[i]) == dict:
                             try:
                                 out = item[i][ii]
-                                #print('found',ii)
                             except: pass
                         if obj[i] == ii:
                             out = item[i]
-                            #print('found', i)
                         if isinstance(item[i], types.InstanceType):
-                            #print 'searching deeper'
                             try: out = instance_search(item[i])
                             except: pass
                 except:
                     pass
-                    #print('cant find instance', ii)
             return out
 
         for ii in var:
-            #print('look for dependency',ii),type(obj)
             if type(obj) == dict:
                 try:
                     v[ii] = dict_search(obj)
                 except UnboundLocalError:
                     pass
-                    #print('couldnt find required data: ',ii)
-                    #self.errordialog('couldnt find required data: '+ii)
 
             if isinstance(obj, types.InstanceType):
                 try:
                     v[ii] = instance_search(obj)
                 except UnboundLocalError:
                     pass
-                    #print('couldnt find required data: ',ii)
-                    #self.errordialog('couldnt find required data: '+ii)
 
-            #if type(obj) == dict:
-                #print('dict search')
-                #try:
-                    #out = obj[ii]
-                    #print('found as child dict', ii)
-                #except:
-                    #try:
-                        #for i in obj:
-                            #print('i',i, type(obj[i]))
-                            #if type(obj[i]) == dict:
-                                #try:
-                                    #out = obj[i][ii]
-                                    #print('found',ii)
-                                #except: pass
-
-                            #if obj[i] == ii:
-                                #out = obj[i]
-                                #print('found', i)
-                    #except:
-
-                        #print('cant find instance', ii)
-
-            #if isinstance(obj, types.InstanceType):
-                #print('instance..')
-                #try:
-                    #print 'looking for child'
-                    #out = eval('obj.'+ii)
-                    #print('found as child instance', ii)
-                #except:
-                    #try:
-                        #for i in inspect.getmembers(obj):
-                            #if i[0] == ii:
-                                #out = i[1]
-                                #print('found', i[0])
-                            #if isinstance(i[1], types.InstanceType):
-                                #for j in inspect.getmembers(i[1]):
-                                    #if j[0] == ii:
-                                        #out = j[1]
-                                        #print('found', j[0])
-                    #except:
-                        #print('cant find instance', ii)
-
-            #v.extend([out]);
-            #try:
-                #v[ii] = out
-            #except UnboundLocalError:
-                #print('couldnt find required data: ',ii)
-                #self.errordialog('couldnt find required data: '+ii)
         if len(v) != len(var):
-            #print('missing items requested')
             raise KeyError
 
         return v
@@ -845,8 +793,6 @@ class maingui():
         except AttributeError, NameError:
             self.vm = viewmri.setup_gui()
             self.vm.window.show()
-        #print(self.treedata[self.selecteditem].data)
-        #try:
 
         obj=self.treedata#[self.selecteditem];
         try:
@@ -863,36 +809,17 @@ class maingui():
 
         self.mrimousepos = self.vm.display(data,pixdim=res['pixdim'],translation=res['translation'])
 
-        #except:# (AttributeError, KeyError):
-            #try:
-                #self.mrimousepos = vm.display(self.treedata[self.selecteditem])
-                #vm.window.show()
-            #except (AttributeError, KeyError):
-                #print('Unknown data format')
-                #self.errordialog('Unknown data format. Try selecting variable = nifti, or data array');
-
     def plot3DMRIhandle(self, widget):
         from mri import vtkview
         vtkview.show()
 
     def gridcalc(self, widget):
         def setgrid(grid,mr=None):
-            #MT = MainThread()
-            #MT.start()
-            #print 'progress.....start'
             self.data_file_selected['grid'] = grid #in mm
-            #mr.nifti = []
             if mr != None:
                 self.data_file_selected['source_space'] = {'pixdim':mr.pixdim*mr.factor,'data':mr.img,'ind':mr.ind,'megxyz':mr.megxyz,'origimg':mr.origimg,'img':mr.img} #in mm
-                #ss = self.data_file_selected['source_space']
-                #print ss['pixdim']
-                #ss['pixdim'] =  ss['pixdim']*ss['factor']
-                #ss['origmri'] = ss['data']
-                #ss['data'] = ss['img']
-            self.refreshtree() # self.treegohome(None)
             gridwin.window.hide()
             self.updatestatusbar('grid calculation of '+str(size(grid,1))+' points complete')
-            #MT.terminate()
 
         if self.checkreq() == -1:
             print('caught error')
@@ -901,18 +828,13 @@ class maingui():
         from gui.gtk import grid
         gridwin = grid.gridwin()
 
-        #try:
-            #self.gridwin.mriwin(workspace_data=self.data_file_selected)
         obj=self.treedata#[self.selecteditem];
         res = (self.setup_helper(var=['hs'],obj=obj));
         gridwin.headshape = res['hs']
         gridwin.builder.get_object("filechooserbutton2").set_sensitive(False)
         gridwin.datahandler(setgrid)
         gridwin.window.show()# = grid.gridwin()
-        #except (AttributeError, KeyError):
-            #print('no data')
-            #self.errordialog\
-            #('No data selected. Double Click a MEG filename')
+
 
     def leadfieldcalc(self, widget):
         def leadfieldthread():
@@ -922,7 +844,6 @@ class maingui():
 
             obj=self.treedata;#[self.selecteditem];
             res = (self.setup_helper(var=['channels','grid'],obj=obj));
-            #grid = self.data_file_selected['grid']
             print 'grid print',res['grid']
 
             try:
@@ -947,28 +868,6 @@ class maingui():
 
         MT = progressbar.MainThread()
         MT.main(leadfieldthread)
-        ##self.progressbar.window.show()
-        ##self.progressbar.widget.set_fraction(0)
-        ##p = progressbar.MainThread()
-        ##p.main(leadfield.calc(res['channels'],self.data_file_selected['grid']))
-
-        #self.lf = leadfield.calc(res['channels'],self.data_file_selected['grid'])
-        ##MT.terminate()
-        ##self.progressbar.window.hide()
-        #self.data_file_selected['leadfield'] = self.lf
-        #self.data_file_selected['leadfield'].channels = res['channels']
-        ##self.data_file_selected['leadfield'].leadfields_transposed = self.lf.lp.T
-        #self.refreshtree()
-        #self.updatestatusbar('leadfield calculation complete')
-
-
-        #self.lf = leadfield.calc(self.data_file_selected['data'].filename, self.data_file_selected['data'].channels, \
-        #self.data_file_selected['grid'])
-        #print('lf shape', self.data_file_selected['grid'].shape)
-        #print('saving leadfield in workspace')
-        #self.data_file_selected['leadfield'] = self.lf
-        #self.data_file_selected['leadfield'].channels = self.data_file_selected['data'].channels
-        #self.data_file_selected['leadfield'].leadfields_transposed = self.lf.lp.T
 
     def minimunnorm_handler(self,widget):
         def minnormthread():
@@ -989,15 +888,10 @@ class maingui():
         obj=self.treedata;
         res = (self.setup_helper(var=['ind','origimg','img'],obj=obj));
         solution = self.treedata[self.selecteditem]
-        #source_space = self.data_file_selected['source_space']
         c = sourcesolution2img.build(solution,ind=res['ind'],origimg=res['origimg'],img=res['img'])
-        #solution = self.data_file_selected['source_space']
-        #self.data_file_selected['source_space'] = copy(source_space)
-        #self.data_file_selected['source_space'][self.selecteditem] = c
+
         self.data_file_selected['source_space']['total_power'] = mean(c,axis=0);
-        #self.data_file_selected['source_space']['pixdim'] = self.data_file_selected['source_space']['pixdim']*self.data_file_selected['source_space']['factor']
         self.datadict[self.data_filename_selected] = self.data_file_selected
-        #self.treegohome(None)
         self.updatestatusbar('solution to image complete')
 
     def dipoledensityhandle(self,widget):
@@ -1031,7 +925,6 @@ class maingui():
             'numofepochs','eventtime'],obj=obj));
             print (len(res), 'length')
             self.tf.builder.get_object('filechooserbutton1').set_sensitive(False)
-            #self.tf.datahandler(ret[0],ret[1],ret[2][0],ret[3],ret[4][0],ret[5],callback=donetft)
             self.tf.datahandler(res,callback=donetft)
             self.tf.window.show()
             print('tft on data instance')
@@ -1074,14 +967,6 @@ class maingui():
     def signal_space_filter(self,widget):
 
         self.datadict[self.data_filename_selected] = self.data_file_selected
-        #sp = self.data_file_selected['signal_projection']
-        #obj = self.treedata[self.selecteditem]
-        #var = ['channels','srate','numofepochs','labellist',
-        #'chanlocs','frames','eventtime','wintime']
-        #res = (self.setup_helper(var,obj=obj));
-        #data_block = (self.setup_helper(['data_block'],obj=obj))['data_block']
-        #ed = self.data_file_selected['epoched_data'] = {}
-        #self.result_helper(ed,res)
 
         if self.signal_space_build_weights(widget) == -1:
             self.data_editor(None)
@@ -1110,20 +995,10 @@ class maingui():
         res = (self.setup_helper(var,obj=obj));
         self.result_helper(sp,res)
 
-        #sp['channels'] = {}
         labels = []
         for i in range(0,size(ssp,1)):
             labels.extend(['SigSP'+str(i)])
         sp['labellist'] = labels
-        #sp['chanlocs'] = \
-        #array(self.treedata[self.selecteditem].channels.chanlocs[:,0:size(ssp,1)])
-        #sp['data_block'] = ssp
-        #sp['srate'] = self.treedata[self.selecteditem].srate
-        #sp['wintime'] = self.treedata[self.selecteditem].wintime
-        #sp['eventtime'] = self.treedata[self.selecteditem].eventtime
-        #sp['frames'] = self.treedata[self.selecteditem].frames
-        #sp['srate'] = self.treedata[self.selecteditem].srate
-        #sp['numofepochs'] = self.treedata[self.selecteditem].numofepochs
 
     def contour_plot(self,widget):
         try:
@@ -1228,10 +1103,6 @@ class maingui():
                 if j.get_name() ==  'GtkMenuItem':
                     j.set_sensitive(False)
 
-
-        #predict['Data Editor'] = ['data_block','srate','wintime','labellist','chanlocs']
-        #predict['Calculate Grid'] = ['hs']
-        #predict['Leadfield Calc'] = ['channels','grid']
         for i in predict.keys():
             predict[i]
             try:
@@ -1262,7 +1133,6 @@ class maingui():
         def data_editor_callback(widget):
             print ('de calling back'), widget.get_label()
             try:
-                #self.de.get_time_selection(widget,current=True)
                 data = self.de.data
                 if widget.get_label() == 'Save As Event':
                     self.de.get_time_selection(widget,current=True)
@@ -1273,8 +1143,6 @@ class maingui():
                 print 'saved selection....'
                 if widget.get_label() == 'Offset Correct':
                     print 'replacing data with offset correction'
-                    #obj=self.treedata;#[self.selecteditem];
-                    #r = (self.setup_helper(var=['data_block'],obj=obj));
                     try:
                         self.obj.data_block = data
                         print 'replaced'
@@ -1283,19 +1151,9 @@ class maingui():
 
                     except:
                         print 'error replacing'
-                #print ('selection list', self.de.selections)
-                #self.de.time
-                #liststore,iter = self.de.SelView.get_selection().get_selected_rows()
-                #for i in iter:
-                    #print ('highlighted', liststore[i][1])
-                    #self.de.get_time_selection(widget,current=False)
-                    #print ('indices',self.de.sel_ind)
-                    #data = self.de.data
-                    #self.data_file_selected['data_selection'] = data[self.de.sel_ind]
 
             except:
                 pass
-            #self.refreshtree()
 
         try:
             self.obj = obj=self.treedata[self.selecteditem];
@@ -1318,16 +1176,12 @@ class maingui():
         except RuntimeError:
             self.errordialog("Can't do that Dave");
 
-    #def data_editor_callback(self):
-        #print ('Done')
-
     def power_spectral_density(self,widget):
         obj=self.treedata[self.selecteditem];
         res = (self.setup_helper(var=['data_block','srate','labellist','chanlocs'],obj=obj));
         self.psd = power_spectral_density.setup_gui()
         self.psd.datahandler(res)
         self.psd.window.show()
-
 
     def testhandler(self, widget):
         self.prnt(None)
@@ -1345,7 +1199,6 @@ class maingui():
             self.datadict[path].data.getdata(0, self.datadict[path].data.pnts_in_file)
             self.chanlist = ['meg']
             self.readMEG()
-        #self.datadict[path].results = self.datadict[path].__class__
 
 class MainThread(threading.Thread):
     def run(self):
@@ -1357,27 +1210,20 @@ class MainThread(threading.Thread):
         self.pbwindow.show()
         self.progressbar.show()
         self.pbwindow.connect('destroy', gtk.main_quit)
-
         self.still_working = True
         gobject.timeout_add(100, self.pulse)
         self.tic = 0
-
         gtk.main()
 
     def pulse(self):
-        #self.tic = self.tic + 1
-        #while self.tic < 100:
-
         self.progressbar.pulse()
         return self.still_working # 1 = repeat, 0 = stop
-        #self.terminate()
 
     def test(self,widget):
         pass
 
     def terminate(self):
         self.still_working = False
-        #gtk.main_quit()
         self.pbwindow.hide()
 
     def interaction_shell(self,widget):
@@ -1389,11 +1235,6 @@ if __name__ == "__main__":
     mainwindow.testload(None)
     i = 1
     import code; code.interact(local=locals()) #Interactive Shell
-
-    #exit
-    #MT = MainThread()
-    #MT.start()
-    #MR.terminate()
     gtk.main()
 
 
