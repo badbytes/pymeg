@@ -659,11 +659,10 @@ Lead Field Matrix</property>
                 <property name="rubber_banding">True</property>
                 <property name="enable_grid_lines">both</property>
                 <property name="enable_tree_lines">True</property>
-                <signal name="key_press_event" handler="on_key_press_event"/>
-                <signal name="selection_get" handler="on_selection"/>
                 <signal name="button_press_event" handler="on_button_press_event"/>
+                <signal name="cursor_changed" handler="on_selection"/>
+                <signal name="key_press_event" handler="on_key_press_event"/>
                 <signal name="row_activated" handler="on_row_activated"/>
-                <signal name="selection_received" handler="on_selection"/>
               </object>
             </child>
           </object>
@@ -1585,6 +1584,9 @@ Lead Field Matrix</property>
     <property name="opacity">0.90000000000000002</property>
     <signal name="close" handler="gtk_widget_hide"/>
     <signal name="cancel" handler="gtk_widget_hide"/>
+    <child>
+      <placeholder/>
+    </child>
     <child>
       <placeholder/>
     </child>

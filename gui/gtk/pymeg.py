@@ -173,9 +173,10 @@ class maingui():
                 m.show_all()
                 m.popup(None,None,None,3,0)
             if event.button == 1:
-                self.itemselect(None)
+                print 'trying to select'
+                #self.itemselect(None)
         except:
-            pass
+            print 'error with mouse click'
 
     def copy_item(self, widget):
         print self.dataselected, 'copied item to clipboard'
