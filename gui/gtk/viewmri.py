@@ -289,8 +289,6 @@ class setup_gui:
 
     def display(self,data=None, overlay=None, colormap=cm.gray, pixdim=None, translation=None):
         self.get_color_maps()
-
-
         try:
             if os.path.splitext(data.__module__)[0] == 'nibabel':
                 self.hdr = img.get_header()

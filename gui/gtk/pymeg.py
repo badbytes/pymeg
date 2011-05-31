@@ -58,6 +58,7 @@ from gui.gtk import filter, offset_correct, errordialog, preferences,\
 dipoledensity, coregister, timef, data_editor, event_process, parse_instance, \
 meg_assistant, errordialog, viewmri, power_spectral_density, progressbar
 from gui.gtk import contour as contour_gtk
+import nibabel
 
 #from IPython.Shell import IPShellEmbed
 #ipshell = IPShellEmbed()
@@ -267,9 +268,10 @@ class maingui():
     def fileOpenMRI(self,widget):
         fcd = self.builder.get_object("filechooserdialog1")
         filter = gtk.FileFilter()
-        filter.set_name("Nifti files")
+        filter.set_name("MRI Nifti or Analyze files")
         filter.add_pattern("*nii.gz")
         filter.add_pattern("*nii")
+        filter.add_pattern("*img")
         self.clear_filters()
         fcd.add_filter(filter)
         try:fcd.set_current_folder(self.prefs['LastMRIPath'])
@@ -341,7 +343,7 @@ class maingui():
 
         if self.filetype == 'MRI':
             print('filetype MRI')
-            self.datadict[self.fn] = {'nifti':img.loadimage(self.fn)}
+            self.datadict[self.fn] = {'mri':img.loadimage(self.fn)}
             self.prefs['LastMRIPath'] = pathtofile
             readwrite.writedata(self.prefs, os.getenv('HOME')+'/.pymeg')
             self.refreshdatasummary()
@@ -483,7 +485,7 @@ class maingui():
         model,rows = b.get_selection().get_selected()
         iter = self.dataList.get_iter(c[0])
         print('you selected', self.dataList.get_value(iter,0))#, self.dataList.get_value(iter,1))
-        self.refreshdatasummary()
+        #self.refreshdatasummary()
 
         print('you selected position',c[0])
         print('length of tree', len(self.treedict))
@@ -513,6 +515,7 @@ class maingui():
     def deleteselected(self, widget):
         liststore,iter = self.View.get_selection().get_selected()
         self.selectedvar = self.dataList.get_value(iter,0)
+        print 'deleting', self.selecteditem
         try:
             #delete whole dataset
             self.datadict.pop(self.selecteditem)
@@ -521,11 +524,9 @@ class maingui():
         except KeyError:
             #delete item
             self.treedata.pop(self.selecteditem)
-
-        self.refreshtree()
+            self.refreshtree()
 
     def refreshtree(self):
-
         print 'len',len(self.treedict.keys())
         if len(self.treedict.keys()) > 1: #bug in delete item. cant seem to delete higher than 2 dictionary items.
             self.builder.get_object('deleteselecteditem').set_sensitive(False)
@@ -739,30 +740,6 @@ class maingui():
 
         return v
 
-
-    def filter_handler(self,widget):
-        def donefilt(results):
-            self.data_file_selected['filtered'].data_block = results
-        import copy
-        self.checkreq()
-        self.data_file_selected['filtered'] = copy.copy(self.treedata[self.selecteditem])
-        srate = self.setup_helper(var='srate',obj=self.data_file_selected['filtered'])[0]
-        self.fil = filter.filtwin()
-        print('target',self.target)
-        print(shape(self.target))
-        try:
-            self.fil.setupfilterwin(None, self.target,srate,callback=donefilt)
-        except KeyError:
-            print('had a prob, bob')
-            return -1
-        self.fil.builder.get_object('FilterWindow').show()
-
-    def offset_handler(self,widget):
-        self.checkreq()
-        self.offset = offset_correct.offsetwin()#.window.show()
-        self.offset.setupoffsetwin(None, workspace_data=self.datadict[self.fn], \
-        data_selected=self.treedata[self.selecteditem])
-
     def checkreq(self):
         try: self.fn
         except AttributeError: self.errordialog('No MEG data loaded');self.fileOpenMEG(None);return -1
@@ -789,11 +766,11 @@ class maingui():
     def plot2Dmri(self, widget):
         try:
             self.vm.fig.clf()
-            if self.vm.window.get_property('visible') == False:
-                self.vm.window.show()
+            #if self.vm.window.get_property('visible') == False:
+            #    self.vm.window.show()
         except AttributeError, NameError:
             self.vm = viewmri.setup_gui()
-            self.vm.window.show()
+            #self.vm.window.show()
 
         obj=self.treedata#[self.selecteditem];
         try:
@@ -801,14 +778,14 @@ class maingui():
                 print('displaying default MR: data')
                 obj=self.treedata[self.selecteditem];
                 res = (self.setup_helper(var=['pixdim','data','translation'],obj=obj));
-                data = res['data']
+                self.mrimousepos = self.vm.display(data=squeeze(res['data']),pixdim=res['pixdim'],translation=res['translation'])
         except AttributeError:
             print('displaying custom data:',self.selecteditem)
-            obj=self.treedata;
-            res = (self.setup_helper(var=['pixdim'],obj=obj));
+            #obj=self.treedata;
+            #res = (self.setup_helper(var=['data'],obj=obj));
             data = self.treedata[self.selecteditem];
-
-        self.mrimousepos = self.vm.display(data,pixdim=res['pixdim'],translation=res['translation'])
+            self.mrimousepos = self.vm.display(data,pixdim=[1,1,1],translation=[0,0,0])#squeeze(res['data']))
+        self.vm.window.show()
 
     def plot3DMRIhandle(self, widget):
         from mri import vtkview
@@ -818,9 +795,10 @@ class maingui():
         def setgrid(grid,mr=None):
             self.data_file_selected['grid'] = grid #in mm
             if mr != None:
-                self.data_file_selected['source_space'] = {'pixdim':mr.pixdim*mr.factor,'data':mr.img,'ind':mr.ind,'megxyz':mr.megxyz,'origimg':mr.origimg,'img':mr.img} #in mm
+                self.data_file_selected['source_space'] = {'pixdim':mr.pixdim*mr.factor,'data':mr.img,'ind':mr.ind,'megxyz':mr.megxyz,'data':mr.data,'img':mr.img} #in mm
             gridwin.window.hide()
             self.updatestatusbar('grid calculation of '+str(size(grid,1))+' points complete')
+            self.refreshtree()
 
         if self.checkreq() == -1:
             print('caught error')
@@ -828,7 +806,6 @@ class maingui():
 
         from gui.gtk import grid
         gridwin = grid.gridwin()
-
         obj=self.treedata#[self.selecteditem];
         res = (self.setup_helper(var=['hs'],obj=obj));
         gridwin.headshape = res['hs']
@@ -863,6 +840,7 @@ class maingui():
                     return
             self.lf = leadfield.calc(res['channels'],self.data_file_selected['grid'])
             self.data_file_selected['leadfield'] = self.lf
+            print type(self.lf)
             self.data_file_selected['leadfield'].channels = res['channels']
             self.refreshtree()
             self.updatestatusbar('leadfield calculation complete')
@@ -911,6 +889,37 @@ class maingui():
     def coregister_handler(self,widget):
         self.cr = coregister.setup() #window
         self.cr.window.show()
+        
+    def filter_handler(self,widget):
+        def donefilt(results):
+            #obj = self.treedata[self.selecteditem]
+            #var = ['channels','srate','numofepochs','labellist','chanlocs','frames','eventtime','wintime']
+            #res = (self.setup_helper(var,obj=obj));
+            res['data_block'] = results
+            self.result_helper(self.data_file_selected['filtered'],self.res)
+            #self.data_file_selected['filtered'].data_block = results
+        import copy
+        obj=self.treedata[self.selecteditem];
+        res = self.res = (self.setup_helper(var=['data_block','srate','channels','numofepochs','labellist','chanlocs','frames','eventtime','wintime'],obj=obj));
+        #self.checkreq()
+        self.data_file_selected['filtered'] = {}#copy.copy(self.treedata[self.selecteditem])
+        
+        #srate = self.setup_helper(var='srate',obj=self.data_file_selected['filtered'])[0]
+        self.fil = filter.filtwin()
+        #print('target',self.target)
+        #print(shape(self.target))
+        try:
+            self.fil.setupfilterwin(None, res['data_block'],res['srate'],callback=donefilt)
+        except KeyError:
+            print('had a prob, bob')
+            return -1
+        self.fil.builder.get_object('FilterWindow').show()
+
+    def offset_handler(self,widget):
+        self.checkreq()
+        self.offset = offset_correct.offsetwin()#.window.show()
+        self.offset.setupoffsetwin(None, workspace_data=self.datadict[self.fn], \
+        data_selected=self.treedata[self.selecteditem])
 
     def timef_handler(self,widget):
         def donetft(results):
@@ -942,8 +951,7 @@ class maingui():
                 self.errordialog\
                 ('Unknown data type. Type selecting Variable = data.')
                 raise TypeError
-
-
+                
     def signal_space_build_weights(self,widget):
         try:
             print ('selection list', self.de.selections)
@@ -966,7 +974,6 @@ class maingui():
             self.data_file_selected['signal_projection']['signal_weights'] = data[self.de.sel_ind]
 
     def signal_space_filter(self,widget):
-
         self.datadict[self.data_filename_selected] = self.data_file_selected
 
         if self.signal_space_build_weights(widget) == -1:
@@ -988,7 +995,6 @@ class maingui():
             pass
 
         ssp = signalspaceprojection.calc(res['data_block'], weight=weights)
-
 
         sp['ssp'] = sp['data_block'] = ssp
         var = ['channels','srate','numofepochs','labellist','chanlocs','frames','eventtime','wintime']
@@ -1085,6 +1091,8 @@ class maingui():
                 predict['Data Editor'] = ['data_block','srate','wintime','labellist','chanlocs']
                 predict['Time Freq Transform'] = ['data_block','labellist','srate','frames','numofepochs','eventtime']
                 predict['Power Spectral Density'] = ['data_block','srate','labellist','chanlocs']
+                predict['Filter'] = ['data_block','srate']
+                predict['Offset Correct'] = ['data_block','srate']
 
             if itemtype == 'generalitem':
                 obj=self.treedata
@@ -1094,7 +1102,7 @@ class maingui():
                 predict['Solution To Image'] = ['ind','origimg','img']
                 predict['Plot MRI'] = ['pixdim','data']
                 predict['Contour Plot'] = ['chanlocs']
-
+                predict['Plot TFT'] = ['tft']
                 #predict['Plot'] = True
 
 
@@ -1147,11 +1155,11 @@ class maingui():
                     try:
                         self.obj.data_block = data
                         print 'replaced'
-
                         self.refreshtree()
-
                     except:
                         print 'error replacing'
+                if widget.get_label() == 'Filter':
+                    pass
 
             except:
                 pass
@@ -1200,6 +1208,13 @@ class maingui():
             self.datadict[path].data.getdata(0, self.datadict[path].data.pnts_in_file)
             self.chanlist = ['meg']
             self.readMEG()
+        #self.fn = ['/home/danc/programming/python/data/standardmri/colin_1mm.img']
+        ##self.datadict[path] = self.fn
+        #self.filetype = 'MRI'
+        #self.builder.get_object("filechooserdialog1").set_uri('file://'+self.fn[0])
+        #self.builder.get_object("filechooserdialog1").show()
+
+        
 
 class MainThread(threading.Thread):
     def run(self):

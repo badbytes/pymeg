@@ -43,7 +43,8 @@ class prefs:
             self.prefs = readwrite.readdata(os.getenv('HOME')+'/.pymeg.pym')
             print 'reading pref file'
             for i in self.prefs.keys():
-                self.builder.get_object(i).set_state(self.prefs[i])
+                try: self.builder.get_object(i).set_state(self.prefs[i])
+                except: pass
                 pass
                 #i.set_state(self.prefs[i])
         except IOError:

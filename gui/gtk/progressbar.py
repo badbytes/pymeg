@@ -35,7 +35,8 @@ class MainThread:
     def __init__(self):
         gtk.gdk.threads_init()
         self.builder = gtk.Builder()
-        self.builder.add_from_file("progressbar.glade")
+        self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
+        #self.builder.add_from_file("progressbar.glade")
         self.window = self.builder.get_object("window1")
         self.progressbar = self.builder.get_object("progressbar")
 
@@ -47,8 +48,14 @@ class MainThread:
             print 'quiting'
         return self.still_working # 1 = repeat, 0 = stop
 
-    def fraction(self):
-        self.progressbar.set_fraction(10)
+    def fraction(self, inc=None):
+        self.increment = self.increment + .1
+        self.progressbar.set_fraction(self.increment)
+        if self.still_working == False:
+            #gtk.main_quit()
+            self.window.hide()
+            print 'quiting'
+        return self.still_working
 
     def main(self, function_passed=None, progresstype='pulse'):
         self.window.show()
@@ -59,7 +66,9 @@ class MainThread:
         if progresstype == 'pulse':
             gobject.timeout_add(100, self.pulse)
         if progresstype == 'fraction':
-            self.fraction()
+            self.increment = 0
+            gobject.timeout_add(100, self.fraction)
+            #self.fraction()
         gtk.main()
 
 class WorkerThread(threading.Thread):
@@ -77,9 +86,9 @@ class WorkerThread(threading.Thread):
 if __name__ == '__main__':
     MT = MainThread()
     def testfunction():
-        for i in range(0,50):
+        for i in range(0,10):
                 print i;
                 time.sleep(.1)
         gtk.main_quit()
-    MT.main(testfunction)
+    MT.main(testfunction, progresstype='fraction')
 

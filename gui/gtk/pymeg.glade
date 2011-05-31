@@ -62,20 +62,23 @@
                     <child>
                       <object class="GtkMenuItem" id="loadmeg1">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">Load 4D MEG</property>
+                        <property name="tooltip_text" translatable="yes">Supports 4D format MEG data</property>
+                        <property name="label" translatable="yes">Load 4D MEG File</property>
                         <signal name="activate" handler="on_loadmeg_activate"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="loadmri1">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">Load MRI Nifti</property>
+                        <property name="tooltip_text" translatable="yes">Support Nifti or Analyze format</property>
+                        <property name="label" translatable="yes">Load MRI File</property>
                         <signal name="activate" handler="on_loadmri_activate"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="loadpythondata1">
                         <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">Supports pickled python data *.pym</property>
                         <property name="label" translatable="yes">Load Python File</property>
                         <signal name="activate" handler="on_loadpythondata_activate"/>
                       </object>
@@ -83,6 +86,8 @@
                     <child>
                       <object class="GtkMenuItem" id="loaddipolefile1">
                         <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">4D format dipole files.
+Either dipole report text file or binary *lA</property>
                         <property name="label" translatable="yes">Load Dipole File</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_loaddipolefile_activate"/>
@@ -91,6 +96,7 @@
                     <child>
                       <object class="GtkMenuItem" id="loadmatlab1">
                         <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">Supports *.mat MATLAB files.</property>
                         <property name="label" translatable="yes">Load Matlab File</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_loadmatlabdata_activate"/>
@@ -104,6 +110,7 @@
                     <child>
                       <object class="GtkMenuItem" id="savefile">
                         <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">Python pickled save.</property>
                         <property name="label" translatable="yes">Save File</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_saveselecteditem_clicked"/>
@@ -117,6 +124,7 @@
                     <child>
                       <object class="GtkMenuItem" id="quit1">
                         <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">Exit PyMEG</property>
                         <property name="label" translatable="yes">Quit</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_menuQuit_activate"/>
@@ -137,6 +145,7 @@
                     <child>
                       <object class="GtkMenuItem" id="menuitem8">
                         <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">Copy item on clipboard</property>
                         <property name="label" translatable="yes">Copy</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_copy_activate"/>
@@ -145,6 +154,7 @@
                     <child>
                       <object class="GtkMenuItem" id="menuitem9">
                         <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">Paste item.</property>
                         <property name="label" translatable="yes">Paste</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_paste_activate"/>
@@ -153,6 +163,7 @@
                     <child>
                       <object class="GtkMenuItem" id="menuitem7">
                         <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">Rename item.</property>
                         <property name="label" translatable="yes">Rename</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_rename_activate"/>
@@ -166,6 +177,7 @@
                     <child>
                       <object class="GtkMenuItem" id="imagemenuitem8">
                         <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">Change PyMEG preferences</property>
                         <property name="label" translatable="yes">Preferences</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_menuPrefs_activate"/>
@@ -186,6 +198,7 @@
                     <child>
                       <object class="GtkMenuItem" id="imagemenuitem9">
                         <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">License and link to wiki</property>
                         <property name="label" translatable="yes">About PyMEG</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_menuAbout_activate"/>
@@ -205,7 +218,7 @@
           <object class="GtkToolbar" id="toolbar2">
             <property name="visible">True</property>
             <property name="toolbar_style">both</property>
-            <property name="icon_size">4</property>
+            <property name="icon_size">5</property>
             <property name="icon_size_set">True</property>
             <child>
               <object class="GtkToolButton" id="treebutton1">
@@ -304,6 +317,7 @@
                     <child>
                       <object class="GtkMenuItem" id="imagemenuitem6">
                         <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">Source space location creation.</property>
                         <property name="label" translatable="yes">Calculate Grid</property>
                         <signal name="activate" handler="on_imagemenuitem6_activate"/>
                       </object>
@@ -311,6 +325,7 @@
                     <child>
                       <object class="GtkMenuItem" id="imagemenuitem7">
                         <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">Forward solution at grid points.</property>
                         <property name="label" translatable="yes">Leadfield Calc</property>
                         <signal name="activate" handler="on_menuleadfield_activate"/>
                       </object>
@@ -318,6 +333,7 @@
                     <child>
                       <object class="GtkMenuItem" id="timef">
                         <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">TFT on data.</property>
                         <property name="label" translatable="yes">Time Freq Transform</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_timef_activate"/>
@@ -349,7 +365,7 @@
                     <child>
                       <object class="GtkMenuItem" id="menuitem6">
                         <property name="visible">True</property>
-                        <property name="tooltip_text" translatable="yes">uses noisecov selected
+                        <property name="tooltip_text" translatable="yes">Uses noisecov selected
  and leadfield to 
 calculate power of 
 data for each grid point.</property>
@@ -1615,6 +1631,12 @@ Lead Field Matrix</property>
       <placeholder/>
     </child>
     <child>
+      <placeholder/>
+    </child>
+    <child>
+      <placeholder/>
+    </child>
+    <child>
       <object class="GtkLabel" id="label31">
         <property name="visible">True</property>
         <property name="label" translatable="yes">MEG load assistant</property>
@@ -1843,7 +1865,7 @@ Lead Field Matrix</property>
   </object>
   <object class="GtkImage" id="image2">
     <property name="visible">True</property>
-    <property name="pixbuf">Dots.png</property>
+    <property name="pixbuf">Spheres Silver.png</property>
   </object>
   <object class="GtkAboutDialog" id="aboutdialog1">
     <property name="border_width">5</property>

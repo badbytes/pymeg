@@ -49,7 +49,7 @@ class loadimage():
                 self.rpa = eval(str(h['descrip']))[1]
                 self.nas = eval(str(h['descrip']))[2]
                 print('got fiducal info from description field in header')
-            except NameError2:
+            except NameError:
                 print 'no fiducal file or info found. you will not be able to perform any transforms with other data.'
     #def reorient(self):
         #'''27 possible combinations of orientations

@@ -36,7 +36,7 @@ from numpy.linalg import norm
 from pdf2py import pdf
 from time import time,sleep
 import sys, logging
-from misc import progressbar
+from misc import progressbar as pb
 from multiprocessing import Pool,Process,cpu_count
 
 class shared_data:
@@ -93,13 +93,18 @@ class calc:
                 return
             grid = grid.transpose()
             print 'reshaping grid'
-
+        
+        global y; y = float(len(grid))/float(cpu_count())
+        global pbar; pbar = pb.ProgressBar().start()
+        #Parallel Compute Leadfields
         logging.basicConfig(level=logging.DEBUG,format='(%(threadName)-10s) %(message)s',)
         pool = Pool(processes=cpu_count())
         self.p = pool.map(code, grid)
         te = time()
         print 'Done. Elapsed time', te-ts, 'seconds'
         self.leadfield = squeeze(array(self.p))
+        del(self.p)
+        self.grid = grid
         return
 
 import threading
@@ -107,13 +112,26 @@ import os
 def code(grid):#=None, pos=None, ori=None, cent=None):
 
     #print("Task(%s) processid = %s" % ('layer', os.getpid()))
+    try: x;
+    except NameError: global x; x = 0
+    x = x +1
+    #print y
     """grid=voxel location. dimensions: N X 3
     pos=position of channels. returned by pos.py
     ori=orientation of channels. returned by pos.py"""
 
     #danc changed hdr read to convert to mm upfront.
     #pos=pos*1000 #convert channel pos from meters to mm
-
+    
+    #pbar = pb.ProgressBar().start()
+    #sys.stdout.flush()
+    if (float(x)/float(y))*100 < 100:
+        pbar.update((float(x)/float(y))*100)
+    #for i in [10,20,30,40,50,60,70,80,90,100]:
+        #if (float(x)/float(y))*100 > 10:
+            #pass
+    #print (float(x)/float(y))*100, '%complete'
+    
     R = grid - cos
     nchans = len(chupos)
     ncoils = 2
@@ -123,8 +141,7 @@ def code(grid):#=None, pos=None, ori=None, cent=None):
     for h in [[chupos,chudir,0],[chlpos,chldir,1]]:
         #for j in range(0,len(loc)): #for each grid point
         "for each chp calculate the leadfield"
-        #sys.stdout.flush()
-        #pbar.update((float(j)/float(len(loc)))*100)
+
 
         chp = h[0] - cos
         position = chp
@@ -157,10 +174,18 @@ def code(grid):#=None, pos=None, ori=None, cent=None):
 
 if __name__ == '__main__':
     from numpy import *
-    fn = '/home/danc/python/data/0611/0611SEF/e,rfhp1.0Hz,n,x,baha001-1SEF,f50lp'
-    from pdf2py import pdf
-    p = pdf.read(fn)
-    p.data.setchannels('meg')
-    grid=random.randn(3,10)
-    lft = calc(p.data.channels,grid)
-
+    from gui.gtk import progressbar
+    MT = progressbar.MainThread()
+    
+    def leadfieldthread():
+        fn = '/home/danc/python/data/0611/0611SEF/e,rfhp1.0Hz,n,x,baha001-1SEF,f50lp'
+        from pdf2py import pdf
+        p = pdf.read(fn)
+        p.data.setchannels('meg')
+        grid=random.randn(3,10)
+        lft = calc(p.data.channels,grid)
+        print type(lft.leadfield), shape(lft.leadfield)
+        
+    
+    
+    MT.main(leadfieldthread)#,progresstype='fraction')
