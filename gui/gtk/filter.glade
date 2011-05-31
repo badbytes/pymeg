@@ -65,7 +65,6 @@
                 <property name="text" translatable="yes">10</property>
               </object>
               <packing>
-                <property name="fill">False</property>
                 <property name="position">0</property>
               </packing>
             </child>
@@ -163,6 +162,8 @@
             <property name="label" translatable="yes">Filter</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="can_default">True</property>
+            <property name="has_default">True</property>
             <property name="receives_default">True</property>
             <signal name="clicked" handler="startfiltfilt"/>
           </object>
@@ -173,21 +174,6 @@
             <property name="bottom_attach">7</property>
             <property name="x_padding">97</property>
             <property name="y_padding">9</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkComboBox" id="combobox1">
-            <property name="sensitive">False</property>
-            <property name="model">liststore2</property>
-            <property name="has_frame">False</property>
-            <property name="button_sensitivity">off</property>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="right_attach">2</property>
-            <property name="top_attach">4</property>
-            <property name="bottom_attach">5</property>
-            <property name="y_options">GTK_EXPAND</property>
           </packing>
         </child>
         <child>
@@ -217,20 +203,17 @@
           </packing>
         </child>
         <child>
-          <object class="GtkEntry" id="entry28">
-            <property name="can_focus">True</property>
-            <property name="editable">False</property>
-            <property name="invisible_char">&#x2022;</property>
-            <property name="text" translatable="yes">Rename of Object</property>
+          <object class="GtkLabel" id="label1">
+            <property name="visible">True</property>
+            <property name="label" translatable="yes">label</property>
           </object>
           <packing>
-            <property name="left_attach">1</property>
-            <property name="right_attach">2</property>
-            <property name="top_attach">5</property>
-            <property name="bottom_attach">6</property>
-            <property name="x_options">GTK_EXPAND</property>
-            <property name="y_options">GTK_EXPAND</property>
+            <property name="top_attach">6</property>
+            <property name="bottom_attach">7</property>
           </packing>
+        </child>
+        <child>
+          <placeholder/>
         </child>
         <child>
           <placeholder/>

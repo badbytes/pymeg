@@ -213,11 +213,9 @@ class maingui():
             print 'canceling'
             self.rename_win.hide()
 
-
-
-    def data_editor_handler(self,widget):
-        self.de = data_editor.setup_gui() #window
-        self.de.window.show()
+    #def data_editor_handler(self,widget):
+        #self.de = data_editor.setup_gui() #window
+        #self.de.window.show()
 
     def hideinsteadofdelete(self,widget, ev=None):
         widget.hide()
@@ -889,37 +887,39 @@ class maingui():
     def coregister_handler(self,widget):
         self.cr = coregister.setup() #window
         self.cr.window.show()
-        
+
     def filter_handler(self,widget):
         def donefilt(results):
-            #obj = self.treedata[self.selecteditem]
-            #var = ['channels','srate','numofepochs','labellist','chanlocs','frames','eventtime','wintime']
-            #res = (self.setup_helper(var,obj=obj));
             res['data_block'] = results
             self.result_helper(self.data_file_selected['filtered'],self.res)
-            #self.data_file_selected['filtered'].data_block = results
-        import copy
+            self.refreshtree()
         obj=self.treedata[self.selecteditem];
         res = self.res = (self.setup_helper(var=['data_block','srate','channels','numofepochs','labellist','chanlocs','frames','eventtime','wintime'],obj=obj));
-        #self.checkreq()
-        self.data_file_selected['filtered'] = {}#copy.copy(self.treedata[self.selecteditem])
-        
-        #srate = self.setup_helper(var='srate',obj=self.data_file_selected['filtered'])[0]
+        self.data_file_selected['filtered'] = {}
         self.fil = filter.filtwin()
-        #print('target',self.target)
-        #print(shape(self.target))
+
         try:
             self.fil.setupfilterwin(None, res['data_block'],res['srate'],callback=donefilt)
         except KeyError:
             print('had a prob, bob')
             return -1
         self.fil.builder.get_object('FilterWindow').show()
+        self.fil.builder.get_object('label1').set_text('Item to filter:'+str(self.selecteditem))
 
     def offset_handler(self,widget):
-        self.checkreq()
-        self.offset = offset_correct.offsetwin()#.window.show()
-        self.offset.setupoffsetwin(None, workspace_data=self.datadict[self.fn], \
-        data_selected=self.treedata[self.selecteditem])
+        def offset_callback(results):
+            res['data_block'] = results
+            self.result_helper(self.data_file_selected['offset_corrected'],self.res)
+            self.updatestatusbar('offset correction complete')
+            self.refreshtree()
+        obj = self.obj = self.treedata[self.selecteditem];
+        res = self.res = (self.setup_helper(var=['data_block','srate','channels','numofepochs','labellist','chanlocs','frames','eventtime','wintime'],obj=obj));
+        self.offset = offset_correct.setup_gui()
+        self.offset.setupoffsetwin(widget, res['data_block'],res['eventtime'],res['frames'],res['numofepochs'],callback=offset_callback)
+        self.offset.window.show()
+        self.data_file_selected['offset_corrected'] = {}
+
+
 
     def timef_handler(self,widget):
         def donetft(results):
@@ -951,7 +951,7 @@ class maingui():
                 self.errordialog\
                 ('Unknown data type. Type selecting Variable = data.')
                 raise TypeError
-                
+
     def signal_space_build_weights(self,widget):
         try:
             print ('selection list', self.de.selections)
@@ -1089,6 +1089,7 @@ class maingui():
             if itemtype == 'selecteditem':
                 obj=self.treedata[self.selecteditem]
                 predict['Data Editor'] = ['data_block','srate','wintime','labellist','chanlocs']
+                predict['Epoch Data'] = ['data_block','srate','wintime','labellist','chanlocs']
                 predict['Time Freq Transform'] = ['data_block','labellist','srate','frames','numofepochs','eventtime']
                 predict['Power Spectral Density'] = ['data_block','srate','labellist','chanlocs']
                 predict['Filter'] = ['data_block','srate']
@@ -1119,8 +1120,7 @@ class maingui():
                 for j in menufunctions:
                     if j.get_name() ==  'GtkMenuItem' and j.get_label() == i:
                         j.set_sensitive(True)
-                        #try: j.get_parent().set_sensive(True)
-                        #except AttributeError: pass
+
             except KeyError:
                 for j in menufunctions:
                     if j.get_name() ==  'GtkMenuItem' and j.get_label() == i:
@@ -1214,7 +1214,7 @@ class maingui():
         #self.builder.get_object("filechooserdialog1").set_uri('file://'+self.fn[0])
         #self.builder.get_object("filechooserdialog1").show()
 
-        
+
 
 class MainThread(threading.Thread):
     def run(self):

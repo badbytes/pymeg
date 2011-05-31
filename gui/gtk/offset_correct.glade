@@ -3,17 +3,64 @@
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy project-wide -->
   <object class="GtkWindow" id="OffsetWindow">
+    <property name="title" translatable="yes">Offset Correction</property>
+    <property name="window_position">mouse</property>
     <property name="destroy_with_parent">True</property>
+    <property name="gravity">center</property>
     <child>
-      <object class="GtkHBox" id="hbox1">
+      <object class="GtkHBox" id="vbox1">
         <property name="visible">True</property>
+        <child>
+          <object class="GtkHButtonBox" id="hbuttonbox1">
+            <property name="visible">True</property>
+            <property name="orientation">vertical</property>
+            <property name="layout_style">center</property>
+            <child>
+              <object class="GtkRadioButton" id="indexbased">
+                <property name="label" translatable="yes">Index Based Correction</property>
+                <property name="visible">True</property>
+                <property name="sensitive">False</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">False</property>
+                <property name="draw_indicator">True</property>
+                <property name="group">timebased</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkRadioButton" id="timebased">
+                <property name="label" translatable="yes">Time Based Correction (sec)</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">False</property>
+                <property name="active">True</property>
+                <property name="draw_indicator">True</property>
+                <property name="group">indexbased</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
         <child>
           <object class="GtkVBox" id="vbox2">
             <property name="visible">True</property>
+            <property name="orientation">vertical</property>
             <child>
               <object class="GtkLabel" id="label1">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">start (ms)</property>
+                <property name="label" translatable="yes">Start</property>
               </object>
               <packing>
                 <property name="position">0</property>
@@ -22,7 +69,7 @@
             <child>
               <object class="GtkLabel" id="label2">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">end (ms)</property>
+                <property name="label" translatable="yes">End</property>
               </object>
               <packing>
                 <property name="position">1</property>
@@ -30,12 +77,14 @@
             </child>
           </object>
           <packing>
-            <property name="position">0</property>
+            <property name="position">1</property>
           </packing>
         </child>
         <child>
-          <object class="GtkVBox" id="vbox3">
+          <object class="GtkVBox" id="hbox3">
             <property name="visible">True</property>
+            <property name="orientation">vertical</property>
+            <property name="homogeneous">True</property>
             <child>
               <object class="GtkEntry" id="entry1">
                 <property name="visible">True</property>
@@ -58,19 +107,24 @@
             </child>
           </object>
           <packing>
-            <property name="position">1</property>
+            <property name="position">2</property>
           </packing>
         </child>
         <child>
           <object class="GtkButton" id="button1">
-            <property name="label" translatable="yes">DC offset</property>
+            <property name="label">gtk-apply</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="can_default">True</property>
+            <property name="has_default">True</property>
             <property name="receives_default">True</property>
-            <signal name="clicked" handler="on_button1_clicked"/>
+            <property name="use_stock">True</property>
+            <signal name="clicked" handler="on_dcoffset_clicked"/>
           </object>
           <packing>
-            <property name="position">2</property>
+            <property name="padding">20</property>
+            <property name="pack_type">end</property>
+            <property name="position">3</property>
           </packing>
         </child>
       </object>

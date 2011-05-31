@@ -1637,6 +1637,9 @@ Lead Field Matrix</property>
       <placeholder/>
     </child>
     <child>
+      <placeholder/>
+    </child>
+    <child>
       <object class="GtkLabel" id="label31">
         <property name="visible">True</property>
         <property name="label" translatable="yes">MEG load assistant</property>
@@ -1865,7 +1868,7 @@ Lead Field Matrix</property>
   </object>
   <object class="GtkImage" id="image2">
     <property name="visible">True</property>
-    <property name="pixbuf">Spheres Silver.png</property>
+    <property name="pixbuf">3d.png</property>
   </object>
   <object class="GtkAboutDialog" id="aboutdialog1">
     <property name="border_width">5</property>

@@ -326,8 +326,6 @@ class setup_gui:
         ct.data.getdata(0, ct.data.pnts_in_file) #read the whole file
         self.builder.get_object("entry5").set_text(str(ct.data.data_block.max()/3))
         self.ct = ct
-
-
         return
 
     def hideinsteadofdelete(self,widget, ev=None):
@@ -341,15 +339,6 @@ class setup_gui:
 
         print 'reloading triggers with additional', self.chan_sel
 
-        #self.get_trigger_events_from_data(file_widget,xtrachannellabels=self.chan_sel)
-
-        #print 'filename', self.builder.get_object('filechooserbutton1').get_uri()
-        #print(widget.get_filename())
-        #try:
-
-
-        #
-
         data = self.ct.data.data_block #actual data array
         #self.event_dict = event_logic.get_ind(u,self.data) #dictionary with indices to events
 
@@ -359,11 +348,6 @@ class setup_gui:
         print self.event_dict.keys(), 'new ind', tind
         self.event_list = append(self.event_list,[self.chan_sel])
         self.event_tree(None,self.event_list,self.event_dict,treeview='treeview1')
-        #except:
-        #    print 'EERRROOOORRR'
-
-
-
 
 if __name__ == "__main__":
     mainwindow = setup_gui()
