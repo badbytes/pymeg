@@ -117,6 +117,14 @@ Either dipole report text file or binary *lA</property>
                       </object>
                     </child>
                     <child>
+                      <object class="GtkMenuItem" id="closefile">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Close File</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_closefile_clicked"/>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkSeparatorMenuItem" id="&lt;separator&gt;">
                         <property name="visible">True</property>
                       </object>
@@ -1600,6 +1608,9 @@ Lead Field Matrix</property>
     <property name="opacity">0.90000000000000002</property>
     <signal name="close" handler="gtk_widget_hide"/>
     <signal name="cancel" handler="gtk_widget_hide"/>
+    <child>
+      <placeholder/>
+    </child>
     <child>
       <placeholder/>
     </child>

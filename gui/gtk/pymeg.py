@@ -130,6 +130,7 @@ class maingui():
             "on_copy_activate" : self.copy_item,
             "on_paste_activate" : self.paste_item,
             "on_rename_activate" : self.rename_item,
+            "on_closefile_clicked" : self.close_file,
         }
 
         self.builder.connect_signals(dic)
@@ -213,9 +214,10 @@ class maingui():
             print 'canceling'
             self.rename_win.hide()
 
-    #def data_editor_handler(self,widget):
-        #self.de = data_editor.setup_gui() #window
-        #self.de.window.show()
+    def close_file(self, widget):
+        self.datadict.pop(self.data_filename_selected)
+        self.parseddatadict.pop(self.data_filename_selected)
+        self.treegohome(self)
 
     def hideinsteadofdelete(self,widget, ev=None):
         widget.hide()
@@ -1022,7 +1024,11 @@ class maingui():
         self.mc.fig.clf()
 
         chanlocs = self.setup_helper(var='chanlocs',obj=self.treedata)['chanlocs']
-        self.mc.display(self.treedata[self.selecteditem],chanlocs, subplot='on')
+        labellist = self.setup_helper(var='chanlocs',obj=self.treedata)['labellist']
+        if self.mc.builder.get_object('channellabels').get_active() == True:
+            self.mc.display(self.treedata[self.selecteditem],chanlocs, labels=labellist, subplot='on')
+        else:
+            self.mc.display(self.treedata[self.selecteditem],chanlocs, subplot='on')
 
     def result_helper(self,newobj,var):
         for i in var.keys():
@@ -1246,11 +1252,15 @@ class MainThread(threading.Thread):
         import code; code.interact(local=locals()) #Interactive Shell
 
 if __name__ == "__main__":
-    mainwindow = maingui()
+    import cProfile, pstats
+    cProfile.run('mainwindow = maingui()')#,filename='profile.out')
+    #p = pstats.Stats('fooprof')
+    #mainwindow = maingui()
     mainwindow.window.show()
-    mainwindow.testload(None)
-    i = 1
-    import code; code.interact(local=locals()) #Interactive Shell
+    cProfile.run('mainwindow.testload(None)')
+    #mainwindow.testload(None)
+    #i = 1
+    #import code; code.interact(local=locals()) #Interactive Shell
     gtk.main()
 
 

@@ -63,6 +63,8 @@ class setup_gui:
             "gtk_widget_hide" : self.hideinsteadofdelete,
             "on_menu_load_data_activate" : self.load_data,
             "on_menu_load_channels_activate" : self.load_channel_positions,
+            "on_channellabels_toggled" : self.channel_labels_toggle,
+
             }
 
         self.builder.connect_signals(dic)
@@ -84,6 +86,9 @@ class setup_gui:
 
         self.fig.clf()
         self.display(self.data,self.chanlocs,data2=self.data[0],quiver='on')
+
+    def channel_labels_toggle(self,widget):
+        pass
 
     def hideinsteadofdelete(self,widget,ev=None):
         print 'hiding',widget
