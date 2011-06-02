@@ -395,6 +395,27 @@ Lead Field Matrix</property>
                       </object>
                     </child>
                     <child>
+                      <object class="GtkMenuItem" id="ica">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Independant Component Analysis</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="pca">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Pricipal Component Analysis</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="svd">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Singular Value Decomposition</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkSeparatorMenuItem" id="separator2">
                         <property name="visible">True</property>
                       </object>
@@ -478,7 +499,7 @@ Lead Field Matrix</property>
                             <child>
                               <object class="GtkMenuItem" id="3DMRI1">
                                 <property name="visible">True</property>
-                                <property name="label" translatable="yes">3D MRI plot</property>
+                                <property name="label" translatable="yes">3D plot</property>
                                 <property name="use_underline">True</property>
                                 <signal name="activate" handler="on_3DMRI_activate"/>
                               </object>
@@ -1608,6 +1629,9 @@ Lead Field Matrix</property>
     <property name="opacity">0.90000000000000002</property>
     <signal name="close" handler="gtk_widget_hide"/>
     <signal name="cancel" handler="gtk_widget_hide"/>
+    <child>
+      <placeholder/>
+    </child>
     <child>
       <placeholder/>
     </child>

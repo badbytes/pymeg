@@ -650,9 +650,11 @@ class maingui():
         plotvtk.display(self.sel2plot, color = colordict, radius = sizedict)
 
     def plot2D(self, widget):
+        D = self.treedata[self.selecteditem]
         try:
-            plot2dgtk.makewin(self.treedata[self.selecteditem],\
-            xaxis=arange(size(self.treedata[self.selecteditem],axis=0)))
+            if shape(D)[0] == 3 and shape(D)[0] != 3:
+                D = D.T
+            plot2dgtk.makewin(D, xaxis=arange(size(D,axis=0)))
         except AttributeError:
             print('Plotting Random data')
             plot2dgtk.makewin(random.randn(10))
@@ -1022,13 +1024,13 @@ class maingui():
             self.mc.window.show()
 
         self.mc.fig.clf()
-
+        print 'label state',self.mc.builder.get_object('channellabels').get_active()
         chanlocs = self.setup_helper(var='chanlocs',obj=self.treedata)['chanlocs']
         labellist = self.setup_helper(var='chanlocs',obj=self.treedata)['labellist']
-        if self.mc.builder.get_object('channellabels').get_active() == True:
-            self.mc.display(self.treedata[self.selecteditem],chanlocs, labels=labellist, subplot='on')
-        else:
-            self.mc.display(self.treedata[self.selecteditem],chanlocs, subplot='on')
+        #if self.mc.builder.get_object('channellabels').get_active() == True:
+            #self.mc.display(self.treedata[self.selecteditem],chanlocs, labels=labellist, subplot='on')
+        #else:
+        self.mc.display(self.treedata[self.selecteditem],chanlocs, subplot='on',chlabels=labellist)
 
     def result_helper(self,newobj,var):
         for i in var.keys():
@@ -1037,14 +1039,15 @@ class maingui():
 
     def epoch_data(self,widget):
         def epoch_callback(widget,startcut,endcut):
-            self.datadict[self.data_filename_selected] = self.data_file_selected
-            obj = self.treedata[self.selecteditem]
-            var = ['channels','srate','numofepochs','labellist',
-            'chanlocs','frames','eventtime','wintime']
-            res = (self.setup_helper(var,obj=obj));
-            data_block = (self.setup_helper(['data_block'],obj=obj))['data_block']
+            #self.datadict[self.data_filename_selected] = self.data_file_selected
+            #obj = self.treedata[self.selecteditem]
+            #var = ['channels','srate','numofepochs','labellist',
+            #'chanlocs','frames','eventtime','wintime']
+            #res = (self.setup_helper(var,obj=obj));
+            #data_block = (self.setup_helper(['data_block'],obj=self.obj))['data_block']
+
             ed = self.data_file_selected['epoched_data'] = {}
-            self.result_helper(ed,res)
+            self.result_helper(ed,self.res)
 
             print ('cutsize',startcut[0],startcut[1])
             ed['frames'] = endcut[0]-startcut[0]
@@ -1060,14 +1063,13 @@ class maingui():
             tmp_data = zeros((ed['frames'],len(startcut),size(ed['chanlocs'],1)))
             c = 0
             for i,j in zip(startcut,endcut):
-                print (shape(tmp_data),shape(data_block[i:j]))
-                tmp_data[:,c] = data_block[i:j]
+                print (shape(tmp_data),shape(res['data_block'][i:j]))
+                tmp_data[:,c] = res['data_block'][i:j]
                 c = c+1
             print 'widgetname',widget.get_label()
             print 'elapsed time:',time.time()-ts
             avg_data = mean(tmp_data,axis=1)
             tmp_data = tmp_data.reshape((ed['frames']*len(startcut),size(ed['chanlocs'],1)),order='F')
-
 
             if widget.get_label() == 'Average':
                 print 'Trying to average'
@@ -1077,15 +1079,21 @@ class maingui():
             print ('tmpdatashape',shape(tmp_data))
 
             ed['data_block'] = tmp_data
-            self.treegohome(None)
+            self.refreshtree()
 
-        filepath = self.setup_helper(var='filepath',obj=self.treedata[self.selecteditem])['filepath']
+        obj = self.obj = self.treedata[self.selecteditem]
+        var = self.var = ['data_block','channels','srate','numofepochs','labellist','chanlocs','frames','eventtime','wintime']
+        res = self.res = (self.setup_helper(var,obj=obj));
+
+        #filepath = self.setup_helper(var='filepath',obj=self.treedata[self.selecteditem])['filepath']
+        filepath = self.data_filename_selected
         if os.path.isfile(filepath) == False:
             return -1
         self.ed = event_process.setup_gui()
         self.ed.window.show()
         print ('sending file:'+'file://'+filepath)
         self.ed.set_passed_filename(filepath,callback=epoch_callback)
+        self.ed.builder.get_object('filechooserbutton1').set_sensitive(False)
 
     def prerequisite(self,itemtype):
         print 'Item finder searching'

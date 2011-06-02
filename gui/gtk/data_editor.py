@@ -99,7 +99,7 @@ class setup_gui:
 
     def printtest(self,widget):
         print 'something'
-    
+
     def store_noise(self,widget):
         print widget,'wid',widget.get_parent().get_name()
         self.callback(widget)
@@ -531,7 +531,7 @@ class setup_gui:
             self.mc.window.show()
 
         self.mc.fig.clf()
-        self.mc.display(self.data[self.sel_ind,:],self.channels, subplot='on')
+        self.mc.display(self.data[self.sel_ind,:],self.channels, subplot='on', chlabels=self.chanlabels)
 
     def generate_testdata(self,widget):
         self.quick_load_pdf_script()
@@ -625,7 +625,7 @@ class setup_gui:
         wintime = input_dict['wintime']
         chanlabels = input_dict['labellist']
         chanlocs = input_dict['chanlocs']
-        
+
         print type(data),srate,type(wintime),type(chanlabels),type(chanlocs)
         print len(chanlabels),size(data,1),len(wintime),size(data,0),\
         size(chanlocs,1)
@@ -654,11 +654,11 @@ class setup_gui:
         self.data_loaded_setup()
         self.data2plot = self.data
         self.display_apply(None)
-        
-        
+
+
         try: callback(widget); self.callback = callback
         except TypeError, NameError: print('no callback')
-        
+
     #def store_event(self,widget):
         #self.callback()
 

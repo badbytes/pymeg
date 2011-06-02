@@ -54,12 +54,11 @@ class setup_gui:
         self.builder = gtk.Builder()
         self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
         self.window = self.builder.get_object("window1")
-        #self.window.connect("delete-event", self.hideinsteadofdelete)
 
         dic = {
-            "on_button1_clicked" : self.test,
-            "on_button2_clicked" : self.test2,
-            "on_button3_clicked" : self.test3,
+            "on_subplot_clicked" : self.subplot_redraw,
+            "on_animate_clicked" : self.animate_redraw,
+            "on_quiver_clicked" : self.quiver_redraw,
             "gtk_widget_hide" : self.hideinsteadofdelete,
             "on_menu_load_data_activate" : self.load_data,
             "on_menu_load_channels_activate" : self.load_channel_positions,
@@ -69,23 +68,24 @@ class setup_gui:
 
         self.builder.connect_signals(dic)
         self.create_draw_frame('none')
+
     def load_data(self,widget):
         pass
+
     def load_channel_positions(self,widget):
         pass
 
-    def test(self,widget):
-
+    def subplot_redraw(self,widget):
         self.fig.clf()
-        self.display(self.data,self.chanlocs,subplot='on')
-    def test2(self,widget):
+        self.display(self.data,self.chanlocs,subplot='on',labels=self.labels)
 
+    def animate_redraw(self,widget):
         self.fig.clf()
-        self.display(self.data,self.chanlocs,animate='on')
-    def test3(self,widget):
+        self.display(self.data,self.chanlocs,animate='on',labels=self.labels)
 
+    def quiver_redraw(self,widget):
         self.fig.clf()
-        self.display(self.data,self.chanlocs,data2=self.data[0],quiver='on')
+        self.display(self.data,self.chanlocs,data2=self.data[0],quiver='on',labels=self.labels)
 
     def channel_labels_toggle(self,widget):
         pass
@@ -116,11 +116,8 @@ class setup_gui:
             intx and inty= sensor coords for channel plotting"""
 
         tstart = time.time()
-
         zim = ma.masked_where(isnan(zi),zi)
-
         self.sp.pcolor(xi,yi,zim,shading='interp',cmap=cm.jet)
-
         self.sp.contourf(xi,yi,zim,cmap=cm.jet)
         self.sp.scatter(intx,inty, alpha=.75,s=3)
 
@@ -134,30 +131,29 @@ class setup_gui:
             #if labels != None:
         count = 0
         for l in labels:
-            p.text(chanlocs[1,count], chanlocs[0,count], l, alpha=1, fontsize=9)
+            self.sp.text(chanlocs[1,count], chanlocs[0,count], l, alpha=.6, fontsize=15)
             count = count + 1
 
     def titles(titletxt):
         print
 
-    def display(self, data, chanlocs, data2=None, subplot='off', animate='off', quiver='off', title=None, labels=None, colorbar='off'):
-        #self.p = f.add_subplot(111)
+    def display(self, data, chanlocs, labels, data2=None, subplot='off', animate='off', quiver='off', title=None, colorbar='off'):
         self.data = data
         self.chanlocs = chanlocs
-        #self.axes.cla()
+        self.labels = labels
         if len(shape(chanlocs)) != 2:
             print 'Chanlocs shape error. Should be 2D array "(2,N)"'
             print 'transposing'
             chanlocs = chanlocs.T
             print chanlocs.shape
 
-        #xi, yi = mgrid[-.5:.5:67j,-.5:.5:67j]
         xi, yi = mgrid[chanlocs[1,:].min():chanlocs[1,:].max():57j,chanlocs[0,:].min():chanlocs[0,:].max():57j]
         intx=chanlocs[1,:]
         inty=chanlocs[0,:]
 
-        if shape(shape(data))[0]==2: #more than a single vector, need to animate or subplot
+        labelstatus = self.builder.get_object('channellabels').get_active(); print 'ls', labelstatus
 
+        if shape(shape(data))[0]==2: #more than a single vector, need to animate or subplot
             print '2d array of data'
             z = data[0,:]
             if delaunay == 'yes':
@@ -172,7 +168,6 @@ class setup_gui:
                 except TypeError:
                     print('something wrong with data your trying to plot')
                     return -1
-
 
             if animate == 'on': #single plot with a loop to animate
                 self.sp = self.fig.add_subplot(111);
@@ -189,10 +184,11 @@ class setup_gui:
 
                     zim = ma.masked_where(isnan(zi),zi)
                     self.sp.contourf(xi,yi,zim,cmap=cm.jet)#, alpha=.8)
-                    if labels != None:
-                        printlabels(chanlocs, labels)
+                    if labels != None and labelstatus == True:
+                        self.printlabels(chanlocs, labels)
                     self.sp.axes.axis('off')
                     self.canvas.draw()
+
             if subplot == 'on':
                 print 'suplotting'
                 for i in range(0, shape(data)[0]):
@@ -211,13 +207,14 @@ class setup_gui:
                     zim = ma.masked_where(isnan(zi),zi)
                     self.sp.contourf(xi,yi,zim,cmap=cm.jet, alpha=.8)
                     self.sp.axes.axis('off')
-                    if labels != None:
-                        printlabels(chanlocs, labels)
+                    print len(labels), labelstatus
+                    if labels != None and labelstatus == True:
+                        self.printlabels(chanlocs, labels)
                     if title != None:
                         self.sp.title(str(title[i]))
                     else:
                         pass
-                        #self.p.title(str(i))
+
             if quiver == 'on':
                 print 'suplotting quiver'
                 for i in range(0, shape(data)[0]):
@@ -231,7 +228,7 @@ class setup_gui:
                         self.sp.quiver(intx[xx],inty[xx], z[xx], data2[xx])
 
                     self.sp.axis('off')
-                    if labels != None:
+                    if labels != None and labelstatus == True:
                         printlabels(chanlocs, labels)
                 self.canvas.draw()
 
@@ -252,7 +249,7 @@ class setup_gui:
 
             zim = ma.masked_where(isnan(zi),zi)
             self.plot_data(xi,yi,zi,intx,inty)
-            if labels != None:
+            if labels != None and labelstatus == True:
                 printlabels(chanlocs, labels)
 
             if colorbar == 'on':
@@ -270,5 +267,5 @@ if __name__ == "__main__":
     p = pdf.read(fn)
     p.data.setchannels('meg')
     p.data.getdata(0,p.data.pnts_in_file)
-    mainwindow.display(p.data.data_block[2:20:5,:],p.data.channels.chanlocs, subplot='on')
+    mainwindow.display(p.data.data_block[2:20:5,:],p.data.channels.chanlocs, subplot='on',labels=p.data.channels.labellist)
     gtk.main()

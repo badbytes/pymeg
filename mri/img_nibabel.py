@@ -39,9 +39,10 @@ class loadimage():
         self.pixdim = h['pixdim'][0:3]
         self.gettransform(h)
         #self.reorient()
-        if os.path.isfile(filepath+'.pym') == True:
-            print('loading index points found in file',filepath+'.pym')
-            self.fiddata = readwrite.readdata(filepath+'.pym')
+        xfm_fn = os.path.splitext(filepath)[0]+'.pym'
+        if os.path.isfile(xfm_fn) == True:
+            print('loading index points found in file',xfm_fn)
+            self.fiddata = readwrite.readdata(xfm_fn)
             self.getfiducals(h)
         else:
             try: #This is a shitty way in which fiducal point were saved in descrip field in header, as there were no user avail fields to store the 3X3 matrix.
@@ -78,7 +79,7 @@ class loadimage():
             #pass
         #if self.transform[:,0:4].argmax() == 2: #IS first dim
             #pass
-        
+
     def getfiducals(self,header):
         self.lpa = self.fiddata['lpa']
         self.rpa = self.fiddata['rpa']
@@ -246,7 +247,8 @@ class decimate:
         self.img = decimg
         self.factor = dec
         self.ind = array(nonz)
-        self.data = nim
+        self.origimg = nim
+        self.data = decimg
 
 if __name__ == "__main__":
     def __init__(self):

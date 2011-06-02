@@ -93,12 +93,12 @@
           <object class="GtkHButtonBox" id="hbuttonbox1">
             <property name="visible">True</property>
             <child>
-              <object class="GtkButton" id="button1">
+              <object class="GtkButton" id="subplot">
                 <property name="label" translatable="yes">Subplot</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <signal name="clicked" handler="on_button1_clicked"/>
+                <signal name="clicked" handler="on_subplot_clicked"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -107,12 +107,12 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="button2">
+              <object class="GtkButton" id="animate">
                 <property name="label" translatable="yes">Animate</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <signal name="clicked" handler="on_button2_clicked"/>
+                <signal name="clicked" handler="on_animate_clicked"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -121,12 +121,12 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="button3">
+              <object class="GtkButton" id="quiver">
                 <property name="label" translatable="yes">Quiver</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <signal name="clicked" handler="on_button3_clicked"/>
+                <signal name="clicked" handler="on_quiver_clicked"/>
               </object>
               <packing>
                 <property name="expand">False</property>

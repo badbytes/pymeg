@@ -280,7 +280,8 @@ class setup_gui:
         print 'epoch'
         startcut = self.result_ind-prestim_ind
         endcut = self.result_ind+poststim_ind
-        self.callback(widget,startcut,endcut)
+        try:self.callback(widget,startcut,endcut)
+        except: pass
         return
         epoched = self.data[self.result_ind-prestim_ind:self.result_ind+poststim_ind]
         print epoched.shape,'shape'
