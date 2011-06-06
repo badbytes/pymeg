@@ -177,16 +177,14 @@ class setup_gui:
         #coord.set_title('\n\n\n\ncoord')
 
         self.data = (data)
-        rows,cols,self.slices3 = data.shape
-        rows,self.slices2,cols = data.shape
-        self.slices1,rows,cols = data.shape
+        self.slices1,self.slices2,self.slices3 = data.shape
 
         print self.slices3,self.slices2,self.slices1, translation, data.shape
         self.translation = translation
-        coord1 = (-1000,100,-100,1000)
-        coord1 = (translation[1]+self.slices2,translation[1],translation[0]+self.slices3,translation[0])
-        coord2 = (translation[0]+self.slices3,translation[0],translation[2]-self.slices1,self.slices1-translation[2])
-        coord3 = (translation[1]+self.slices2,translation[1],translation[2]-self.slices1,self.slices1-translation[2])
+        #coord1 = (-1000,100,-100,1000)
+        #coord1 = (translation[1]+self.slices2,translation[1],translation[0]+self.slices3,translation[0])
+        #coord2 = (translation[0]+self.slices3,translation[0],translation[2]-self.slices1,self.slices1-translation[2])
+        #coord3 = (translation[1]+self.slices2,translation[1],translation[2]-self.slices1,self.slices1-translation[2])
 
         self.ind1 = self.slices3/2
         self.ind2 = self.slices2/2
@@ -251,9 +249,9 @@ class setup_gui:
 
         #print self.pixdim
         def printcoord():
-            #coordinates = round(self.ind3*self.pixdim[0]+(self.translation[0])), round(self.ind2*self.pixdim[1]+(self.translation[1])), round(self.ind1*self.pixdim[2]+(self.translation[2])), 'mm'
-            self.coordinates = array([round(self.ind2*self.pixdim[1]+(self.translation[1])), round(self.ind3*self.pixdim[0]+(self.translation[0])), round(self.ind1*self.pixdim[2]+(self.translation[2]))])
-            coordinates = self.coordinates
+            #coordinates = round(self.ind3*self.pixdim[0]+(self.translation[0])), round(self.ind2*self.pixdim[1]+(self.translation[1])), round(self.ind1*self.pixdim[2]+(self.translation[2]))
+            coordinates = self.coordinates = array([round(self.ind2*self.pixdim[1]+(self.translation[1])), round(self.ind3*self.pixdim[0]+(self.translation[0])), round(self.ind1*self.pixdim[2]+(self.translation[2]))])
+            coordinates = self.coordinates = array([round(self.ind3*self.pixdim[0]), round(self.ind2*self.pixdim[1]), round(self.ind1*self.pixdim[2])])
             print coordinates, 'mm'#, self.ind3, self.pixdim,(self.translation[0])
             return coordinates
 

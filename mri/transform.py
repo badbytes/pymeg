@@ -44,7 +44,7 @@ def generic(p1,p2,p3):
 
 def meg2mri(lpa,rpa,nas, dipole=None):
     'requires MRI lpa, rpa, and nas. Dipole is optional (dipole=NX3)'
-    print 'what are your units of your dipole and lpa,rpa,nas?, should be in mm'
+    print 'what are your units of your dipole and lpa,rpa,nas?, should be in mm', lpa
     origin = mean([[lpa],[rpa]],0)
     x = nas - origin;
     x = x/norm(x);
@@ -82,7 +82,8 @@ def mri2meg(translation,rotation, mrixyz):
     return megxyz
 
 def scalesourcespace(headshape, megxyz, lpa, rpa, nas, voxdim, brain='no'):
-    print 'what are your units?', 'assuming cm'
+    print 'what are your units?', 'assuming mm'
+    print headshape.index_nasion,lpa,rpa,nas,voxdim
     scale = 1 #from mm (hs.index points) to mm.
     #p=pdf.read(datapdf)
     hs = headshape
@@ -92,12 +93,12 @@ def scalesourcespace(headshape, megxyz, lpa, rpa, nas, voxdim, brain='no'):
     mriLRdim = (lpa*voxdim - rpa*voxdim)[1]#166; #lpa to rpa in mri
     mriAPdim = (((lpa[0]+rpa[0])/2)-nas[0])*2#211;  #nas to center of head X 2
     mriISdim = mriLRdim/1.11 #this is a guess. based on standard ch brain, the AP to IS ratio is 1.11
-    scalemegx=mriAPdim/(sx*scale); print 'xfactor',scalemegx
-    scalemegy=mriLRdim/(sy*scale); print 'yfactor',scalemegy
-    scalemegz=mriISdim/(sz*scale); print 'zfactor',scalemegz
-    sourcespacescaledmegx=megxyz[0,:]*scalemegx;
-    sourcespacescaledmegy=megxyz[1,:]*scalemegy;
-    sourcespacescaledmegz=megxyz[2,:]*scalemegz;
+    #scalemegx=mriAPdim/(sx*scale); print 'xfactor',scalemegx
+    #scalemegy=mriLRdim/(sy*scale); print 'yfactor',scalemegy
+    #scalemegz=mriISdim/(sz*scale); print 'zfactor',scalemegz
+    sourcespacescaledmegx=megxyz[0,:]#*scalemegx;
+    sourcespacescaledmegy=megxyz[1,:]#*scalemegy;
+    sourcespacescaledmegz=megxyz[2,:]#*scalemegz;
     sourcespacescaledmeg=array([sourcespacescaledmegx,sourcespacescaledmegy,sourcespacescaledmegz]);
     if brain == 'yes':
         print 'your using a brain sourcespace. adding additional scaling factor reduction of 1.1'

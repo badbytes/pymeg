@@ -112,7 +112,7 @@ class gridwin():
         if self.builder.get_object("filechooserbutton1").get_filename() == None:
             pass
         else:
-            filename = self.builder.get_object("filechooserbutton1").get_filename()
+            filename = self.filename = self.builder.get_object("filechooserbutton1").get_filename()
 
         print 'loading and checking coreg', filename
         try: self.mr = nibabel.load(filename)
@@ -233,13 +233,26 @@ class gridwin():
         self.gridcallback()
 
     def gridcallback(self):
+        print 'callback'
         if self.callback != None:
             self.callback(self.grid,mr=self.mr)
         else:
             return self.grid
+            
+        from meg import plotvtk
+        d = {'hs':self.headshape.hs_point,'brain':self.grid}
+        plotvtk.display(d,color=[[255,255,0],[0,255,255]],radius=[1.,1.])
+
 
 
 if __name__ == "__main__":
     mainwindow = gridwin()
     mainwindow.window.show()
+    fn = '/home/danc/python/data/0611/0611piez/e,rfhp1.0Hz,COH'
+    mainwindow.builder.get_object("filechooserbutton2").set_uri('file://'+fn)
+    #mainwindow.builder.get_object("filechooserbutton2").set_filename('file://'+fn)
+    #mainwindow.pdfcheck(None)
+    
+    #print mainwindow.grid
+    #d = {'hs':p.hs.hs_point,'brain':z}
     gtk.main()

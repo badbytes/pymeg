@@ -20,7 +20,7 @@ mr.fitdata(path2pdf, 10, weights) #fits weights to a grid a factor of 10
 mr.getsourcesolution() #generates a low and hires mri like image of the fit over decimated sourcespace
 '''
 
-from numpy import ceil, shape, where, array, ndarray
+from numpy import ceil, shape, where, array, ndarray, copy
 #from nifti import *
 from mri import transform, sourcesolution2img
 from pdf2py import readwrite
@@ -52,33 +52,36 @@ class loadimage():
                 print('got fiducal info from description field in header')
             except NameError:
                 print 'no fiducal file or info found. you will not be able to perform any transforms with other data.'
-    #def reorient(self):
-        #'''27 possible combinations of orientations
-        #('LAI' or 'LIA' or 'ALI' or 'AIL' or 'ILA' or 'IAL' or 'LAS' or 'LSA' or 'ALS' or 'ASL' or 'SLA' or 'SAL' or 'LPI' or 'LIP' or 'PLI' or 'PIL' or 'ILP' or 'IPL' or 'LPS' or 'LSP' or 'PLS' or 'PSL' or 'SLP' or 'SPL' or 'RAI' or 'RIA' or 'ARI' or 'AIR' or 'IRA' or 'IAR' or 'RAS' or 'RSA' or 'ARS' or 'ASR' or 'SRA' or 'SAR' or 'RPI' or 'RIP' or 'PRI' or 'PIR' or 'IRP' or 'IPR' or 'RPS' or 'RSP' or 'PRS' or 'PSR' or 'SRP' or 'SPR')'''
-        #print 'transform',self.transform[:,0],abs(self.transform[:,0]).argmax()
-        #rot = self.transform[0:3,0:3]
-        #arot = abs(rot)
-        #print arot
-        #if abs(rot[:,0]).argmax() == 0: #RL first dim
+    def reorient(self):
+        '''27 possible combinations of orientations
+        ('LAI' or 'LIA' or 'ALI' or 'AIL' or 'ILA' or 'IAL' or 'LAS' or 'LSA' or 'ALS' or 'ASL' or 'SLA' or 'SAL' or 'LPI' or 'LIP' or 'PLI' or 'PIL' or 'ILP' or 'IPL' or 'LPS' or 'LSP' or 'PLS' or 'PSL' or 'SLP' or 'SPL' or 'RAI' or 'RIA' or 'ARI' or 'AIR' or 'IRA' or 'IAR' or 'RAS' or 'RSA' or 'ARS' or 'ASR' or 'SRA' or 'SAR' or 'RPI' or 'RIP' or 'PRI' or 'PIR' or 'IRP' or 'IPR' or 'RPS' or 'RSP' or 'PRS' or 'PSR' or 'SRP' or 'SPR')'''
+        print 'transform',self.transform[:,0],abs(self.transform[:,0]).argmax(), 
+        self.t = copy(self.translation)
+        
+        rot = self.transform[0:3,0:3]
+        arot = abs(rot)
+        print arot
+        if abs(rot[:,0]).argmax() == 0: #RL first dim
             #if rot[0,0] < 0:
-                #self.origimg = self.origimg[::-1,:,:]
+                #self.data = self.data[::-1,:,:]
                 #rot[0,0] = rot[0,0] * -1
                 #print 'flipping'
-            #print 'swapping'
+            print 'swapping'
+            self.data = self.data.swapaxes(0,1)
+            self.t[0] = self.translation[1]; self.t[1] = self.translation[0]
+            rot[0,:] = rot[0,]
+        if arot[:,0].argmax() == 1: #AP first dim
             #self.origimg = self.origimg.swapaxes(0,1)
-            ##rot[0,:] = rot[0,]
-        #if arot[:,0].argmax() == 1: #AP first dim
-            ##self.origimg = self.origimg.swapaxes(0,1)
-            #pass
+            pass
 
-        #if arot[:,1].argmax() == 1: #AP second dim
-            #if rot[0,1] < 0:
-                #self.origimg = self.origimg[::-1,:,:]
-            #pass
-        #if arot[:,2].argmax() == 2: #IS third dim
-            #pass
-        #if self.transform[:,0:4].argmax() == 2: #IS first dim
-            #pass
+        if arot[:,1].argmax() == 1: #AP second dim
+            if rot[0,1] < 0:
+                self.data = self.data[::-1,:,:]
+            pass
+        if arot[:,2].argmax() == 2: #IS third dim
+            pass
+        if self.transform[:,0:4].argmax() == 2: #IS first dim
+            pass
 
     def getfiducals(self,header):
         self.lpa = self.fiddata['lpa']
@@ -100,7 +103,7 @@ class loadimage():
         self.filename = nim.get_filename()
         xend = nim.get_shape()[0]
         yend = nim.get_shape()[1]
-        zend  =nim.get_shape()[2]
+        zend = nim.get_shape()[2]
 
         if type(dec) != float and type(dec) != int:
             print 'nonuniform decimation'
@@ -147,7 +150,7 @@ class loadimage():
             print 'Transform Error, skipping'
 
     def getscalespace(self, path2pdf):
-        self.scaledgrid = transform.scalesourcespace(path2pdf, self.megxyz, self.lpa, self.rpa, self.nas, self.nifti.voxdim)/1000
+        self.scaledgrid = transform.scalesourcespace(path2pdf, self.megxyz, self.lpa, self.rpa, self.nas, self.nifti.voxdim)#/1000
         self.path2pdf = path2pdf
 
     def getsourcesolution(self, highres=None):
@@ -185,70 +188,70 @@ class loadimage():
 
 
 
-### OLD STUFF BELOW. LEFT FOR COMPATIBILITY.
-def ind2sub(row,col,ind):
-    """ Converts row,col indices into one index for .flat """
-    i = ind/col
-    j = ind - i* row
-    return i,j
+#### OLD STUFF BELOW. LEFT FOR COMPATIBILITY.
+#def ind2sub(row,col,ind):
+    #""" Converts row,col indices into one index for .flat """
+    #i = ind/col
+    #j = ind - i* row
+    #return i,j
 
-def read(imgfile):
-    print 'reading',imgfile
-    #try:
-    nim = NiftiImage(imgfile)
-    return nim
-    #except RuntimeError:
-        #print 'not an mri, or file corrupt. not loading!'
-        #return MRIerror
+#def read(imgfile):
+    #print 'reading',imgfile
+    ##try:
+    #nim = NiftiImage(imgfile)
+    #return nim
+    ##except RuntimeError:
+        ##print 'not an mri, or file corrupt. not loading!'
+        ##return MRIerror
 
-class decimate:
-    def __init__(self,nim,dec):
-#def decimate(nim, dec):
-        "nim is the mri data in python format"
-        "dec is the decimation factor"
+#class decimate:
+    #def __init__(self,nim,dec):
+##def decimate(nim, dec):
+        #"nim is the mri data in python format"
+        #"dec is the decimation factor"
 
-        self.filename = nim.filename.rsplit('/')[-1]
-        xend=shape(nim.origimg)[0]
-        yend=shape(nim.origimg)[1]
-        zend=shape(nim.origimg)[2]
+        #self.filename = nim.filename.rsplit('/')[-1]
+        #xend=shape(nim.origimg)[0]
+        #yend=shape(nim.origimg)[1]
+        #zend=shape(nim.origimg)[2]
 
-        if type(dec) != float and type(dec) != int:
-            print 'nonuniform decimation'
-            xstartval=ceil(dec[0]/2);
-            print xstartval,
-            ystartval=ceil(dec[1]/2);
-            zstartval=ceil(dec[2]/2);
-            decimg=array(nim.origimg[xstartval::dec[0],:,:][:,ystartval::dec[1],:][:,:,zstartval::dec[2]])
-            nonz = where(decimg > 0)
-            x = ((nonz[0])*dec[0])+(dec[0])
-            y = ((nonz[1])*dec[1])+(dec[1])
-            z = ((nonz[2])*dec[2])+(dec[2])
+        #if type(dec) != float and type(dec) != int:
+            #print 'nonuniform decimation'
+            #xstartval=ceil(dec[0]/2);
+            #print xstartval,
+            #ystartval=ceil(dec[1]/2);
+            #zstartval=ceil(dec[2]/2);
+            #decimg=array(nim.origimg[xstartval::dec[0],:,:][:,ystartval::dec[1],:][:,:,zstartval::dec[2]])
+            #nonz = where(decimg > 0)
+            #x = ((nonz[0])*dec[0])+(dec[0])
+            #y = ((nonz[1])*dec[1])+(dec[1])
+            #z = ((nonz[2])*dec[2])+(dec[2])
 
-        else:
-            print 'uniform decimation'
-            startval=ceil(dec/2);
-            decimg=array(nim.origimg[startval::dec,:,:][:,startval::dec,:][:,:,startval::dec])
-            nonz = where(decimg > 0)
-            x = ((nonz[0]+1)*dec)#-(dec)
-            y = ((nonz[1]+1)*dec)#-(dec)
-            z = ((nonz[2]+1)*dec)#-(dec)
+        #else:
+            #print 'uniform decimation'
+            #startval=ceil(dec/2);
+            #decimg=array(nim.origimg[startval::dec,:,:][:,startval::dec,:][:,:,startval::dec])
+            #nonz = where(decimg > 0)
+            #x = ((nonz[0]+1)*dec)#-(dec)
+            #y = ((nonz[1]+1)*dec)#-(dec)
+            #z = ((nonz[2]+1)*dec)#-(dec)
 
 
-        #--20090702--danc--not sure about reordering
-        #mrixyz = array([x,y,z])
-        #--20090702--danc--adding voxel scaling. this had to be a huge bug, so why i haven't noticed it so far???
-        #                   The effect would be non existant on isotropic volumes, so thats probably why.
-        voxdim = nim.voxdim[::-1] #flipped voxel dims
-        print voxdim
-        print 'WARNING: assuming voxdim reverse of img.voxdim. Could be wrong'
-        mrixyz = (array([x,y,z]).T*voxdim).T
+        ##--20090702--danc--not sure about reordering
+        ##mrixyz = array([x,y,z])
+        ##--20090702--danc--adding voxel scaling. this had to be a huge bug, so why i haven't noticed it so far???
+        ##                   The effect would be non existant on isotropic volumes, so thats probably why.
+        #voxdim = nim.voxdim[::-1] #flipped voxel dims
+        #print voxdim
+        #print 'WARNING: assuming voxdim reverse of img.voxdim. Could be wrong'
+        #mrixyz = (array([x,y,z]).T*voxdim).T
 
-        self.mrixyz = mrixyz
-        self.img = decimg
-        self.factor = dec
-        self.ind = array(nonz)
-        self.origimg = nim
-        self.data = decimg
+        #self.mrixyz = mrixyz
+        #self.img = decimg
+        #self.factor = dec
+        #self.ind = array(nonz)
+        #self.origimg = nim
+        #self.data = decimg
 
 if __name__ == "__main__":
     def __init__(self):

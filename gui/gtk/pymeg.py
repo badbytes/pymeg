@@ -867,7 +867,7 @@ class maingui():
 
     def sourcesolution2img_handler(self,widget):
         obj=self.treedata;
-        res = (self.setup_helper(var=['ind','origimg','img'],obj=obj));
+        res = (self.setup_helper(var=['ind','data','img'],obj=obj));
         solution = self.treedata[self.selecteditem]
         c = sourcesolution2img.build(solution,ind=res['ind'],origimg=res['origimg'],img=res['img'])
 
@@ -1075,6 +1075,7 @@ class maingui():
                 print 'Trying to average'
                 tmp_data = avg_data;#mean(tmp_data.reshape((ed['frames'],len(startcut),size(ed['chanlocs'],1)),order='F'),axis=1)
                 ed['wintime'] = arange(0,res['wintime'][ed['frames']],res['wintime'][1])
+                ed['numofepochs'] = 1
 
             print ('tmpdatashape',shape(tmp_data))
 
@@ -1114,7 +1115,7 @@ class maingui():
                 predict['Calculate Grid'] = ['hs']
                 predict['Leadfield Calc'] = ['channels','grid']
                 predict['Minimum Norm Solution'] = ['selection_event','leadfield','selection_noise','channels']
-                predict['Solution To Image'] = ['ind','origimg','img']
+                predict['Solution To Image'] = ['ind','data','img']
                 predict['Plot MRI'] = ['pixdim','data']
                 predict['Contour Plot'] = ['chanlocs']
                 predict['Plot TFT'] = ['tft']

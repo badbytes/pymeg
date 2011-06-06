@@ -531,7 +531,7 @@ class setup_gui:
             self.mc.window.show()
 
         self.mc.fig.clf()
-        self.mc.display(self.data[self.sel_ind,:],self.channels, subplot='on', chlabels=self.chanlabels)
+        self.mc.display(self.data[self.sel_ind,:],self.channels, subplot='on', labels=self.chanlabels)
 
     def generate_testdata(self,widget):
         self.quick_load_pdf_script()
