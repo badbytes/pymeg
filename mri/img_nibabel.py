@@ -33,10 +33,10 @@ class loadimage():
         print 'reading',filepath
         self.nifti = nibabel.load(filepath)
         dirpath = os.path.dirname(filepath)
-        self.data = self.nifti.get_data()#.T
-        self.nifti.data = self.data
+        self.data = copy(self.nifti.get_data())#.T
+        #self.nifti.data = self.data
         h = self.nifti.get_header()
-        self.pixdim = h['pixdim'][0:3]
+        self.pixdim = h['pixdim'][1:4]
         self.gettransform(h)
         #self.reorient()
         xfm_fn = os.path.splitext(filepath)[0]+'.pym'
@@ -52,36 +52,37 @@ class loadimage():
                 print('got fiducal info from description field in header')
             except NameError:
                 print 'no fiducal file or info found. you will not be able to perform any transforms with other data.'
-    def reorient(self):
-        '''27 possible combinations of orientations
-        ('LAI' or 'LIA' or 'ALI' or 'AIL' or 'ILA' or 'IAL' or 'LAS' or 'LSA' or 'ALS' or 'ASL' or 'SLA' or 'SAL' or 'LPI' or 'LIP' or 'PLI' or 'PIL' or 'ILP' or 'IPL' or 'LPS' or 'LSP' or 'PLS' or 'PSL' or 'SLP' or 'SPL' or 'RAI' or 'RIA' or 'ARI' or 'AIR' or 'IRA' or 'IAR' or 'RAS' or 'RSA' or 'ARS' or 'ASR' or 'SRA' or 'SAR' or 'RPI' or 'RIP' or 'PRI' or 'PIR' or 'IRP' or 'IPR' or 'RPS' or 'RSP' or 'PRS' or 'PSR' or 'SRP' or 'SPR')'''
-        print 'transform',self.transform[:,0],abs(self.transform[:,0]).argmax(), 
-        self.t = copy(self.translation)
-        
-        rot = self.transform[0:3,0:3]
-        arot = abs(rot)
-        print arot
-        if abs(rot[:,0]).argmax() == 0: #RL first dim
-            #if rot[0,0] < 0:
-                #self.data = self.data[::-1,:,:]
-                #rot[0,0] = rot[0,0] * -1
-                #print 'flipping'
-            print 'swapping'
-            self.data = self.data.swapaxes(0,1)
-            self.t[0] = self.translation[1]; self.t[1] = self.translation[0]
-            rot[0,:] = rot[0,]
-        if arot[:,0].argmax() == 1: #AP first dim
-            #self.origimg = self.origimg.swapaxes(0,1)
-            pass
 
-        if arot[:,1].argmax() == 1: #AP second dim
-            if rot[0,1] < 0:
-                self.data = self.data[::-1,:,:]
-            pass
-        if arot[:,2].argmax() == 2: #IS third dim
-            pass
-        if self.transform[:,0:4].argmax() == 2: #IS first dim
-            pass
+    #def reorient(self):
+        #'''27 possible combinations of orientations
+        #('LAI' or 'LIA' or 'ALI' or 'AIL' or 'ILA' or 'IAL' or 'LAS' or 'LSA' or 'ALS' or 'ASL' or 'SLA' or 'SAL' or 'LPI' or 'LIP' or 'PLI' or 'PIL' or 'ILP' or 'IPL' or 'LPS' or 'LSP' or 'PLS' or 'PSL' or 'SLP' or 'SPL' or 'RAI' or 'RIA' or 'ARI' or 'AIR' or 'IRA' or 'IAR' or 'RAS' or 'RSA' or 'ARS' or 'ASR' or 'SRA' or 'SAR' or 'RPI' or 'RIP' or 'PRI' or 'PIR' or 'IRP' or 'IPR' or 'RPS' or 'RSP' or 'PRS' or 'PSR' or 'SRP' or 'SPR')'''
+        #print 'transform',self.transform[:,0],abs(self.transform[:,0]).argmax(),
+        #self.t = copy(self.translation)
+
+        #rot = self.transform[0:3,0:3]
+        #arot = abs(rot)
+        #print arot
+        #if abs(rot[:,0]).argmax() == 0: #RL first dim
+            ##if rot[0,0] < 0:
+                ##self.data = self.data[::-1,:,:]
+                ##rot[0,0] = rot[0,0] * -1
+                ##print 'flipping'
+            #print 'swapping'
+            #self.data = self.data.swapaxes(0,1)
+            #self.t[0] = self.translation[1]; self.t[1] = self.translation[0]
+            #rot[0,:] = rot[0,]
+        #if arot[:,0].argmax() == 1: #AP first dim
+            ##self.origimg = self.origimg.swapaxes(0,1)
+            #pass
+
+        #if arot[:,1].argmax() == 1: #AP second dim
+            #if rot[0,1] < 0:
+                #self.data = self.data[::-1,:,:]
+            #pass
+        #if arot[:,2].argmax() == 2: #IS third dim
+            #pass
+        #if self.transform[:,0:4].argmax() == 2: #IS first dim
+            #pass
 
     def getfiducals(self,header):
         self.lpa = self.fiddata['lpa']
@@ -98,12 +99,12 @@ class loadimage():
         '''nim is the mri data in python format
         dec is the decimation factor'''
 
-        nim = self.nifti
-        header = nim.get_header()
-        self.filename = nim.get_filename()
-        xend = nim.get_shape()[0]
-        yend = nim.get_shape()[1]
-        zend = nim.get_shape()[2]
+        #nim = self.nifti
+        header = self.nifti.get_header()
+        self.filename = self.nifti.get_filename()
+        xend = self.nifti.get_shape()[0]
+        yend = self.nifti.get_shape()[1]
+        zend = self.nifti.get_shape()[2]
 
         if type(dec) != float and type(dec) != int:
             print 'nonuniform decimation'
@@ -111,7 +112,7 @@ class loadimage():
             print xstartval,
             ystartval=ceil(dec[1]/2);
             zstartval=ceil(dec[2]/2);
-            decimg=array(nim.data[xstartval::dec[0],:,:][:,ystartval::dec[1],:][:,:,zstartval::dec[2]])
+            decimg=array(self.data[xstartval::dec[0],:,:][:,ystartval::dec[1],:][:,:,zstartval::dec[2]])
             nonz = where(decimg > 0)
             x = ((nonz[0])*dec[0])+(dec[0])
             y = ((nonz[1])*dec[1])+(dec[1])
@@ -120,7 +121,7 @@ class loadimage():
         else:
             print 'uniform decimation'
             startval=ceil(dec/2);
-            decimg=array(nim.data[startval::dec,:,:][:,startval::dec,:][:,:,startval::dec])
+            decimg=array(self.data[startval::dec,:,:][:,startval::dec,:][:,:,startval::dec])
             nonz = where(decimg > 0)
             x = ((nonz[0]+1)*dec)#-(dec)
             y = ((nonz[1]+1)*dec)#-(dec)
@@ -132,7 +133,7 @@ class loadimage():
         #--20090702--danc--adding voxel scaling. this had to be a huge bug, so why i haven't noticed it so far???
         #                   The effect would be non existant on isotropic volumes, so thats probably why.
 
-        voxdim = header['pixdim'][0:3]#.voxdim[::-1] #flipped voxel dims
+        voxdim = header['pixdim'][1:4]#.voxdim[::-1] #flipped voxel dims
         print voxdim
         #print 'WARNING: assuming voxdim reverse of img.voxdim. Could be wrong'
         mrixyz = (array([x,y,z]).T*voxdim).T

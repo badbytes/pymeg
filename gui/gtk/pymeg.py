@@ -311,6 +311,7 @@ class maingui():
         filter = gtk.FileFilter()
         filter.set_name("Matlab Files")
         filter.add_pattern("*.mat")
+        #filter.add_pattern("*.set")
         self.clear_filters()
         fcd.add_filter(filter)
         try:fcd.set_current_folder(self.prefs['LastMATPath'])
@@ -869,11 +870,12 @@ class maingui():
         obj=self.treedata;
         res = (self.setup_helper(var=['ind','data','img'],obj=obj));
         solution = self.treedata[self.selecteditem]
-        c = sourcesolution2img.build(solution,ind=res['ind'],origimg=res['origimg'],img=res['img'])
+        c = sourcesolution2img.build(solution,ind=res['ind'],origimg=res['data'],img=res['img'])
 
         self.data_file_selected['source_space']['total_power'] = mean(c,axis=0);
         self.datadict[self.data_filename_selected] = self.data_file_selected
         self.updatestatusbar('solution to image complete')
+        self.refreshtree()
 
     def dipoledensityhandle(self,widget):
         self.dd = dipoledensity.density() #window
@@ -1170,7 +1172,7 @@ class maingui():
                     try:
                         self.obj.data_block = data
                         print 'replaced'
-                        self.refreshtree()
+
                     except:
                         print 'error replacing'
                 if widget.get_label() == 'Filter':
@@ -1178,6 +1180,7 @@ class maingui():
 
             except:
                 pass
+            self.refreshtree()
 
         try:
             self.obj = obj=self.treedata[self.selecteditem];

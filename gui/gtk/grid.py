@@ -32,7 +32,7 @@ except:
 from mri import img_nibabel as img
 import nibabel
 from mri import transform
-from numpy import array, ndarray, float
+from numpy import array, ndarray, float, shape
 from pdf2py import readwrite,pdf
 from meg import grid
 from gui.gtk import progressbar,viewmri
@@ -40,9 +40,7 @@ from gui.gtk import progressbar,viewmri
 
 class gridwin():
     def __init__(self):
-        #self.callback = callback
         MT = progressbar.MainThread()
-        #
         self.datahandler()
         self.builder = gtk.Builder()
         self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
@@ -52,10 +50,10 @@ class gridwin():
         self.statusbar_cid = self.statusbar.get_context_id("")
         #n.set_current_page(0)
         dic = {
-            "on_button1_clicked" : self.mrigrid,
+            "on_mrigridcompute_clicked" : self.mrigrid,
             "on_filechooserbutton1_file_set": self.coregistercheck,
             "on_filechooserbutton2_file_set": self.pdfcheck,
-            #"on_button3_clicked" : self.coregister_handler,
+            "on_coregister_clicked" : self.coregister_handler,
             "on_radiobutton_clicked" : self.gridtypechanged,
             "on_button2_clicked" : self.manualgrid,
 
@@ -73,32 +71,21 @@ class gridwin():
             self.coregistercheck(None, filename)
             self.statusbar.push(self.statusbar_cid, 'Loading Previous MRI.')
 
-            #try:
-                #type(self.mr.lpa) == ndarray#type(eval(self.mr.description)[0]) == ndarray: #coregegistered mri
-                #self.builder.get_object("button1").set_sensitive(True)
-            #except:
-                #self.builder.get_object("button1").set_sensitive(False)
         except (IOError, KeyError): #no last file
             print 'no prev data'
             self.prevdata = {}
         except TypeError:
             pass
 
-    #def loadmr(self, filename):
-        #self.mr = nibabel.load(filename)
-
-
     def datahandler(self,callback=None):
         self.callback = callback
         #if callback != None: self.callback = callback
 
-    def coregister_handler(s195elf, widget):
-        vm = viewmri.display()
-
-    #def coregister_handler(self, widget):
-        #self.cr = coregister.setup() #window
-        #self.cr.window.show()
-        #self.cr.builder.get_object('filechooserbutton1').set_uri(self.builder.get_object("filechooserbutton1").get_uri())
+    def coregister_handler(self, widget):
+        vm = viewmri.setup_gui()
+        vm.builder.get_object('coregister').set_active(True)
+        vm.window.show()
+        vm.display(self.mr)
 
     def pdfcheck(self, widget):
         print 'pdfcheck'
@@ -115,7 +102,7 @@ class gridwin():
             filename = self.filename = self.builder.get_object("filechooserbutton1").get_filename()
 
         print 'loading and checking coreg', filename
-        try: self.mr = nibabel.load(filename)
+        try: self.mr = nibabel.load(filename); print 'loaded', filename
         except RuntimeError: print 'unsupported MR file'; return
 
         self.prevdata['MRI'] = filename
@@ -184,7 +171,7 @@ class gridwin():
         #gtk.main_quit()
 
     def mrigrid(self,widget):
-        print 'MRI source space computing'
+        print 'computing MRI source space '
         from numpy import shape
         self.mr = img.loadimage(self.filename)
         def gridthread():
@@ -234,11 +221,13 @@ class gridwin():
 
     def gridcallback(self):
         print 'callback'
+        #self.test_plot()
         if self.callback != None:
             self.callback(self.grid,mr=self.mr)
         else:
             return self.grid
-            
+
+    def test_plot(self):
         from meg import plotvtk
         d = {'hs':self.headshape.hs_point,'brain':self.grid}
         plotvtk.display(d,color=[[255,255,0],[0,255,255]],radius=[1.,1.])
@@ -252,7 +241,7 @@ if __name__ == "__main__":
     mainwindow.builder.get_object("filechooserbutton2").set_uri('file://'+fn)
     #mainwindow.builder.get_object("filechooserbutton2").set_filename('file://'+fn)
     #mainwindow.pdfcheck(None)
-    
+
     #print mainwindow.grid
     #d = {'hs':p.hs.hs_point,'brain':z}
     gtk.main()

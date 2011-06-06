@@ -49,6 +49,7 @@ from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanva
 from matplotlib.patches import Circle
 
 from pdf2py import readwrite
+#from gui.gtk import file
 
 
 class setup_gui:
@@ -67,10 +68,12 @@ class setup_gui:
             "on_menuAbout_activate": self.show_aboutdialog,
             "on_menu_coregister_toggled" : self.coregister_toggle,
             "on_buttonsavecoreg_activate" : self.save_coregister_info,
+            #"test" : self.changed_cb,
             }
 
         self.builder.connect_signals(dic)
         self.create_draw_frame('none')
+        #self.load_data(None)
 
     def coregister_toggle(self,widget):
         if widget.get_active() == True:
@@ -82,7 +85,21 @@ class setup_gui:
         self.builder.get_object("aboutdialog1").show()
 
     def load_data(self,widget):
-        pass
+        chooser = gtk.FileChooserDialog(title=None,action=gtk.FILE_CHOOSER_ACTION_OPEN,
+        buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
+        filter = gtk.FileFilter()
+        filter.set_name('MRI files')
+        filter.add_pattern('*.img')
+        filter.add_pattern('*.nii*')
+        chooser.add_filter(filter)
+        chooser.run()
+        print chooser.get_filename(), 'selected'
+        fn = chooser.get_filename(); print type(fn);
+        chooser.destroy()
+        img = nibabel.load(fn)
+        self.fig.clf()
+        self.display(img)
+
     def load_channel_positions(self,widget):
         pass
 
@@ -118,7 +135,12 @@ class setup_gui:
 
     def save_coregister_info(self,widget):
         print 'current aux field in header',self.hdr['aux_file']
-        filepath = os.path.splitext(self.img.file_map['header'].filename)[0]
+        #filepath = os.path.splitext(self.img.file_map['header'].filename)[0]
+        try:
+            filepath = os.path.splitext(self.filename)[0]
+        except:
+            print 'Couldnt find filename for saving XFM, saving in current dir as MRI_XFM_DATA'
+            filepath = 'MRI_XFM_DATA'
         coreg_dict = {'lpa': self.lpa,'rpa': self.rpa, 'nas':self.nas}
         readwrite.writedata(coreg_dict, filepath)
 
@@ -250,7 +272,7 @@ class setup_gui:
         #print self.pixdim
         def printcoord():
             #coordinates = round(self.ind3*self.pixdim[0]+(self.translation[0])), round(self.ind2*self.pixdim[1]+(self.translation[1])), round(self.ind1*self.pixdim[2]+(self.translation[2]))
-            coordinates = self.coordinates = array([round(self.ind2*self.pixdim[1]+(self.translation[1])), round(self.ind3*self.pixdim[0]+(self.translation[0])), round(self.ind1*self.pixdim[2]+(self.translation[2]))])
+            #coordinates = self.coordinates = array([round(self.ind2*self.pixdim[1]+(self.translation[1])), round(self.ind3*self.pixdim[0]+(self.translation[0])), round(self.ind1*self.pixdim[2]+(self.translation[2]))])
             coordinates = self.coordinates = array([round(self.ind3*self.pixdim[0]), round(self.ind2*self.pixdim[1]), round(self.ind1*self.pixdim[2])])
             print coordinates, 'mm'#, self.ind3, self.pixdim,(self.translation[0])
             return coordinates
@@ -285,41 +307,6 @@ class setup_gui:
             m.show_all()
             m.popup(None,None,None,3,0)
 
-    def display(self,data=None, overlay=None, colormap=cm.gray, pixdim=None, translation=None):
-        self.get_color_maps()
-        try:
-            if os.path.splitext(data.__module__)[0] == 'nibabel':
-                self.hdr = img.get_header()
-                pixdim = self.hdr['pixdim'][0:3]
-                transform = img._affine[0:3,0:3];print 'orig trans',transform
-                translation = img._affine[0:3,3]; print 'translation', translation
-                data = squeeze(img.get_data())
-                self.img = img
-        except:
-            pass
-
-        if translation == None:
-            translation == [0,0,0]
-        print '------------',translation
-
-        if pixdim == None:
-            pixdim = [1.0,1.0,1.0]; #unitless
-        ax1 = self.fig.add_subplot(221);#axis('off')
-        #colorbar(fig,ax=ax1)
-        xlabel('Anterior (A->P 1st Dim)');ylabel('Right (R->L 2nd Dim)')
-        ax2 = self.fig.add_subplot(222);#axis('off')
-        xlabel('Inferior (I->S Dim)');ylabel('Anterior (A->P 1st Dim)')
-        ax3 = self.fig.add_subplot(223);#axis('off')
-        xlabel('Infererior (I->S 3rd dim)');ylabel('Right (R->L 2nd Dim)')
-        #coord = self.fig.add_subplot(224);axis('off')
-        tracker = self.IndexTracker(data, ax1, ax2, ax3, colormap, pixdim, overlay, translation)#, coord)
-        self.fig.canvas.mpl_connect('scroll_event', self.onscroll)
-        self.fig.canvas.mpl_connect('button_press_event', self.click)
-        #ax1.imshow(data[100])
-        print 'plot done'
-
-        return tracker
-
     def get_color_maps(self):
         self.color_list = []
         m = inspect.getmembers(cm)
@@ -349,7 +336,12 @@ class setup_gui:
             liststore.append([n])
         combobox.set_model(liststore)
         combobox.connect('changed', self.changed_cb)
-        combobox.set_active(0)
+        try:
+            prefs = readwrite.readdata(os.getenv('HOME')+'/.pymeg.pym')
+            combobox.set_active(prefs['MRI_color'])
+            print 'Setting color scheme to last'
+        except:
+            combobox.set_active(0)
         return
 
     def changed_cb(self, combobox):
@@ -360,36 +352,81 @@ class setup_gui:
             #self.chan_ind = index
             self.color_sel = str(model[index][0])
         #self.im1.axes.clear()
+        print 'debug'
         self.im1.set_cmap(self.color_sel)
         self.im1.axes.figure.canvas.draw()
         self.im2.set_cmap(self.color_sel)
         self.im2.axes.figure.canvas.draw()
         self.im3.set_cmap(self.color_sel)
         self.im3.axes.figure.canvas.draw()
+
+        try:
+            prefs = readwrite.readdata(os.getenv('HOME')+'/.pymeg.pym')
+            prefs['MRI_color'] = index
+            readwrite.writedata(prefs, os.getenv('HOME')+'/.pymeg')
+        except IOError: pass
         return
+
+    def display(self,data=None, overlay=None, colormap=cm.gray, pixdim=None, translation=None):
+        self.get_color_maps()
+        try:
+            if os.path.splitext(data.__module__)[0] == 'nibabel':
+                print 'nibabel loaded data'
+                self.filename = data.get_filename()
+                self.hdr = data.get_header()
+                pixdim = self.hdr['pixdim'][1:4]
+                transform = data._affine[0:3,0:3];print 'orig trans',transform
+                translation = data._affine[0:3,3]; print 'translation', translation
+                data = squeeze(data.get_data())
+                self.img = data
+        except:
+            #Not a nifti or analyze file, raw data
+            pass
+
+        if translation == None:
+            translation == [0,0,0]
+
+        if pixdim == None:
+            pixdim = [1.0,1.0,1.0]; #unitless
+        ax1 = self.fig.add_subplot(221);#axis('off')
+        #colorbar(fig,ax=ax1)
+        xlabel('Anterior (A->P 1st Dim)');#ylabel('Right (R->L 2nd Dim)')
+        ax2 = self.fig.add_subplot(222);#axis('off')
+        xlabel('Inferior (I->S Dim)');#ylabel('Anterior (A->P 1st Dim)')
+        ax3 = self.fig.add_subplot(223);#axis('off')
+        xlabel('Infererior (I->S 3rd dim)');#ylabel('Right (R->L 2nd Dim)')
+        #ax4 = self.fig.add_subplot(224);ax4.axis('off')
+        #coord = self.fig.add_subplot(224);axis('off')
+        tracker = self.IndexTracker(data, ax1, ax2, ax3, colormap, pixdim, overlay, translation)#, coord)
+        self.fig.canvas.mpl_connect('scroll_event', self.onscroll)
+        self.fig.canvas.mpl_connect('button_press_event', self.click)
+        #ax1.imshow(data[100])
+        print 'plot setup done'
+
+        return tracker
 
 if __name__ == "__main__":
     mainwindow = setup_gui()
     mainwindow.window.show()
     from pdf2py import pdf
     from mri import img_nibabel
-    fn = '/home/danc/python/data/standardmri/colin_1mm.img'
+    fn = '/home/danc/python/data/standardmri/colin_brain_1mm.img'
     #fn = '/home/danc/python/data/standardmri/ch3.nii.gz'
     img = nibabel.load(fn)
     h = img.get_header()
 
-    pixdim = h['pixdim'][0:3]
-    transform = img._affine[0:3,0:3];#print 'orig trans',transform
-    translation = img._affine[0:3,3]
-    #a = array([[0,1,0],[1,0,0],[0,0,1]]);print 'new trans',a
-    a = dot(eye(3),img._affine[0:3,0:3])- img._affine[0:3,0:3]
-    print 'new transform',a
+    #pixdim = h['pixdim'][0:3]
+    #transform = img._affine[0:3,0:3];#print 'orig trans',transform
+    #translation = img._affine[0:3,3]
+    ##a = array([[0,1,0],[1,0,0],[0,0,1]]);print 'new trans',a
+    #a = dot(eye(3),img._affine[0:3,0:3])- img._affine[0:3,0:3]
+    #print 'new transform',a
 
-    #d = squeeze(img.get_data())
-    r = nibabel.apply_orientation(squeeze(img.get_data()),a)#transform)#a[0:3,0:3])
+    ##d = squeeze(img.get_data())
+    #r = nibabel.apply_orientation(squeeze(img.get_data()),a)#transform)#a[0:3,0:3])
 
     t = mainwindow.display(img)#, pixdim=pixdim,translation=translation)
-    mainwindow.get_color_maps()
+    #mainwindow.get_color_maps()
 
 
     #ion()

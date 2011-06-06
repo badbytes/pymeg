@@ -120,7 +120,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <signal name="clicked" handler="on_button3_clicked"/>
+                    <signal name="clicked" handler="on_coregister_clicked"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -135,7 +135,7 @@
                     <property name="sensitive">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <signal name="clicked" handler="on_button1_clicked"/>
+                    <signal name="clicked" handler="on_mrigridcompute_clicked"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
