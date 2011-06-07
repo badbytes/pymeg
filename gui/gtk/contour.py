@@ -145,13 +145,13 @@ class setup_gui:
             print 'Chanlocs shape error. Should be 2D array "(2,N)"'
             print 'transposing'
             chanlocs = chanlocs.T
-            print chanlocs.shape
+            #print chanlocs.shape
 
         xi, yi = mgrid[chanlocs[1,:].min():chanlocs[1,:].max():57j,chanlocs[0,:].min():chanlocs[0,:].max():57j]
         intx=chanlocs[1,:]
         inty=chanlocs[0,:]
 
-        labelstatus = self.builder.get_object('channellabels').get_active(); print 'ls', labelstatus
+        labelstatus = self.builder.get_object('channellabels').get_active(); #print 'ls', labelstatus
 
         if shape(shape(data))[0]==2: #more than a single vector, need to animate or subplot
             print '2d array of data'
@@ -207,7 +207,7 @@ class setup_gui:
                     zim = ma.masked_where(isnan(zi),zi)
                     self.sp.contourf(xi,yi,zim,cmap=cm.jet, alpha=.8)
                     self.sp.axes.axis('off')
-                    print len(labels), labelstatus
+                    print 'plotting figure',i+1#len(labels), labelstatus
                     if labels != None and labelstatus == True:
                         self.printlabels(chanlocs, labels)
                     if title != None:

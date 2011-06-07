@@ -1028,11 +1028,19 @@ class maingui():
         self.mc.fig.clf()
         print 'label state',self.mc.builder.get_object('channellabels').get_active()
         chanlocs = self.setup_helper(var='chanlocs',obj=self.treedata)['chanlocs']
-        labellist = self.setup_helper(var='chanlocs',obj=self.treedata)['labellist']
+        labellist = self.setup_helper(var='labellist',obj=self.treedata)['labellist']
         #if self.mc.builder.get_object('channellabels').get_active() == True:
             #self.mc.display(self.treedata[self.selecteditem],chanlocs, labels=labellist, subplot='on')
         #else:
-        self.mc.display(self.treedata[self.selecteditem],chanlocs, subplot='on',chlabels=labellist)
+
+        #Limit data to 50 subplots
+        if shape(self.treedata[self.selecteditem])[0] > 50:
+            print('Your data has too many indices, \n and this is an expensive function that you can not afford. Limiting you to the first 50 indices')
+
+            data2plot = self.treedata[self.selecteditem][0:51]
+        else:
+            data2plot = self.treedata[self.selecteditem]
+        self.mc.display(data2plot,chanlocs, subplot='on',labels=labellist)
 
     def result_helper(self,newobj,var):
         for i in var.keys():
@@ -1119,7 +1127,7 @@ class maingui():
                 predict['Minimum Norm Solution'] = ['selection_event','leadfield','selection_noise','channels']
                 predict['Solution To Image'] = ['ind','data','img']
                 predict['Plot MRI'] = ['pixdim','data']
-                predict['Contour Plot'] = ['chanlocs']
+                predict['Contour Plot'] = ['chanlocs','labellist']
                 predict['Plot TFT'] = ['tft']
                 #predict['Plot'] = True
 
