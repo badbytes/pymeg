@@ -293,8 +293,9 @@ Either dipole report text file or binary *lA</property>
                     <property name="resize_mode">immediate</property>
                     <property name="tearoff_title">Function Menu</property>
                     <child>
-                      <object class="GtkMenuItem" id="imagemenuitem4">
+                      <object class="GtkMenuItem" id="filter">
                         <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">Requires objects ['data_block','srate']</property>
                         <property name="label" translatable="yes">Filter</property>
                         <signal name="activate" handler="on_menufilter_activate"/>
                       </object>
@@ -302,14 +303,16 @@ Either dipole report text file or binary *lA</property>
                     <child>
                       <object class="GtkMenuItem" id="epoch_data">
                         <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">Requires ['data_block','srate','wintime','labellist','chanlocs']</property>
                         <property name="label" translatable="yes">Epoch Data</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_menu_epoch_data_activated"/>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="imagemenuitem3">
+                      <object class="GtkMenuItem" id="offsetcorrect">
                         <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">Requires ['data_block','srate']</property>
                         <property name="label" translatable="yes">Offset Correct</property>
                         <signal name="activate" handler="on_menuoffset_activate"/>
                       </object>
@@ -323,17 +326,19 @@ Either dipole report text file or binary *lA</property>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="imagemenuitem6">
+                      <object class="GtkMenuItem" id="grid">
                         <property name="visible">True</property>
-                        <property name="tooltip_text" translatable="yes">Source space location creation.</property>
+                        <property name="tooltip_text" translatable="yes">Source space location creation.
+Requires ['hs']</property>
                         <property name="label" translatable="yes">Calculate Grid</property>
                         <signal name="activate" handler="on_imagemenuitem6_activate"/>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="imagemenuitem7">
+                      <object class="GtkMenuItem" id="leadfield">
                         <property name="visible">True</property>
-                        <property name="tooltip_text" translatable="yes">Forward solution at grid points.</property>
+                        <property name="tooltip_text" translatable="yes">Forward solution at grid points.
+Requires ['channels','grid']</property>
                         <property name="label" translatable="yes">Leadfield Calc</property>
                         <signal name="activate" handler="on_menuleadfield_activate"/>
                       </object>
@@ -341,7 +346,8 @@ Either dipole report text file or binary *lA</property>
                     <child>
                       <object class="GtkMenuItem" id="timef">
                         <property name="visible">True</property>
-                        <property name="tooltip_text" translatable="yes">TFT on data.</property>
+                        <property name="tooltip_text" translatable="yes">TFT on data.
+Requires ['data_block','labellist','srate','frames','numofepochs','eventtime']</property>
                         <property name="label" translatable="yes">Time Freq Transform</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_timef_activate"/>
@@ -350,6 +356,8 @@ Either dipole report text file or binary *lA</property>
                     <child>
                       <object class="GtkMenuItem" id="powerspectraldensity">
                         <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">PSD
+Requires ['data_block','srate','labellist','chanlocs']</property>
                         <property name="label" translatable="yes">Power Spectral Density</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_power_spectral_density_activate"/>
@@ -371,12 +379,14 @@ Either dipole report text file or binary *lA</property>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="menuitem6">
+                      <object class="GtkMenuItem" id="minnorm">
                         <property name="visible">True</property>
                         <property name="tooltip_text" translatable="yes">Uses noisecov selected
  and leadfield to 
 calculate power of 
-data for each grid point.</property>
+data for each grid point.
+Open Data Editor and make selections.
+Requires ['selection_event','leadfield','selection_noise','channels']</property>
                         <property name="label" translatable="yes">Minimum Norm Solution</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_minimumnorm_activate"/>
@@ -423,6 +433,8 @@ Lead Field Matrix</property>
                     <child>
                       <object class="GtkMenuItem" id="dataeditormenu">
                         <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">Matplotlib data viewer
+Requires ['data_block','srate','labellist','chanlocs']</property>
                         <property name="label" translatable="yes">Data Editor</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_data_editor_clicked"/>
@@ -444,6 +456,8 @@ Lead Field Matrix</property>
                     <child>
                       <object class="GtkMenuItem" id="solution_to_image">
                         <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">Convert results to MRI map.
+Requires ['ind','data','img']</property>
                         <property name="label" translatable="yes">Solution To Image</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_solution_to_image_activate"/>
@@ -457,6 +471,8 @@ Lead Field Matrix</property>
                     <child>
                       <object class="GtkMenuItem" id="plot_contour">
                         <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">2D Contour map. 
+Requires array selection and ['chanlocs','labellist']</property>
                         <property name="label" translatable="yes">Contour Plot</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_menu_contour_plot_activate"/>
@@ -511,6 +527,8 @@ Lead Field Matrix</property>
                     <child>
                       <object class="GtkMenuItem" id="tftplot">
                         <property name="visible">True</property>
+                        <property name="tooltip_text" translatable="yes">TFT Power and Phase plotting
+Requires ['tft']</property>
                         <property name="label" translatable="yes">Plot TFT</property>
                         <property name="use_underline">True</property>
                         <child type="submenu">
@@ -1629,6 +1647,9 @@ Lead Field Matrix</property>
     <property name="opacity">0.90000000000000002</property>
     <signal name="close" handler="gtk_widget_hide"/>
     <signal name="cancel" handler="gtk_widget_hide"/>
+    <child>
+      <placeholder/>
+    </child>
     <child>
       <placeholder/>
     </child>

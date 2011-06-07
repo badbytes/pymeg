@@ -1036,7 +1036,7 @@ class maingui():
         #Limit data to 50 subplots
         if shape(self.treedata[self.selecteditem])[0] > 50:
             print('Your data has too many indices, \n and this is an expensive function that you can not afford. Limiting you to the first 50 indices')
-
+            self.errordialog('Your data has too many indices')
             data2plot = self.treedata[self.selecteditem][0:51]
         else:
             data2plot = self.treedata[self.selecteditem]
