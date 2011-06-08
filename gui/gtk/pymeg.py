@@ -1273,13 +1273,9 @@ class MainThread(threading.Thread):
 
 if __name__ == "__main__":
     import cProfile, pstats
-    cProfile.run('mainwindow = maingui()')#,filename='profile.out')
-    #p = pstats.Stats('fooprof')
-    #mainwindow = maingui()
+    cProfile.run('mainwindow = maingui()')
     mainwindow.window.show()
     cProfile.run('mainwindow.testload(None)')
-    #mainwindow.testload(None)
-    #i = 1
     #import code; code.interact(local=locals()) #Interactive Shell
     gtk.main()
 
