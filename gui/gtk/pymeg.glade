@@ -233,7 +233,7 @@ Either dipole report text file or binary *lA</property>
                 <property name="visible">True</property>
                 <property name="label" translatable="yes">Refresh</property>
                 <property name="use_underline">True</property>
-                <property name="stock_id">gtk-refresh</property>
+                <property name="stock_id">gtk-home</property>
                 <signal name="clicked" handler="on_treebutton1_clicked"/>
               </object>
               <packing>
@@ -1647,6 +1647,9 @@ Requires ['tft']</property>
     <property name="opacity">0.90000000000000002</property>
     <signal name="close" handler="gtk_widget_hide"/>
     <signal name="cancel" handler="gtk_widget_hide"/>
+    <child>
+      <placeholder/>
+    </child>
     <child>
       <placeholder/>
     </child>
