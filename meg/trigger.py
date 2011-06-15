@@ -64,7 +64,7 @@ def ind(uvals, nzind, nz, includefirstpointhigh=True):
                     tind.append(i)
             if i - val > 1:
                 tind.append(i)
-                print i,val, i-val
+                #print i,val, i-val
             val = i
 
     return np.array(tind),t

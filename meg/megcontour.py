@@ -201,7 +201,7 @@ def display(data, chanlocs, data2=None, subplot='off', animate='off', quiver='of
             printlabels(chanlocs, labels)
 
         if colorbar == 'on':
-            p.colorbar(cm)
+            p.colorbar(cmap=p.cm.jet)
 
 
 

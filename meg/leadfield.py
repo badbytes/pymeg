@@ -40,7 +40,6 @@ from misc import progressbar
 
 
 class calc:
-    #def __init__(self,datapdf,channelinstance,grid, centerofsphere=None):
     def __init__(self,channelinstance=None,grid=None,centerofsphere=None,chlpos=None,chupos=None,chldir=None,chudir=None):
         '''calc leadfield script to use pos.py and getlf class to get the sum of upper and lower coils
         returns leadfield

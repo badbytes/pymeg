@@ -24,7 +24,7 @@ from meg import leadfield
 from pdf2py import pdf
 p = pdf.read('path2pdf')
 p.data.set.channels('meg')
-xyz = array([ 0.501 ,  -5.756 ,   7.504])
+xyz = array([ 05.01 ,  -57.56 ,   75.04]) #in mm
 qxqyqz = array([0.935  ,  0.184 ,   0.347])
 lf = leadfield.calc(p, p.data.channels, xyz)
 sourcespaceprojection.calc(data, L=lf, qn=qxzyqz || weight=weight2use)
@@ -40,10 +40,9 @@ def calc(data, L=None, qn=None, weight=None):
 
     #s=(qn.conj().transpose())*(Li) #s=(qn')*(Li);
     if qn != None:
-        'source space projection'
-        #s=dot(qn,Li).transpose();
+        print 'source space projection'
+        print 'Resulting units in Nano Amp mm'
         s = dot(dot(data,Li.T), qn/linalg.norm(qn))#q(t) = B(r,t) * L-1 (rq, r) * (q(rq) / |q(rq)|)from Ross
-        #s = dot(dot(data,Li.T), qn/sum(qn))
         return s
     if weight != None:
         print 'weight projection'
