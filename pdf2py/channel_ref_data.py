@@ -17,8 +17,11 @@
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
 
-try:from scipy.io.numpyio import *
-except ImportError: from extra.numpyio import *
+#try:from scipy.io.numpyio import *
+#except ImportError: from extra.numpyio import *
+from pdf2py import io_wrapper
+fread = io_wrapper.fread
+fwrite = io_wrapper.fwrite
 from numpy import char, reshape
 from pdf2py import align
 import os

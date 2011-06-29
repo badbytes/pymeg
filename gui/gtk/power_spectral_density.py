@@ -49,35 +49,23 @@ class setup_gui:
         print 'test'
 
     def datahandler(self,ddict,callback=None):
-        #try:
-        #'data_block','srate','labellist','chanlocs'
         self.chlabels=ddict['labellist']
         self.populate_combo(self.chlabels)
-        #self.builder.get_object('entry1').set_text(str(ddict['srate']))
         self.builder.get_object('entry2').set_text(str(ddict['srate']))
         self.data = ddict['data_block']
-        #except:
-        #    print 'some error'
-            
+
     def display_power_density(self,widget):
         print 'trying'
-        from meg import spectral
         from pylab import psd,show,figure,ion,title
         nfft = int(self.builder.get_object('entry1').get_text())
         srate = float(self.builder.get_object('entry2').get_text())
         chind = self.chlabels.index(self.chan_sel);print 'chind',chind
         data = self.data[:,chind]
-        #p,f,i,r = spectral.psd(data, NFFT=nfft, Fs=srate)
-        #from meg import plot2dgtk
-        #plot2dgtk.makewin(data,\
-            #xaxis=f)
         figure()
         pow,freq=psd(data, NFFT=nfft, Fs=srate);ion();
         title('Spectral Power of Channel: '+self.chan_sel)
         show()
-        
-            
-        
+
     def populate_combo(self, chlabels=None):
         print 'populating channel list'
         if chlabels == None:
@@ -102,10 +90,8 @@ class setup_gui:
         index = combobox.get_active()
         if index > -1:
             print model[index][0], 'selected','index',index
-            #self.chan_ind = index
             self.chan_sel = str(model[index][0])
         return
-
 
 if __name__ == "__main__":
     mainwindow = setup_gui()

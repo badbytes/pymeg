@@ -17,9 +17,12 @@
 
 #add-danc-writesupport
 
-try:from scipy.io.numpyio import *
-except ImportError: from extra.numpyio import *
+#try:from scipy.io.numpyio import *
+#except ImportError: from extra.numpyio import *
 from numpy import char, reshape, arange, vstack
+from pdf2py import io_wrapper
+fread = io_wrapper.fread
+fwrite = io_wrapper.fwrite
 from pdf2py import align
 import os, subprocess
 
@@ -50,17 +53,17 @@ class read:
             fid.seek(16,1)
             self.inion = fread(fid,3,'d','d',1)
             fid.seek(st,0)
-            
+
         if self.user_block_data_hdr_type == 'B_COH_Points':
             self.coil_locations = []
             st = fid.tell()
             for i in arange(5):
                 fid.seek(16,1)
                 self.coil_locations.append(fread(fid,3,'d','d',1))
-                
+
             self.coil_locations = vstack(self.coil_locations)
             fid.seek(st,0)
-        
+
         #print self.user_block_data_hdr_type, fid.tell(), self.user_block_data_user_space_size
         fid.seek(self.user_block_data_user_space_size, os.SEEK_CUR) #skip user space
 

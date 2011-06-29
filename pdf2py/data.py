@@ -16,8 +16,11 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-try:from scipy.io.numpyio import *
-except ImportError: from extra.numpyio import *
+#try:from scipy.io.numpyio import *
+#except ImportError: from extra.numpyio import *
+from pdf2py import io_wrapper
+fread = io_wrapper.fread
+fwrite = io_wrapper.fwrite
 from numpy import reshape, shape, float32, array, arange, size, single
 from pdf2py import align, header, config, channel_new #channel
 import os

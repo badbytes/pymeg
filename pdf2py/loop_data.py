@@ -15,8 +15,11 @@
 # along with Build; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-try:from scipy.io.numpyio import *
-except ImportError: from extra.numpyio import *
+#try:from scipy.io.numpyio import *
+#except ImportError: from extra.numpyio import *
+from pdf2py import io_wrapper
+fread = io_wrapper.fread
+fwrite = io_wrapper.fwrite
 from numpy import char, reshape
 from pdf2py import align
 import os
@@ -32,11 +35,11 @@ class read:
         fid.seek(2, os.SEEK_CUR);
         self.checksum = fread(fid, 1, 'i', 'i', 1);
         self.reserved = fread(fid, 32, 'c', 'c', 1);
-        
+
 class write:
     def __init__(self, fid, loop_data):
         align.check(fid);
-        
+
         fwrite(fid, 3, loop_data.position, 'd', 1)/1000; #convert to meters
         fwrite(fid, 3, loop_data.direction, 'd', 1);
         fwrite(fid, 1, loop_data.radius, 'd', 1);

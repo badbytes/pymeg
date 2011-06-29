@@ -15,8 +15,11 @@
 # along with Build; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-try:from scipy.io.numpyio import *
-except ImportError: from extra.numpyio import *
+#try:from scipy.io.numpyio import *
+#except ImportError: from extra.numpyio import *
+from pdf2py import io_wrapper
+fread = io_wrapper.fread
+fwrite = io_wrapper.fwrite
 from numpy import char, reshape, array
 from pdf2py import header_data, epoch_data, channel_ref_data, event_data, proc_data, proc_step
 import os

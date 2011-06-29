@@ -15,10 +15,12 @@
 # along with Build; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-try:from scipy.io.numpyio import *
-except ImportError: from extra.numpyio import *
+#try:from scipy.io.numpyio import *
+#except ImportError: from extra.numpyio import *
 from numpy import char, reshape
-
+from pdf2py import io_wrapper
+fread = io_wrapper.fread
+fwrite = io_wrapper.fwrite
 #import matplotlib.axes3d as p3   #legacy code
 '3d plotting doesnt work in pylab v .98'
 
@@ -26,7 +28,7 @@ from numpy import char, reshape
 
 class read:
     def __init__(self, hsfile):
-        self.fid=open(hsfile, "r") 
+        self.fid=open(hsfile, "r")
         self.hdr_version = fread(self.fid, 1, 'i', 'i', 1);
         self.hdr_timestamp = fread(self.fid, 1, 'i', 'i', 1);
         self.hdr_checksum = fread(self.fid, 1, 'i', 'i', 1);
@@ -36,7 +38,11 @@ class read:
         self.index_nasion = fread(self.fid, 3, 'd', 'd', 1)*1000;
         self.index_cz = fread(self.fid, 3, 'd', 'd', 1)*1000;
         self.index_inion = fread(self.fid, 3, 'd', 'd', 1)*1000;
- 
+
         hs_pointvec = fread(self.fid, self.hdr_npoints*3, 'd', 'd', 1)*1000;
         self.hs_point = reshape(hs_pointvec, [len(hs_pointvec)/3, 3])
         self.fid.close
+if __name__ == "__main__":
+    hsfile = '/media/2TB/4D_data/msw_data/spartan_data0/0611/IB_MOTb/04%13%11@14:55/1/hs_file'
+    c = read(hsfile)
+    print c.hdr_npoints, c.hs_point

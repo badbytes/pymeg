@@ -1,8 +1,16 @@
-Installation of pymeg on linux. First download and install the latest build pymeg_dailybuild.
+Installation of pymeg on linux.
 
-Of course make sure you install python2.4 or 2.5 or 2.6 http://www.python.org/download/ as well as numpy and scipy http://www.scipy.org/Download
+Of course make sure you install python2.? http://www.python.org/download/
 
-If using Ubuntu linux for instance you would install the necessary dependencies.
+A list of dependant software.
+
+numpy
+scipy
+matplotlib
+pynifti
+vtk
+
+If using debian based linux for instance you would install the necessary dependencies with something like this.
 
 sudo apt-get install python-scipy python-matplotlib python-nifti
 
@@ -12,6 +20,9 @@ mv pymeg.tgz ~/
 cd ~/
 tar -xvzf pymeg.tgz
 
+or download the git repository
+git clone https://github.com/badbytes/pymeg.git
+
 Add pymeg path to your shells environmental variables.
 
 echo 'export PYTHONPATH=$PYTHONPATH:'$HOME'/pymeg/' >> ~/.bashrc
@@ -20,7 +31,7 @@ source ~/.bashrc
 Now start python and test a function From the commandline type "python" to start an interactive python shell and try to load the pdf module.
 
 
-Python 2.5.2 (r252:60911, May  7 2008, 15:21:12) 
+Python 2.5.2 (r252:60911, May  7 2008, 15:21:12)
 [GCC 4.2.3 (Ubuntu 4.2.3-2ubuntu7)] on linux2
 Type "help", "copyright", "credits" or "license" for more information.
 >>> from pdf2py import pdf
@@ -37,15 +48,5 @@ p = pdf.read('/path2data/e,rfhp1.0Hz,ra,f50lp,o')
 To start the GTK gui interface, type the following command.
 cd ~/pymeg/gui/gtk/
 python pymeg.py
-
-
-Python < 2.6 extra modules install instructions (delaunay and ndimage)
-If using python < 2.6 you need to install ndimage, unzip pymeg/extras/ndimage.zip somewhere and install as root.
-ndimage is needed for some image filtering.
-
-cp pymeg/extras/ndimage.zip ~/
-unzip ~/ndimage.zip
-cd ~/ndimage/
-sudo python setup.py install
 
 For more documentation on usage of tools, see http://wiki.neuromeg.org/PyMEG

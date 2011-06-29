@@ -38,27 +38,53 @@ except:
     print("GTK import error")
     sys.exit(1)
 
+from gui.gtk import errordialog
+try:
+    from numpy import *
+    from scipy import io
+    from numpy import * #shape, random, sort, array, append, size, arange, ndarray,vstack,mean,zeros, dot
+except ImportError:
+    errordialog.errorwin('Numerical libraries missing. Install Numpy and Scipy. Exiting!')
+    sys.exit()
+
+try:
+    import nibabel
+except ImportError:
+    errordialog.errorwin('MRI module Nibabel missing, MRI tools will not function properly.')
+    sys.exit()
+
 #pylab methods
-from matplotlib import use;use('GTK')
-from matplotlib.figure import Figure
-from matplotlib.axes import Subplot
-from matplotlib.backends.backend_gtk import show
+try:
+    from matplotlib import use;use('GTK')
+    from matplotlib.figure import Figure
+    from matplotlib.axes import Subplot
+    from matplotlib.backends.backend_gtk import show
+except ImportError:
+    errordialog.errorwin('Matplotlib missing. Plotting tools will not work properly')
+    sys.exit()
+
+#gui modules
+try:
+    from gui.gtk import filter, offset_correct, errordialog, preferences,\
+    dipoledensity, coregister, timef, data_editor, event_process, parse_instance, \
+    meg_assistant, errordialog, viewmri, power_spectral_density, progressbar
+    from gui.gtk import contour as contour_gtk
+except ImportError:
+    errordialog.errorwin('PyMEG not installed correctly, cant find pymeg code in path.')
+    #sys.exit()
 
 #load required methods
-from pdf2py import pdf, readwrite,lA2array
-from numpy import * #shape, random, sort, array, append, size, arange, ndarray,vstack,mean,zeros, dot
-from meg import dipole,plotvtk,plot2dgtk,signalspaceprojection,nearest
-from meg import leadfield_parallel as leadfield
-from mri import img_nibabel as img
-from mri import sourcesolution2img
-from beamformers import minimumnorm
-from scipy import io
-#gui modules
-from gui.gtk import filter, offset_correct, errordialog, preferences,\
-dipoledensity, coregister, timef, data_editor, event_process, parse_instance, \
-meg_assistant, errordialog, viewmri, power_spectral_density, progressbar
-from gui.gtk import contour as contour_gtk
-import nibabel
+try:
+    from pdf2py import pdf, readwrite,lA2array
+    from meg import dipole,plotvtk,plot2dgtk,signalspaceprojection,nearest
+    from meg import leadfield_parallel as leadfield
+    from mri import img_nibabel as img
+    from mri import sourcesolution2img
+    from beamformers import minimumnorm
+except ImportError:
+    errordialog.errorwin('PyMEG not installed correctly, cant find pymeg code in path.')
+    #sys.exit()
+
 
 #from IPython.Shell import IPShellEmbed
 #ipshell = IPShellEmbed()
@@ -1275,7 +1301,7 @@ if __name__ == "__main__":
     import cProfile, pstats
     cProfile.run('mainwindow = maingui()')
     mainwindow.window.show()
-    cProfile.run('mainwindow.testload(None)')
+    #cProfile.run('mainwindow.testload(None)')
     #import code; code.interact(local=locals()) #Interactive Shell
     gtk.main()
 

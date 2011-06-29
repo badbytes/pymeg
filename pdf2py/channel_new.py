@@ -27,9 +27,11 @@ p = pdf.read(fn);p.data.getdata(0,p.data.pnts_in_file, chindex=i.indexlist)
 from pdf2py import config, header, headshape#, pdf
 from numpy import zeros, array, unique, append, size, sort, loadtxt
 import re, sys, os
-try:from scipy.io.numpyio import *
-except ImportError: from extra.numpyio import *
-
+#try:from scipy.io.numpyio import *
+#except ImportError: from extra.numpyio import *
+from pdf2py import io_wrapper
+fread = io_wrapper.fread
+fwrite = io_wrapper.fwrite
 
 def sorted(alist):
     '''sort channels'''

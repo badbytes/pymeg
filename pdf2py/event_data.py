@@ -1,6 +1,9 @@
 
-try:from scipy.io.numpyio import *
-except ImportError: from extra.numpyio import *
+#try:from scipy.io.numpyio import *
+#except ImportError: from extra.numpyio import *
+from pdf2py import io_wrapper
+fread = io_wrapper.fread
+fwrite = io_wrapper.fwrite
 from numpy import char, reshape
 from pdf2py import align
 import os
@@ -10,7 +13,7 @@ import os
 class read:
     def __init__(self, fid):
         align.check(fid);
-        
+
         #self.name = ''.join(list(fread(fid, 16, 'c', 'c', 1)));
         self.name = fid.read(16)
         self.start_lat = fread(fid, 1, 'f', 'f', 1);
@@ -22,12 +25,12 @@ class read:
         #self.reserved = ''.join(list(fread(fid, 32, 'c', 'c', 1)));
         self.reserved = fid.read(32)
         fid.seek(4, os.SEEK_CUR);
-        
-        
+
+
 class write:
     def __init__(self, fid, event_data):
         align.check(fid);
-        
+
         fid.write(event_data.name);
         fwrite(fid, 1, event_data.start_lat, 'f', 1);
         fwrite(fid, 1, event_data.end_lat, 'f', 1);

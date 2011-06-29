@@ -30,7 +30,7 @@ from time import time
 
 class calc():
     '''fftd = fftmeg.calc(p.data.data_block,1/ p.hdr.header_data.sample_period, epochs=p.data.numofepochs)'''
-    def __init__(self,data, srate, epochs):
+    def __init__(self,data, srate, epochs, axis=0):
         ts = time();
         pnts = size(data,0)/epochs
         print 'fft pnts per epoch',pnts
@@ -46,81 +46,12 @@ class calc():
         if len(shape(data)) == 1: #its a 1D vector, make 2D
             data = array([data]).T
 
-        self.Yi = Yi = fft(data,n=NFFT, axis=0)/L;
+        self.Yi = Yi = fft(data,n=NFFT, axis=axis)/L;
         self.pow =  abs(Yi[0:NFFT/2]*2)
         self.powc = conjugate(Yi[0:NFFT/2]*2) * (Yi[0:NFFT/2]*2)
         self.comp = (Yi[0:NFFT/2]*2)
         self.ipow = imag(Yi[0:NFFT/2]*2)
-
         self.freq = f
-
-#class calc_old():
-    #'''
-    #fftd = fftmeg.calc(p.data.data_block,1/ p.hdr.header_data.sample_period, epochs=p.data.numofepochs)'''
-    #def __init__(self,data, srate, epochs=1):
-        #ts = time();
-        #pnts = size(data,0)/epochs
-        #print 'fft pnts per epoch',pnts
-        #print 'number of epochs = ',epochs
-        #t = linspace(0,pnts/srate,pnts ); # time in seconds
-
-        ##t = t[:-1]
-        #Fs=srate;
-        #T=1/Fs;
-
-        #L=len(t);
-        #NFFT = int(2**ceil(log2(abs(L))))
-        #f = Fs/2*linspace(0, 1,NFFT/2);
-
-        #if len(shape(data)) == 1: #its a 1D vector, make 2D
-            #data = array([data]).T
-
-        #pow = zeros([size(f),size(data,1)]); #create empty power array. Freq X Ch
-        #powc = zeros([size(f),size(data,1)]);
-        #comp = zeros([size(f),size(data,1)], complex_);
-        #ipow = zeros([size(f),size(data,1)]);#, complex_);
-
-        #if size(data) > 4000000:
-            #print 'lots of pnts. might crash your process.'
-            #print 'going to take care of that for you by grouping channels and looping over groups.'
-
-        #div = int(ceil(size(data)/4000000.0))
-
-        #print 'number of channel groups',div
-        #chgrp = (size(data,1)/div)
-        #print 'debug',div,pnts,chgrp,NFFT
-        #for g in range(0, div):
-            #print g,'of', div
-
-            #for e in range(0,epochs):
-                #Yi = fft(data[e*pnts:(e+1)*pnts,g*chgrp:(g+1)*chgrp],n=NFFT, axis=0)/L;
-                #pow[:,g*chgrp:(g+1)*chgrp] = pow[:,g*chgrp:(g+1)*chgrp] + abs(Yi[0:NFFT/2]*2)
-                #powc[:,g*chgrp:(g+1)*chgrp] = powc[:,g*chgrp:(g+1)*chgrp] +  conjugate(Yi[0:NFFT/2]*2) * (Yi[0:NFFT/2]*2)
-                #comp[:,g*chgrp:(g+1)*chgrp] = comp[:,g*chgrp:(g+1)*chgrp] + (Yi[0:NFFT/2]*2)
-                #ipow[:,g*chgrp:(g+1)*chgrp] = pow[:,g*chgrp:(g+1)*chgrp] + imag(Yi[0:NFFT/2]*2)
-
-
-                #if g == div-1: #last few channels
-                    ##print 'last group'
-                    #Yi = fft(data[e*pnts:(e+1)*pnts,g*chgrp:],n=NFFT, axis=0)/L;
-                    #pow[:,g*chgrp:] = pow[:,g*chgrp:] + abs(Yi[0:NFFT/2]*2)
-                    #powc[:,g*chgrp:(g+1)*chgrp] = powc[:,g*chgrp:] +  conjugate(Yi[0:NFFT/2]*2) * (Yi[0:NFFT/2]*2)
-                    #comp[:,g*chgrp:] = comp[:,g*chgrp:] + (Yi[0:NFFT/2]*2)
-
-        #print 'number of channels processed',size(data,1)
-        #te = time() - ts
-        #print 'time elapsed', te, 'sec'
-        #if epochs > 1: print 'calculating mean power across epochs'
-        #self.pow = pow/epochs
-        #self.freq = f
-        #self.comp = comp
-        #self.powc = powc
-        #self.ipow = ipow
-        #self.Yi = Yi
-
-        ##return pow,f
-    #def ch2keep(self, ch2keep):
-        #self.pow = self.pow[:,ch2keep]
 
 
 def nearest(array, target):

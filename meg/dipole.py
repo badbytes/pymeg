@@ -2,7 +2,8 @@
 
 from meg import euclid
 from numpy import size, zeros, array, inf, shape, sum, mean
-import wx
+#import wx
+from gui.gtk import filechooser
 import os
 
 #poximity based density method
@@ -68,11 +69,13 @@ def val2img(mrdata, value, voxel):
     #f = ndimage.gaussian_filter(z, 14)
 
 def readdipolefile(self):
-    dlg = wx.FileDialog(self, "Select a meg 4d type dipole textfile", os.getcwd(), "", "*", wx.OPEN)
-    if dlg.ShowModal() == wx.ID_OK:
-        filepath = path = dlg.GetPath()
-        dlg.Destroy()
-        return filepath
+    filepath = filechooser()
+    return filepath
+    #dlg = wx.FileDialog(self, "Select a meg 4d type dipole textfile", os.getcwd(), "", "*", wx.OPEN)
+    #if dlg.ShowModal() == wx.ID_OK:
+        #filepath = path = dlg.GetPath()
+        #dlg.Destroy()
+        #return filepath
 
 class parsereport:
     def __init__(self,filepath):
