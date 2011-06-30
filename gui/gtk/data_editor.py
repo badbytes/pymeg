@@ -86,6 +86,7 @@ class setup_gui:
             "on_store_event_clicked" : self.store_event,
             "on_menu_save_noise_activate" : self.store_noise,
             "on_menu_save_event_activate" : self.store_event,
+            "on_key_press_event" : self.key_press_event,
 
             }
 
@@ -103,6 +104,7 @@ class setup_gui:
     def store_noise(self,widget):
         print widget,'wid',widget.get_parent().get_name()
         self.callback(widget)
+
     def store_event(self,widget):
         print widget,'wid',widget.get_parent().get_name()
         self.callback(widget)
@@ -111,6 +113,7 @@ class setup_gui:
         self.fig = Figure(figsize=[100,100], dpi=40)
         self.canvas = FigureCanvas(self.fig)
         self.canvas.connect("scroll_event", self.scroll_event)
+        self.canvas.connect("key-press-event", self.key_press_event)
         #self.canvas.connect('button_press_event', self.button_press_event)
         self.canvas.show()
         self.figure = self.canvas.figure
@@ -174,6 +177,9 @@ class setup_gui:
         else:
             self.win_prefs.hide()
         self.selections_tree(None)
+
+    def key_press_event(self, widget, event):
+        print event.keyval
 
     def scroll_event(self, widget, event):
         if event.direction == gdk.SCROLL_UP:
@@ -270,7 +276,7 @@ class setup_gui:
 
     def redraw(self,widget):
         print len(self.time),self.data2plot.shape
-        self.color = 'black'
+        #self.color = 'black'
         self.axes.cla()
         self.axes = self.figure.axes[0]
         self.axes.plot(self.time, self.data2plot,color=self.color)
@@ -287,7 +293,6 @@ class setup_gui:
         self.axes.yaxis.set_ticklabels(self.chanlabels2plot, fontsize=17)
         self.canvas.draw()
         ion()
-
 
     def zoomin_time(self,widget):
         startind = self.tstart;
@@ -317,13 +322,25 @@ class setup_gui:
         self.curchannel = self.curchannel+self.numofch
         if self.curchannel >= len(self.chanind):
             self.curchannel = len(self.chanind)-self.numofch
-        self.display_apply(None)
+
+        self.chanind2plot = \
+        self.chanind[self.curchannel:self.curchannel+self.numofch]
+        self.chanlabels2plot = \
+        self.chanlabels[self.curchannel:self.curchannel+self.numofch]
+        self.check_scale(self.tstart,self.tstop)
+        self.redraw(None)#self.display_apply(None)
 
     def page_down(self,widget):
         self.curchannel = self.curchannel-self.numofch
         if self.curchannel < 0:
             self.curchannel = 0
-        self.display_apply(None)
+
+        self.chanind2plot = \
+        self.chanind[self.curchannel:self.curchannel+self.numofch]
+        self.chanlabels2plot = \
+        self.chanlabels[self.curchannel:self.curchannel+self.numofch]
+        self.check_scale(self.tstart,self.tstop)
+        self.redraw(None)#self.display_apply(None)
 
     def display_apply(self,widget):
         self.numofch = int(self.builder.get_object("spinbutton1").get_value())
@@ -331,7 +348,11 @@ class setup_gui:
         self.chanind[self.curchannel:self.curchannel+self.numofch]
         self.chanlabels2plot = \
         self.chanlabels[self.curchannel:self.curchannel+self.numofch]
-
+        color = self.builder.get_object('colorbutton1')
+        r = color.get_color().red_float
+        g = color.get_color().green_float
+        b = color.get_color().blue_float
+        self.color = (r,g,b)
         st = float(self.builder.get_object("spinbutton2").get_value())
         ed = float(self.builder.get_object("spinbutton3").get_value())
         self.space = float(self.builder.get_object("entry1").get_text())
@@ -443,8 +464,6 @@ class setup_gui:
 
                 for k in range(0,len(self.selections)):
                     iter=self.selectionList.append([k,str(self.selections[k])])
-                #for i in
-                #print i, liststore[i][1]
                 self.SelView.set_model(self.selectionList)
                 print 'adding selections'
 
@@ -482,7 +501,6 @@ class setup_gui:
             nearest.nearest(self.t,arange(sels,sele,inc))
             sel_ind = nearest.nearest(self.t,arange(sels,sele,inc))
             return sel_ind
-        #print 'parent',widget.get_title()
         if widget.get_parent().get_name() == 'GtkMenu' and current == True: #call from editor menu
             print 'call from right click menu'
             try:
@@ -490,9 +508,6 @@ class setup_gui:
                 self.selections[-1][1],self.t[1]-self.t[0])
             except AttributeError:
                 print 'no selections yet'
-                #self.builder.get_object("messagedialog1").format_secondary_text\
-                #('No Selections Created Yet')
-                #self.builder.get_object("messagedialog1").show()
                 return -1
 
         else: #call from selector
@@ -598,13 +613,9 @@ class setup_gui:
         print 'DONE!'
         p = self.data_assist.pdfdata #4D MEG file format
         input_dict = {'data_block':p.data.data_block,'srate':p.data.srate,'wintime':p.data.wintime,'labellist':p.data.channels.labellist,'chanlocs':p.data.channels.chanlocs}
-        #self.data_handler(p.data.data_block,p.hdr.header_data.sample_period, \
-        #p.data.wintime,p.data.channels.labellist,p.data.channels.chanlocs)
         self.data_handler(widget, input_dict)
 
 
-
-    #def data_handler(self,data,srate,wintime,chanlabels,chanlocs, callback=None):
     def data_handler(self, widget, input_dict, callback=None):
         '''
         datahandler(data,srate,wintime,chanlabels,chanlocs)
@@ -659,12 +670,6 @@ class setup_gui:
         try: callback(widget); self.callback = callback
         except TypeError, NameError: print('no callback')
 
-    #def store_event(self,widget):
-        #self.callback()
-
-
-    #def callback(self):
-        #pass
 
     def offset_correct(self,widget):
         print self.get_time_selection(widget)
@@ -675,6 +680,7 @@ class setup_gui:
             print('no selections detected')
             return -1
         self.data = self.data - average(self.data[self.sel_ind,:],axis=0)
+        print 'Data offset corrected, now trying to replot'
         self.display_apply(None)
         print widget,'wid:',widget.get_label()
         self.callback(widget)
