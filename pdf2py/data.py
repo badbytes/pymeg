@@ -76,7 +76,9 @@ class read(initialize):
                  d.getdata(0, d.pnts_in_file, chindex=chind)'''
 
         self.fid.seek(start*self.time_slice_size, os.SEEK_SET)
+        self.fid_start_pos = self.fid.tell()
         data_block = fread(self.fid, self.total_chans*(end-start), self.dataprecision, self.dataprecision, 1);
+        self.fid_end_pos = self.fid.tell()
         data_blockreshape=(data_block.reshape([ (end-start),self.total_chans]))
         if self.format == 1:
             print 'short format, multiplying units_per_bit from cfg'
@@ -150,8 +152,8 @@ class read(initialize):
 ##------------------------------------------------------------------------------------------
 class write:
     def __init__(self, datapdf, data2write):
-        import shutil
-        from numpy import int16
+        #import shutil
+        #from numpy import int16
         self.fid = open(datapdf.data.writepath, 'w')
         self.fid.seek(0*datapdf.data.time_slice_size, os.SEEK_SET)
 
@@ -165,7 +167,6 @@ class write:
 
         if len(data2write.shape) == 2:
             numofpnts2write = data2write.shape[0]*data2write.shape[1]
-            #reindexed_data = data[:,datapdf.data.channels.reverseindex].flatten()
             reindexed_data = data.flatten()
         elif len(data2write.shape) == 1:
             numofpnts2write = data2write.shape[0]
@@ -174,4 +175,31 @@ class write:
         fwrite(self.fid, numofpnts2write, reindexed_data, datapdf.data.dataprecision, 1);
 
         self.fid.close()
+
+class write_changes:
+    def __init__(self, datapdf, data2write):
+        self.fid = open(datapdf.data.writepath, 'r+')
+        self.fid.seek(0,os.SEEK_SET)
+
+        if datapdf.data.format == 1:
+            data = (data2write) * datapdf.data.scalefact
+        if datapdf.data.format == 3:
+            data = single(data2write)#*2
+            print '3', datapdf.data.dataprecision
+
+        print 'saving changes to file. ',datapdf.data.numofchannels, 'channels getting rewritten.'
+        if len(data2write.shape) == 2:
+            numofpnts2write = data2write.shape[0]*data2write.shape[1]
+            reindexed_data = data.flatten()
+        elif len(data2write.shape) == 1:
+            numofpnts2write = data2write.shape[0]
+            reindexed_data = data
+        print numofpnts2write, reindexed_data.shape
+
+        bitsperchan = datapdf.data.time_slice_size/datapdf.data.total_chans
+        for c in datapdf.data.channels.indexlist:
+            seekpnt = bitsperchan * c
+            for s in arange(datapdf.data.pnts_in_file):
+                fwrite(self.fid, 1, data2write[s,c]
+
 

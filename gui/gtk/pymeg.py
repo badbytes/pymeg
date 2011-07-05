@@ -67,7 +67,7 @@ except ImportError:
 try:
     from gui.gtk import filter, offset_correct, errordialog, preferences,\
     dipoledensity, coregister, timef, data_editor, event_process, parse_instance, \
-    meg_assistant, errordialog, viewmri, power_spectral_density, progressbar
+    meg_assistant, errordialog, viewmri, power_spectral_density, progressbar, spinner
     from gui.gtk import contour as contour_gtk
 except ImportError:
     errordialog.errorwin('PyMEG not installed correctly, cant find pymeg code in path.')
@@ -143,7 +143,7 @@ class maingui():
             "on_3DMRI_activate" : self.plot3DMRIhandle,
             "on_button_press_event" : self.button_press_event ,
             "on_tftplot_activate" : self.tftplot,
-            "on_timef_activate" : self.timef_handler ,
+            "on_timef_activate" : self.timef_handler,
             "on_data_editor_clicked" : self.data_editor,
             "on_menu_signal_space_filter_activate" : self.signal_space_filter,
             "on_menu_contour_plot_activate" : self.contour_plot,
@@ -160,12 +160,10 @@ class maingui():
         }
 
         self.builder.connect_signals(dic)
-        #self.memorystat(self)
         self.parseddatadict = {} #stores path2 loaded data as well as complete data structure
         self.datadict = {} #store the actual loaded data
         self.treelist = [] #appends list with newly clicked items from treeview
         self.treedict = {} #initialize the treeview dictionary.
-        #self.queue_store = gtk.ListStore(str)
         self.dataselected = [] #tree item currently selected
 
         #turn off function menu
@@ -1075,12 +1073,6 @@ class maingui():
 
     def epoch_data(self,widget):
         def epoch_callback(widget,startcut,endcut):
-            #self.datadict[self.data_filename_selected] = self.data_file_selected
-            #obj = self.treedata[self.selecteditem]
-            #var = ['channels','srate','numofepochs','labellist',
-            #'chanlocs','frames','eventtime','wintime']
-            #res = (self.setup_helper(var,obj=obj));
-            #data_block = (self.setup_helper(['data_block'],obj=self.obj))['data_block']
 
             ed = self.data_file_selected['epoched_data'] = {}
             self.result_helper(ed,self.res)
@@ -1244,13 +1236,24 @@ class maingui():
         self.psd.datahandler(res)
         self.psd.window.show()
 
+    def spin(self, status):
+        try: print self.spinner_gui.window.get_visible()
+        except: self.spinner_gui = spinner.setup()
+        if status == 'start':
+            self.spinner_gui.start()
+            self.spinner_gui.window.show()
+
+        if status == 'stop':
+            self.spinner_gui.stop()
+            self.spinner_gui.window.hide()
+
     def testhandler(self, widget):
         self.prnt(None)
         self.timef_handler(None)
 
-    def testload(self, widget):
+    def testload(self, fn):
         print('clicked')
-        fns = ['/home/danc/python/data/0611/0611piez/e,rfhp1.0Hz,COH']
+        fns = [fn] #['/home/danc/python/data/0611/0611piez/e,rfhp1.0Hz,COH']
 
         for i in fns:
             print('i', i)
@@ -1265,8 +1268,6 @@ class maingui():
         #self.filetype = 'MRI'
         #self.builder.get_object("filechooserdialog1").set_uri('file://'+self.fn[0])
         #self.builder.get_object("filechooserdialog1").show()
-
-
 
 class MainThread(threading.Thread):
     def run(self):
@@ -1301,6 +1302,7 @@ if __name__ == "__main__":
     import cProfile, pstats
     cProfile.run('mainwindow = maingui()')
     mainwindow.window.show()
+    mainwindow.testload('/home/danc/data/meg/0611piez/e,rfhp1.0Hz,ra')
     #cProfile.run('mainwindow.testload(None)')
     #import code; code.interact(local=locals()) #Interactive Shell
     gtk.main()
