@@ -80,6 +80,7 @@ class read(initialize):
         data_block = fread(self.fid, self.total_chans*(end-start), self.dataprecision, self.dataprecision, 1);
         self.fid_end_pos = self.fid.tell()
         data_blockreshape=(data_block.reshape([ (end-start),self.total_chans]))
+
         if self.format == 1:
             print 'short format, multiplying units_per_bit from cfg'
             if os.path.isfile(os.path.dirname(self.datapdf)+'/config')==True:
@@ -93,11 +94,13 @@ class read(initialize):
                     data_blockreshape[:,c] = data_blockreshape[:,c]*scalefact
                     self.scalefact = scalefact
 
+
             else:
                 print "can't read config from same directory"
 
         if chindex!=None:
             self.data_block = data_blockreshape[:,chindex]
+            self.scalefact = 1
         else:
             try:
                 self.data_block = data_blockreshape[:,self.channels.indexlist]
@@ -154,14 +157,14 @@ class write:
     def __init__(self, datapdf, data2write):
         #import shutil
         #from numpy import int16
-        self.fid = open(datapdf.data.writepath, 'w')
+        self.fid = open(datapdf.data.filepath, 'w')
         self.fid.seek(0*datapdf.data.time_slice_size, os.SEEK_SET)
 
         if datapdf.data.format == 1:
             data = (data2write) * datapdf.data.scalefact
         if datapdf.data.format == 3:
             data = single(data2write)#*2
-            print '3', datapdf.data.dataprecision
+            print 'dataprecision is single'#, datapdf.data.dataprecision
 
         print 'writing',datapdf.data.numofchannels, 'channels'
 
@@ -176,30 +179,51 @@ class write:
 
         self.fid.close()
 
+'''
+fn = '/home/danc/data/meg/0611piez/e,rfhp1.0Hz,ra.mod'
+p = pdf.read(fn)
+p.data.setchannellabels(['A1'])
+p.data.getdata(0,p.data.pnts_in_file)
+p.data.data_block = p.data.data_block * 100
+pdf.write_changes(p, p.data.data_block)
+
+datapdf = p
+data2write = p.data.data_block
+
+'''
+
 class write_changes:
     def __init__(self, datapdf, data2write):
-        self.fid = open(datapdf.data.writepath, 'r+')
+        self.fid = open(datapdf.data.filepath, 'r+')
         self.fid.seek(0,os.SEEK_SET)
 
         if datapdf.data.format == 1:
             data = (data2write) * datapdf.data.scalefact
         if datapdf.data.format == 3:
             data = single(data2write)#*2
-            print '3', datapdf.data.dataprecision
+            print 'dataprecision is single'#, datapdf.data.dataprecision
 
+        numofpnts2write = data2write.shape[0]*data2write.shape[1]
         print 'saving changes to file. ',datapdf.data.numofchannels, 'channels getting rewritten.'
-        if len(data2write.shape) == 2:
-            numofpnts2write = data2write.shape[0]*data2write.shape[1]
-            reindexed_data = data.flatten()
-        elif len(data2write.shape) == 1:
-            numofpnts2write = data2write.shape[0]
-            reindexed_data = data
-        print numofpnts2write, reindexed_data.shape
+        #if len(data2write.shape) == 2:
+            #numofpnts2write = data2write.shape[0]*data2write.shape[1]
+            #reindexed_data = data.flatten()
+        #elif len(data2write.shape) == 1:
+            #numofpnts2write = data2write.shape[0]
+            #reindexed_data = data
+        #print numofpnts2write, reindexed_data.shape
 
         bitsperchan = datapdf.data.time_slice_size/datapdf.data.total_chans
-        for c in datapdf.data.channels.indexlist:
-            seekpnt = bitsperchan * c
+        for c in arange(len(datapdf.data.channels.indexlist)):
+            print 'ch',c
+            seekpnt = bitsperchan * (datapdf.data.channels.indexlist[c]+1)
+            #self.fid.seek(seekpnt,0)
             for s in arange(datapdf.data.pnts_in_file):
-                fwrite(self.fid, 1, data2write[s,c]
+
+                self.fid.seek(seekpnt + (datapdf.data.time_slice_size * s), os.SEEK_SET)
+                fwrite(self.fid, 1, data2write[s,c], datapdf.data.dataprecision, endianness=1)
+                #print s,self.fid.tell()
+
+        self.fid.close()
 
 

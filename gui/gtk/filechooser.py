@@ -8,7 +8,7 @@ pygtk.require('2.0')
 
 import gtk
 
-def open(path=None):
+def open(path=None, filter_type=None):
     # Check for new pygtk: this is new class in PyGtk 2.4
     if gtk.pygtk_version < (2,3,90):
        print "PyGtk 2.3.90 or later required for this example"
@@ -23,21 +23,23 @@ def open(path=None):
     dialog.set_select_multiple(True)
 
     filter = gtk.FileFilter()
-    filter.set_name("All files")
-    filter.add_pattern("*")
-    dialog.add_filter(filter)
+    if filter_type == None:
 
-    filter = gtk.FileFilter()
-    filter.set_name("Images")
-    filter.add_mime_type("image/png")
-    filter.add_mime_type("image/jpeg")
-    filter.add_mime_type("image/gif")
-    filter.add_pattern("*.png")
-    filter.add_pattern("*.jpg")
-    filter.add_pattern("*.gif")
-    filter.add_pattern("*.tif")
-    filter.add_pattern("*.xpm")
-    dialog.add_filter(filter)
+        filter.set_name("All files")
+        filter.add_pattern("*")
+        dialog.add_filter(filter)
+
+        filter = gtk.FileFilter()
+        filter.set_name("Images")
+        filter.add_mime_type("image/png")
+        filter.add_mime_type("image/jpeg")
+        filter.add_mime_type("image/gif")
+        filter.add_pattern("*.png")
+        filter.add_pattern("*.jpg")
+        filter.add_pattern("*.gif")
+        filter.add_pattern("*.tif")
+        filter.add_pattern("*.xpm")
+        dialog.add_filter(filter)
 
     if path != None:
         dialog.set_current_folder(path)

@@ -67,7 +67,7 @@ except ImportError:
 try:
     from gui.gtk import filter, offset_correct, errordialog, preferences,\
     dipoledensity, coregister, timef, data_editor, event_process, parse_instance, \
-    meg_assistant, errordialog, viewmri, power_spectral_density, progressbar, spinner
+    meg_assistant, errordialog, viewmri, power_spectral_density, progressbar, spinner, filechooser
     from gui.gtk import contour as contour_gtk
 except ImportError:
     errordialog.errorwin('PyMEG not installed correctly, cant find pymeg code in path.')
@@ -262,7 +262,7 @@ class maingui():
         self.readMEG()
 
     def loadMRI(self,widget):
-        self.builder.get_object("filechooserdialog1").show()
+        self.builder.get_object("filechooserdialog").show()
         self.mr = img.read(self.fn)
 
     def readMEG(self):
@@ -282,7 +282,7 @@ class maingui():
         self.parseddatadict[self.fn] = self.parseddata.out
 
     def fileOpenMEG(self,widget):
-        fcd = self.builder.get_object("filechooserdialog1")
+        fcd = self.builder.get_object("filechooserdialog")
         fcd.show()
         try:fcd.set_current_folder(self.prefs['LastMEGPath'])
         except: pass
@@ -290,7 +290,7 @@ class maingui():
         self.clear_filters()
 
     def fileOpenMRI(self,widget):
-        fcd = self.builder.get_object("filechooserdialog1")
+        fcd = self.builder.get_object("filechooserdialog")
         filter = gtk.FileFilter()
         filter.set_name("MRI Nifti or Analyze files")
         filter.add_pattern("*nii.gz")
@@ -300,11 +300,12 @@ class maingui():
         fcd.add_filter(filter)
         try:fcd.set_current_folder(self.prefs['LastMRIPath'])
         except: pass
+
         fcd.show()
         self.filetype = 'MRI'
 
     def fileOpenPYM(self,widget):
-        fcd = self.builder.get_object("filechooserdialog1")
+        fcd = self.builder.get_object("filechooserdialog")
         filter = gtk.FileFilter()
         filter.set_name("Python")
         filter.add_pattern("*.pym")
@@ -318,7 +319,7 @@ class maingui():
         self.filetype = 'PYM'
 
     def fileOpenDIP(self, widget):
-        fcd = self.builder.get_object("filechooserdialog1")
+        fcd = self.builder.get_object("filechooserdialog")
         filter = gtk.FileFilter()
         filter.set_name("Dipole Files")
         filter.add_pattern("*lA")
@@ -331,7 +332,7 @@ class maingui():
         self.filetype = 'DIP'
 
     def fileOpenMAT(self, widget):
-        fcd = self.builder.get_object("filechooserdialog1")
+        fcd = self.builder.get_object("filechooserdialog")
         filter = gtk.FileFilter()
         filter.set_name("Matlab Files")
         filter.add_pattern("*.mat")
@@ -344,14 +345,15 @@ class maingui():
         self.filetype = 'MAT'
 
     def clear_filters(self):
-        fcd = self.builder.get_object("filechooserdialog1")
+        fcd = self.builder.get_object("filechooserdialog")
         for i in fcd.list_filters():
             fcd.remove_filter(i)
 
     def fileLoad(self,widget):
-        self.fn = self.builder.get_object("filechooserdialog1").get_filename()
+        self.fn = self.builder.get_object("filechooserdialog").get_filename()
+        print 'trying to load', self.fn
         pathtofile = os.path.dirname(self.fn)
-        self.builder.get_object("filechooserdialog1").hide()
+        self.builder.get_object("filechooserdialog").hide()
         self.updatestatusbar('loading file'+self.fn)
         if self.parseddatadict.get(self.fn, False) != False:
             errordialog.errorwin('File exists in your workspace. Not reloading.')
@@ -417,7 +419,7 @@ class maingui():
             print('done')
 
     def fileCancel(self,widget):
-        self.builder.get_object("filechooserdialog1").hide()
+        self.builder.get_object("filechooserdialog").hide()
         self.builder.get_object("filechooserdialog2").hide()
 
     def startsavedialog(self,widget):
@@ -1266,8 +1268,8 @@ class maingui():
         #self.fn = ['/home/danc/programming/python/data/standardmri/colin_1mm.img']
         ##self.datadict[path] = self.fn
         #self.filetype = 'MRI'
-        #self.builder.get_object("filechooserdialog1").set_uri('file://'+self.fn[0])
-        #self.builder.get_object("filechooserdialog1").show()
+        #self.builder.get_object("filechooserdialog").set_uri('file://'+self.fn[0])
+        #self.builder.get_object("filechooserdialog").show()
 
 class MainThread(threading.Thread):
     def run(self):
@@ -1302,7 +1304,7 @@ if __name__ == "__main__":
     import cProfile, pstats
     cProfile.run('mainwindow = maingui()')
     mainwindow.window.show()
-    mainwindow.testload('/home/danc/data/meg/0611piez/e,rfhp1.0Hz,ra')
+    mainwindow.testload('/home/danc/data/meg/0611piez/e,rfhp1.0Hz,ra.mod')
     #cProfile.run('mainwindow.testload(None)')
     #import code; code.interact(local=locals()) #Interactive Shell
     gtk.main()

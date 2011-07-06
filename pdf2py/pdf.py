@@ -66,9 +66,9 @@ class write_changes():
     def __init__(self, datapdf, data2write):
         print('writing changes to:', datapdf.data.filename)
         if os.path.isfile(datapdf.data.filepath)==True:
-            data.write(datapdf, data2write)
-            print('writing pdf header')
-            header.write(datapdf);
+            data.write_changes(datapdf, data2write)
+            #print('writing pdf header')
+            #header.write(datapdf);
 
 
 
