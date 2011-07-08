@@ -157,6 +157,8 @@ class maingui():
             "on_paste_activate" : self.paste_item,
             "on_rename_activate" : self.rename_item,
             "on_closefile_clicked" : self.close_file,
+            "on_write_changes_activate" : self.update_changes_meg,
+            "on_message_dialog_response" : self.message_dialog_response,
         }
 
         self.builder.connect_signals(dic)
@@ -224,7 +226,7 @@ class maingui():
         print 'renaming', self.selecteditem
         print widget.get_label()
         if widget.get_label() == 'Rename':
-            self.rename_win = self.builder.get_object('dialog1')
+            self.rename_win = self.builder.get_object('rename_dialog')
             self.rename_win.show()
         if widget.get_label() == 'Save':
             print 'renaming item'
@@ -420,13 +422,13 @@ class maingui():
 
     def fileCancel(self,widget):
         self.builder.get_object("filechooserdialog").hide()
-        self.builder.get_object("filechooserdialog2").hide()
+        self.builder.get_object("filesavedialog").hide()
 
     def startsavedialog(self,widget):
-        self.builder.get_object("filechooserdialog2").show()
+        self.builder.get_object("filesavedialog").show()
 
     def saveselected(self,widget):
-        fcd = self.builder.get_object("filechooserdialog2")
+        fcd = self.builder.get_object("filesavedialog")
         filename_without_ext = fnstrip = os.path.splitext(fcd.get_filename())[0]
         try:
             readwrite.writedata(self.treedata[self.selecteditem], fnstrip)
@@ -435,6 +437,26 @@ class maingui():
         except KeyError:
             readwrite.writedata(self.data_file_selected, fnstrip)
         fcd.hide()
+
+    def update_changes_meg(self,widget):
+        self.builder.get_object('messagedialog').set_markup('You are saving changes to file. Do you want to make a copy of the original file as a backup?')
+        self.builder.get_object('messagedialog').show()
+
+    def message_dialog_response(self,widget,button):
+        print button
+        if button == -5: #OK
+            #m = self.builder.get_object('messagedialog')
+            #m(parent=None, flags=0, type=gtk.MESSAGE_INFO, buttons=gtk.BUTTONS_NONE, message_format=None)
+            #self.builder.get_object('messagedialog').add_button(gtk.STOCK_QUIT, gtk.RESPONSE_CLOSE)
+            self.builder.get_object('messagedialog-action_area').set_sensitive(False)
+            self.spin('start')
+            import shutil
+            shutil.copy('fromhere','tohere')
+            self.spin('stop')
+            self.builder.get_object('messagedialog').hide()
+        if button == -6:
+            self.builder.get_object('messagedialog').hide()
+
 
     def quit(self, widget):
         sys.exit(0)
@@ -950,8 +972,6 @@ class maingui():
         self.offset.setupoffsetwin(widget, res['data_block'],res['eventtime'],res['frames'],res['numofepochs'],callback=offset_callback)
         self.offset.window.show()
         self.data_file_selected['offset_corrected'] = {}
-
-
 
     def timef_handler(self,widget):
         def donetft(results):

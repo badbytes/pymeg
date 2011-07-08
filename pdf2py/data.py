@@ -216,7 +216,7 @@ class write_changes:
         bitsperchan = datapdf.data.time_slice_size/datapdf.data.total_chans
         for c in arange(len(datapdf.data.channels.indexlist)):
             print 'ch',c
-            seekpnt = bitsperchan * (datapdf.data.channels.indexlist[c]+1)
+            seekpnt = bitsperchan * (datapdf.data.channels.indexlist[c])
             #self.fid.seek(seekpnt,0)
             for s in arange(datapdf.data.pnts_in_file):
 

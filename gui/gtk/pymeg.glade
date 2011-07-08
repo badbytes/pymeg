@@ -2,73 +2,7 @@
 <interface>
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-local-resource-path /home/danc/programming/python/pymeg/gui/gtk/images -->
-  <object class="GtkListStore" id="PlotShape">
-    <columns>
-      <!-- column-name gchararray1 -->
-      <column type="gchararray"/>
-    </columns>
-    <data>
-      <row>
-        <col id="0" translatable="yes">points</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">disks</col>
-      </row>
-    </data>
-  </object>
-  <object class="GtkAboutDialog" id="aboutdialog1">
-    <property name="can_focus">False</property>
-    <property name="border_width">5</property>
-    <property name="destroy_with_parent">True</property>
-    <property name="type_hint">normal</property>
-    <property name="deletable">False</property>
-    <property name="program_name">PyMEG</property>
-    <property name="website">http://wiki.neuromeg.org/PyMEG</property>
-    <property name="license" translatable="yes">#
-#       Copyright 2010 dan collins &lt;danc@badbytes.net&gt;
-#
-#       This program is free software; you can redistribute it and/or modify
-#       it under the terms of the GNU General Public License as published by
-#       the Free Software Foundation; either version 2 of the License, or
-#       (at your option) any later version.
-#
-#       This program is distributed in the hope that it will be useful,
-#       but WITHOUT ANY WARRANTY; without even the implied warranty of
-#       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#       GNU General Public License for more details.
-#
-#       You should have received a copy of the GNU General Public License
-#       along with this program; if not, write to the Free Software
-#       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-#       MA 02110-1301, USA.</property>
-    <signal name="delete-event" handler="gtk_widget_hide" swapped="no"/>
-    <signal name="response" handler="on_aboutdialog1_hide" swapped="no"/>
-    <child internal-child="vbox">
-      <object class="GtkBox" id="dialog-vbox3">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
-        <child internal-child="action_area">
-          <object class="GtkButtonBox" id="dialog-action_area3">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="layout_style">end</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="pack_type">end</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-      </object>
-    </child>
-  </object>
-  <object class="GtkAssistant" id="assistant1">
+  <object class="GtkAssistant" id="MEGassistant">
     <property name="can_focus">False</property>
     <property name="border_width">12</property>
     <property name="title" translatable="yes">MEG Data Load</property>
@@ -350,57 +284,58 @@
       </packing>
     </child>
   </object>
-  <object class="GtkDialog" id="dialog1">
+  <object class="GtkListStore" id="PlotShape">
+    <columns>
+      <!-- column-name gchararray1 -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">points</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">disks</col>
+      </row>
+    </data>
+  </object>
+  <object class="GtkAboutDialog" id="aboutdialog1">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
-    <property name="title" translatable="yes">Rename Item</property>
-    <property name="window_position">mouse</property>
+    <property name="destroy_with_parent">True</property>
     <property name="type_hint">normal</property>
-    <property name="skip_taskbar_hint">True</property>
-    <property name="skip_pager_hint">True</property>
-    <property name="decorated">False</property>
     <property name="deletable">False</property>
+    <property name="program_name">PyMEG</property>
+    <property name="website">http://wiki.neuromeg.org/PyMEG</property>
+    <property name="license" translatable="yes">#
+#       Copyright 2010 dan collins &lt;danc@badbytes.net&gt;
+#
+#       This program is free software; you can redistribute it and/or modify
+#       it under the terms of the GNU General Public License as published by
+#       the Free Software Foundation; either version 2 of the License, or
+#       (at your option) any later version.
+#
+#       This program is distributed in the hope that it will be useful,
+#       but WITHOUT ANY WARRANTY; without even the implied warranty of
+#       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#       GNU General Public License for more details.
+#
+#       You should have received a copy of the GNU General Public License
+#       along with this program; if not, write to the Free Software
+#       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#       MA 02110-1301, USA.</property>
+    <signal name="delete-event" handler="gtk_widget_hide" swapped="no"/>
+    <signal name="response" handler="on_aboutdialog1_hide" swapped="no"/>
     <child internal-child="vbox">
-      <object class="GtkBox" id="dialog-vbox9">
+      <object class="GtkBox" id="dialog-vbox3">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
         <property name="spacing">2</property>
         <child internal-child="action_area">
-          <object class="GtkButtonBox" id="dialog-action_area9">
+          <object class="GtkButtonBox" id="dialog-action_area3">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="layout_style">end</property>
-            <child>
-              <object class="GtkButton" id="button2">
-                <property name="label" translatable="yes">Cancel</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
-                <signal name="clicked" handler="on_rename_activate" swapped="no"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="button3">
-                <property name="label" translatable="yes">Save</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_action_appearance">False</property>
-                <signal name="clicked" handler="on_rename_activate" swapped="no"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -410,23 +345,10 @@
           </packing>
         </child>
         <child>
-          <object class="GtkEntry" id="rename_entry">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="invisible_char">●</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
-          </packing>
+          <placeholder/>
         </child>
       </object>
     </child>
-    <action-widgets>
-      <action-widget response="0">button2</action-widget>
-      <action-widget response="0">button3</action-widget>
-    </action-widgets>
   </object>
   <object class="GtkFileChooserDialog" id="filechooserdialog">
     <property name="can_focus">False</property>
@@ -503,7 +425,7 @@
       <action-widget response="0">filedialogLoad</action-widget>
     </action-widgets>
   </object>
-  <object class="GtkFileChooserDialog" id="filechooserdialog2">
+  <object class="GtkFileChooserDialog" id="filesavedialog">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
     <property name="type">popup</property>
@@ -600,6 +522,36 @@
   </object>
   <object class="GtkListStore" id="liststore2"/>
   <object class="GtkListStore" id="liststore3"/>
+  <object class="GtkMessageDialog" id="messagedialog">
+    <property name="can_focus">False</property>
+    <property name="border_width">5</property>
+    <property name="modal">True</property>
+    <property name="window_position">mouse</property>
+    <property name="type_hint">dialog</property>
+    <property name="skip_taskbar_hint">True</property>
+    <property name="urgency_hint">True</property>
+    <property name="buttons">ok-cancel</property>
+    <signal name="response" handler="on_message_dialog_response" swapped="no"/>
+    <child internal-child="vbox">
+      <object class="GtkBox" id="messagedialog-vbox">
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox" id="messagedialog-action_area">
+            <property name="can_focus">False</property>
+            <property name="layout_style">end</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
   <object class="GtkDialog" id="plotdialog">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
@@ -1648,6 +1600,84 @@
       </object>
     </child>
   </object>
+  <object class="GtkDialog" id="rename_dialog">
+    <property name="can_focus">False</property>
+    <property name="border_width">5</property>
+    <property name="title" translatable="yes">Rename Item</property>
+    <property name="window_position">mouse</property>
+    <property name="type_hint">normal</property>
+    <property name="skip_taskbar_hint">True</property>
+    <property name="skip_pager_hint">True</property>
+    <property name="decorated">False</property>
+    <property name="deletable">False</property>
+    <child internal-child="vbox">
+      <object class="GtkBox" id="dialog-vbox9">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox" id="dialog-action_area9">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="layout_style">end</property>
+            <child>
+              <object class="GtkButton" id="button2">
+                <property name="label" translatable="yes">Cancel</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
+                <signal name="clicked" handler="on_rename_activate" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="button3">
+                <property name="label" translatable="yes">Save</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
+                <signal name="clicked" handler="on_rename_activate" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="rename_entry">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="invisible_char">●</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <action-widgets>
+      <action-widget response="0">button2</action-widget>
+      <action-widget response="0">button3</action-widget>
+    </action-widgets>
+  </object>
   <object class="GtkWindow" id="windowTreeview">
     <property name="width_request">700</property>
     <property name="height_request">400</property>
@@ -1757,6 +1787,19 @@ Either dipole report text file or binary *lA</property>
                         <property name="label" translatable="yes">Close File</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_closefile_clicked" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="updatefile">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">This will overwrite the
+ MEG file updating changes
+ you've made.</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="label" translatable="yes">Save MEG Changes</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_write_changes_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
