@@ -179,50 +179,41 @@ class write:
 
         self.fid.close()
 
-'''
-fn = '/home/danc/data/meg/0611piez/e,rfhp1.0Hz,ra.mod'
-p = pdf.read(fn)
-p.data.setchannellabels(['A1'])
-p.data.getdata(0,p.data.pnts_in_file)
-p.data.data_block = p.data.data_block * 100
-pdf.write_changes(p, p.data.data_block)
-
-datapdf = p
-data2write = p.data.data_block
-
-'''
-
 class write_changes:
-    def __init__(self, datapdf, data2write):
-        self.fid = open(datapdf.data.filepath, 'r+')
+    def __init__(self, dataobj, data2write):
+        '''
+        ex.
+        
+        fn = '/home/danc/data/meg/0611piez/e,rfhp1.0Hz,ra.mod'
+        p = pdf.read(fn)
+        p.data.setchannellabels(['A1','A100'])
+        p.data.setchannels('meg')
+        p.data.getdata(0,p.data.pnts_in_file)
+        p.data.data_block = p.data.data_block * 100
+        pdf.write_changes(p.data, p.data.data_block)
+
+        '''
+        print data2write
+        self.fid = open(dataobj.filepath, 'r+')
         self.fid.seek(0,os.SEEK_SET)
 
-        if datapdf.data.format == 1:
-            data = (data2write) * datapdf.data.scalefact
-        if datapdf.data.format == 3:
+        if dataobj.format == 1:
+            data = (data2write) * dataobj.scalefact
+        if dataobj.format == 3:
             data = single(data2write)#*2
-            print 'dataprecision is single'#, datapdf.data.dataprecision
+            print 'dataprecision is single'#, dataobj.dataprecision
 
         numofpnts2write = data2write.shape[0]*data2write.shape[1]
-        print 'saving changes to file. ',datapdf.data.numofchannels, 'channels getting rewritten.'
-        #if len(data2write.shape) == 2:
-            #numofpnts2write = data2write.shape[0]*data2write.shape[1]
-            #reindexed_data = data.flatten()
-        #elif len(data2write.shape) == 1:
-            #numofpnts2write = data2write.shape[0]
-            #reindexed_data = data
-        #print numofpnts2write, reindexed_data.shape
+        print 'saving changes to file. ',dataobj.numofchannels, 'channels getting rewritten.'
 
-        bitsperchan = datapdf.data.time_slice_size/datapdf.data.total_chans
-        for c in arange(len(datapdf.data.channels.indexlist)):
-            print 'ch',c
-            seekpnt = bitsperchan * (datapdf.data.channels.indexlist[c])
-            #self.fid.seek(seekpnt,0)
-            for s in arange(datapdf.data.pnts_in_file):
-
-                self.fid.seek(seekpnt + (datapdf.data.time_slice_size * s), os.SEEK_SET)
-                fwrite(self.fid, 1, data2write[s,c], datapdf.data.dataprecision, endianness=1)
-                #print s,self.fid.tell()
+        bitsperchan = dataobj.time_slice_size/dataobj.total_chans
+        for c in arange(len(dataobj.channels.indexlist)): #for each channel
+            #print 'ch',c
+            seekpnt = bitsperchan * (dataobj.channels.indexlist[c])
+            for s in arange(dataobj.pnts_in_file): #for each time point.
+                self.fid.seek(seekpnt + (dataobj.time_slice_size * s), os.SEEK_SET)
+                fwrite(self.fid, 1, data2write[s,c], dataobj.dataprecision, endianness=1)
+        print 'saving changes to file complete.'
 
         self.fid.close()
 

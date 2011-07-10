@@ -35,7 +35,7 @@ from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
 
 #from meg import megcontour_gtk
-from pdf2py import pdf
+from pdf2py import pdf, readwrite
 from gui.gtk import contour as contour_gtk
 from gui.gtk import meg_assistant,event_process#,offset_correct
 
@@ -91,12 +91,21 @@ class setup_gui:
             }
 
         self.builder.connect_signals(dic)
+        try: self.prefs = readwrite.readdata(os.getenv('HOME')+'/.pymeg.pym')
+        except IOError: self.prefs = {}; readwrite.writedata(self.prefs, os.getenv('HOME')+'/.pymeg')
+        try:
+            self.line_r,self.line_g,self.line_b = self.prefs['LineColor'][0],self.prefs['LineColor'][1],self.prefs['LineColor'][2]
+            self.back_r,self.back_g,self.back_b = self.prefs['BackColor'][0],self.prefs['BackColor'][1],self.prefs['BackColor'][2]
+        except:
+            self.line_r,self.line_g,self.line_b = 1.,1.,1.
+            self.back_r,self.back_g,self.back_b = .9,.9,.9
+        self.color = (self.line_r,self.line_g,self.line_b)
         self.create_draw_frame('none')
         self.create_spec_frame('none')
         self.create_csd_frame('none')
         self.space = 0
         #self.generate_testdata(None)
-        #self.preferences_open(None)
+        self.preferences_open(None)
 
     def printtest(self,widget):
         print 'something'
@@ -118,7 +127,8 @@ class setup_gui:
         self.canvas.show()
         self.figure = self.canvas.figure
         self.axes = self.fig.add_axes([0.045, 0.05, 0.93, 0.925], \
-        axisbg='#FFFFCC')
+        axisbg=(self.back_r,self.back_g,self.back_b))
+        #axisbg='#FFFFCC')
 
         self.vb = self.builder.get_object("vbox3")
         self.vb.pack_start(self.canvas, gtk.TRUE, gtk.TRUE)
@@ -132,7 +142,7 @@ class setup_gui:
         self.speccanvas.show()
         self.specfigure = self.speccanvas.figure
         self.specaxes = self.specfig.add_axes([0.045, 0.05, 0.93, 0.925], \
-        axisbg='#FFFFCC')
+        axisbg=(self.back_r,self.back_g,self.back_b))
         #self.specaxes.axis('off')
         self.vb2 = self.builder.get_object("vbox8")
         self.vb2.pack_end(self.speccanvas, gtk.TRUE, gtk.TRUE)
@@ -145,7 +155,7 @@ class setup_gui:
         self.csdcanvas.show()
         self.csdfigure = self.csdcanvas.figure
         self.csdaxes = self.csdfig.add_axes([0.045, 0.05, 0.93, 0.925], \
-        axisbg='#FFFFCC')
+        axisbg=(self.back_r,self.back_g,self.back_b))
         #self.csdaxes.axis('off')
         self.vb3 = self.builder.get_object("vbox9")
         self.vb3.pack_end(self.csdcanvas, gtk.TRUE, gtk.TRUE)
@@ -172,11 +182,25 @@ class setup_gui:
 
     def preferences_open(self,widget):
         self.win_prefs = self.builder.get_object("window_prefs")
+        #try: self.prefs = readwrite.readdata(os.getenv('HOME')+'/.pymeg.pym')
+        #except IOError: self.prefs = {}; readwrite.writedata(self.prefs, os.getenv('HOME')+'/.pymeg')
+        try:
+            #r,g,b = self.prefs['LineColor'][0],self.prefs['LineColor'][1],self.prefs['LineColor'][2]
+            self.builder.get_object("colorbutton1").set_color(color=gtk.gdk.Color(self.line_r,self.line_g,self.line_b))
+            self.builder.get_object("colorbutton2").set_color(color=gtk.gdk.Color(self.back_r,self.back_g,self.back_b))
+        except IOError:
+            pass
+        #print 'color',self.builder.get_object("colorbutton1").get_color()
+        
+        #self.builder.get_object("colorbutton1").set_color(color=gtk.gdk.Color(111))
+        #print 'color',self.builder.get_object("colorbutton1").get_color()
+        
         if self.builder.get_object('toolbutton12').get_active() == True:
             self.win_prefs.show()
         else:
             self.win_prefs.hide()
         self.selections_tree(None)
+
 
     def key_press_event(self, widget, event):
         print event.keyval
@@ -279,6 +303,7 @@ class setup_gui:
         #self.color = 'black'
         self.axes.cla()
         self.axes = self.figure.axes[0]
+        print 'cur color', self.color
         self.axes.plot(self.time, self.data2plot,color=self.color)
         self.axes.axis('tight')
         try:
@@ -343,16 +368,26 @@ class setup_gui:
         self.redraw(None)#self.display_apply(None)
 
     def display_apply(self,widget):
+        color = self.builder.get_object('colorbutton1')
+        r = color.get_color().red_float
+        g = color.get_color().green_float
+        b = color.get_color().blue_float
+        self.line_color = self.color = (r,g,b)
+        self.prefs['LineColor'] = self.line_color
+        color = self.builder.get_object('colorbutton2')
+        r = color.get_color().red_float
+        g = color.get_color().green_float
+        b = color.get_color().blue_float
+        self.back_color = (r,g,b)
+        self.prefs['BackColor'] = self.back_color
+        readwrite.writedata(self.prefs, os.getenv('HOME')+'/.pymeg')
+        
         self.numofch = int(self.builder.get_object("spinbutton1").get_value())
         self.chanind2plot = \
         self.chanind[self.curchannel:self.curchannel+self.numofch]
         self.chanlabels2plot = \
         self.chanlabels[self.curchannel:self.curchannel+self.numofch]
-        color = self.builder.get_object('colorbutton1')
-        r = color.get_color().red_float
-        g = color.get_color().green_float
-        b = color.get_color().blue_float
-        self.color = (r,g,b)
+        
         st = float(self.builder.get_object("spinbutton2").get_value())
         ed = float(self.builder.get_object("spinbutton3").get_value())
         self.space = float(self.builder.get_object("entry1").get_text())
