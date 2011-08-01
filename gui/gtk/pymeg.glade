@@ -65,6 +65,15 @@
       <placeholder/>
     </child>
     <child>
+      <placeholder/>
+    </child>
+    <child>
+      <placeholder/>
+    </child>
+    <child>
+      <placeholder/>
+    </child>
+    <child>
       <object class="GtkLabel" id="label31">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
@@ -525,22 +534,38 @@
   <object class="GtkMessageDialog" id="messagedialog">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
-    <property name="modal">True</property>
     <property name="window_position">mouse</property>
     <property name="type_hint">dialog</property>
     <property name="skip_taskbar_hint">True</property>
-    <property name="urgency_hint">True</property>
-    <property name="buttons">ok-cancel</property>
+    <property name="message_type">question</property>
+    <property name="buttons">yes-no</property>
+    <property name="secondary_text" translatable="yes">Warning. Selecting yes will modify your original data file.</property>
     <signal name="response" handler="on_message_dialog_response" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkBox" id="messagedialog-vbox">
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
         <property name="spacing">2</property>
+        <signal name="delete-event" handler="gtk_widget_hide" swapped="no"/>
         <child internal-child="action_area">
           <object class="GtkButtonBox" id="messagedialog-action_area">
             <property name="can_focus">False</property>
             <property name="layout_style">end</property>
+            <child>
+              <object class="GtkButton" id="button4">
+                <property name="label">Cancel Save</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
+                <signal name="clicked" handler="on_message_dialog_cancel_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -551,6 +576,9 @@
         </child>
       </object>
     </child>
+    <action-widgets>
+      <action-widget response="0">button4</action-widget>
+    </action-widgets>
   </object>
   <object class="GtkDialog" id="plotdialog">
     <property name="can_focus">False</property>
@@ -1699,18 +1727,18 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <object class="GtkMenuItem" id="menuitem3">
+              <object class="GtkMenuItem" id="menuitem_file">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
                 <property name="label" translatable="yes">_File</property>
                 <property name="use_underline">True</property>
                 <child type="submenu">
-                  <object class="GtkMenu" id="menu4">
+                  <object class="GtkMenu" id="menu_file">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
-                      <object class="GtkMenuItem" id="loadmeg1">
+                      <object class="GtkMenuItem" id="loadmeg">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Supports 4D format MEG data</property>
@@ -1720,7 +1748,7 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="loadmri1">
+                      <object class="GtkMenuItem" id="loadmri">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Support Nifti or Analyze format</property>
@@ -1730,7 +1758,7 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="loadpythondata1">
+                      <object class="GtkMenuItem" id="loadpythondata">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Supports pickled python data *.pym</property>
@@ -1740,7 +1768,7 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="loaddipolefile1">
+                      <object class="GtkMenuItem" id="loaddipolefile">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">4D format dipole files.
@@ -1752,7 +1780,7 @@ Either dipole report text file or binary *lA</property>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="loadmatlab1">
+                      <object class="GtkMenuItem" id="loadmatlab">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Supports *.mat MATLAB files.</property>
@@ -1790,14 +1818,14 @@ Either dipole report text file or binary *lA</property>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="updatefile">
+                      <object class="GtkMenuItem" id="updatefile_4D">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">This will overwrite the
  MEG file updating changes
  you've made.</property>
                         <property name="use_action_appearance">False</property>
-                        <property name="label" translatable="yes">Save MEG Changes</property>
+                        <property name="label" translatable="yes">Save 4D Format</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_write_changes_activate" swapped="no"/>
                       </object>
@@ -1824,7 +1852,7 @@ Either dipole report text file or binary *lA</property>
               </object>
             </child>
             <child>
-              <object class="GtkMenuItem" id="menuitem4">
+              <object class="GtkMenuItem" id="menuitem_edit">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
@@ -1889,7 +1917,7 @@ Either dipole report text file or binary *lA</property>
               </object>
             </child>
             <child>
-              <object class="GtkMenuItem" id="menuitem5">
+              <object class="GtkMenuItem" id="menuitem_help">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
@@ -1922,7 +1950,7 @@ Either dipole report text file or binary *lA</property>
           </packing>
         </child>
         <child>
-          <object class="GtkToolbar" id="toolbar2">
+          <object class="GtkToolbar" id="toolbar">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="toolbar_style">both</property>
@@ -2494,7 +2522,7 @@ Requires ['tft']</property>
           </packing>
         </child>
         <child>
-          <object class="GtkScrolledWindow" id="scrolledwindow3">
+          <object class="GtkScrolledWindow" id="scrolledwindow">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="shadow_type">in</property>

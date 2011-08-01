@@ -37,7 +37,7 @@ try:
 except:
     print("GTK import error")
     sys.exit(1)
-
+print '1'
 from gui.gtk import errordialog
 try:
     from numpy import *
@@ -46,7 +46,7 @@ try:
 except ImportError:
     errordialog.errorwin('Numerical libraries missing. Install Numpy and Scipy. Exiting!')
     sys.exit()
-
+print '2'
 try:
     import nibabel
 except ImportError:
@@ -62,7 +62,7 @@ try:
 except ImportError:
     errordialog.errorwin('Matplotlib missing. Plotting tools will not work properly')
     sys.exit()
-
+print '3'
 #gui modules
 try:
     from gui.gtk import filter, offset_correct, errordialog, preferences,\
@@ -72,7 +72,7 @@ try:
 except ImportError:
     errordialog.errorwin('PyMEG not installed correctly, cant find pymeg code in path.')
     #sys.exit()
-
+print '4'
 #load required methods
 try:
     from pdf2py import pdf, readwrite,lA2array
@@ -85,7 +85,7 @@ except ImportError:
     errordialog.errorwin('PyMEG not installed correctly, cant find pymeg code in path.')
     #sys.exit()
 
-
+print '5'
 #from IPython.Shell import IPShellEmbed
 #ipshell = IPShellEmbed()
 #ipshell() # this call anywhere in your program will start IPython
@@ -136,7 +136,7 @@ class maingui():
             "on_2DMRI_activate" : self.plot2Dmri,
             "on_menuleadfield_activate" : self.leadfieldcalc,
             "on_savebutton_clicked" : self.saveselected,
-            "on_saveselecteditem_clicked" : self.startsavedialog,
+            "on_saveselecteditem_clicked" : self.savedialog,
             "on_deletedselecteditem_clicked" : self.deleteselected,
             "on_dipoledensity_activate" : self.dipoledensityhandle,
             "on_coregister_activate" : self.coregister_handler,
@@ -159,6 +159,7 @@ class maingui():
             "on_closefile_clicked" : self.close_file,
             "on_write_changes_activate" : self.update_changes_meg,
             "on_message_dialog_response" : self.message_dialog_response,
+            "on_message_dialog_cancel_clicked" : self.message_dialog_response,
         }
 
         self.builder.connect_signals(dic)
@@ -167,16 +168,22 @@ class maingui():
         self.treelist = [] #appends list with newly clicked items from treeview
         self.treedict = {} #initialize the treeview dictionary.
         self.dataselected = [] #tree item currently selected
+        self.data_filename_selected = [] #filename/path of loaded file
 
-        #turn off function menu
+        #turn off function menu and file save menu
         menufunctions = self.builder.get_object('menufunctions').get_children()
         for m in menufunctions:
             if m.get_name() ==  'GtkMenuItem':
                 m.set_sensitive(False)
+        self.builder.get_object('savefile').set_sensitive(False)
+        #self.builder.get_object('updatefile_4D').set_sensitive(False)
 
         #preference data
-        try: self.prefs = readwrite.readdata(os.getenv('HOME')+'/.pymeg.pym')
-        except IOError: pass
+        try: 
+            self.prefs = readwrite.readdata(os.getenv('HOME')+'/.pymeg.pym')
+        except IOError: 
+            self.prefs = {'VerboseTreeButton' : False};
+            readwrite.writedata(self.prefs, os.getenv('HOME')+'/.pymeg')
         self.fill_combo_entries(None)
 
     def menu_tearoff(self,widget): #dev default function
@@ -262,6 +269,7 @@ class maingui():
         path = self.data_assist.pdfdata.data.filepath
         self.datadict[path] = self.data_assist.pdfdata
         self.readMEG()
+        self.builder.get_object('updatefile_4D').set_sensitive(True)
 
     def loadMRI(self,widget):
         self.builder.get_object("filechooserdialog").show()
@@ -286,7 +294,7 @@ class maingui():
     def fileOpenMEG(self,widget):
         fcd = self.builder.get_object("filechooserdialog")
         fcd.show()
-        try:fcd.set_current_folder(self.prefs['LastMEGPath'])
+        try: fcd.set_current_folder(self.prefs['LastMEGPath'])
         except: pass
         self.filetype = '4DMEG'
         self.clear_filters()
@@ -367,6 +375,9 @@ class maingui():
             try:
                 pdf.read(self.fn)
                 self.meg_assist()
+                self.prefs['LastMEGPath'] = self.fn#pathtofile
+                readwrite.writedata(self.prefs, os.getenv('HOME')+'/.pymeg')
+                
             except AttributeError:
                 print('Not a MEG file')
 
@@ -418,13 +429,14 @@ class maingui():
             self.datadict[self.fn] = self.dipoledata#.dipdict #dipoledata(self)#.dipdict
             self.refreshdatasummary()
             self.treegohome(None)
-            print('done')
+        self.builder.get_object('savefile').set_sensitive(True)
+        print('done')
 
     def fileCancel(self,widget):
         self.builder.get_object("filechooserdialog").hide()
         self.builder.get_object("filesavedialog").hide()
 
-    def startsavedialog(self,widget):
+    def savedialog(self,widget):
         self.builder.get_object("filesavedialog").show()
 
     def saveselected(self,widget):
@@ -439,24 +451,47 @@ class maingui():
         fcd.hide()
 
     def update_changes_meg(self,widget):
-        self.builder.get_object('messagedialog').set_markup('You are saving changes to file. Do you want to make a copy of the original file as a backup?')
+        self.builder.get_object('messagedialog').set_markup('You are saving object '+self.selecteditem+' to file. Do you want to make a copy of the original file as a backup?')
+        #print 'is active',self.builder.get_object('messagedialog').is_active()
+        #self.builder.get_object('messagedialog').add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CLOSE)
         self.builder.get_object('messagedialog').show()
+        print 'Using',self.selecteditem,'for the rewrite'
 
-    def message_dialog_response(self,widget,button):
+    def message_dialog_response(self,widget,button=False):
         print button
-        if button == -5: #OK
+        
+        if button == -8: #OK
             #m = self.builder.get_object('messagedialog')
             #m(parent=None, flags=0, type=gtk.MESSAGE_INFO, buttons=gtk.BUTTONS_NONE, message_format=None)
-            #self.builder.get_object('messagedialog').add_button(gtk.STOCK_QUIT, gtk.RESPONSE_CLOSE)
-            self.builder.get_object('messagedialog-action_area').set_sensitive(False)
+            
+            try: 
+                self.builder.get_object('messagedialog-action_area').set_sensitive(False)
+                self.spin('start')
+                import shutil
+                print self.data_filename_selected,'sel'
+                shutil.copy(self.data_filename_selected, self.data_filename_selected + '.backup')
+                print 'Copy complete to file', self.data_filename_selected + '.backup'
+                pdf.write_changes(self.data_file_selected['data'], self.treedata[self.selecteditem])
+                print self.treedata[self.selecteditem], 'changes saved to file:',self.data_filename_selected
+                self.updatestatusbar('changes saved')
+                self.builder.get_object('messagedialog-action_area').set_sensitive(True)
+                self.builder.get_object('messagedialog').hide()
+            except IOError:
+                print 'Error in copy'
+                self.updatestatusbar('Error in copy')
+                self.builder.get_object('messagedialog-action_area').set_sensitive(True)
+                
+            
+        if button == -9: #No backup copy, but still proceed with save.
             self.spin('start')
-            import shutil
-            shutil.copy('fromhere','tohere')
-            self.spin('stop')
+            pdf.write_changes(self.data_file_selected['data'], self.treedata[self.selecteditem])
             self.builder.get_object('messagedialog').hide()
-        if button == -6:
+            self.updatestatusbar('changes saved for file:'+self.data_filename_selected)
+            
+        if button == 0: #Cancel
             self.builder.get_object('messagedialog').hide()
-
+            
+        self.spin('stop')
 
     def quit(self, widget):
         sys.exit(0)
@@ -497,10 +532,13 @@ class maingui():
 
     def parseinstance(self,data):
         self.currentDataName = str(data)
-        if self.prefs['VerboseTreeButton'] == True:
-            verbose=True
-        else:
-            verbose=False
+        try:
+            if self.prefs['VerboseTreeButton'] == True:
+                verbose=True
+            else:
+                verbose=False
+        except IOError:
+            pass
         self.parseddata = parse_instance.run(data,verbose)
 
     def populatetree(self,treedata):
@@ -528,6 +566,9 @@ class maingui():
         print('you selected item:', self.dataList.get_value(iter,0))#, self.dataList.get_value(iter,1)
         self.dataselected = self.selecteditem = self.dataList.get_value(iter,0)
         self.prerequisite(itemtype='selecteditem')
+        if len(self.treedict) == 0:
+            self.data_filename_selected = self.selecteditem
+            self.data_file_selected = self.datadict[self.selecteditem]
 
     def treeclicked(self,b,c,d):
         print(b,c,d)
@@ -546,8 +587,8 @@ class maingui():
             except IndexError: self.treedict = {0 :self.treedata}
             self.builder.get_object('statusbar').push(self.builder.get_object("statusbar").get_context_id(''),self.dataList.get_value(iter,0))
 
-            self.data_file_selected = self.datadict[self.selecteditem]
-            self.data_filename_selected = self.selecteditem
+            #self.data_file_selected = self.datadict[self.selecteditem]
+            #self.data_filename_selected = self.selecteditem
             print('Data File Selected:')#,self.data_file_selected
         else:
             print('lower lvl')
@@ -1170,6 +1211,7 @@ class maingui():
                 predict['Contour Plot'] = ['chanlocs','labellist']
                 predict['Plot TFT'] = ['tft']
                 #predict['Plot'] = True
+                
 
 
         except:
@@ -1324,7 +1366,7 @@ if __name__ == "__main__":
     import cProfile, pstats
     cProfile.run('mainwindow = maingui()')
     mainwindow.window.show()
-    mainwindow.testload('/home/danc/data/meg/0611piez/e,rfhp1.0Hz,ra.mod')
+    mainwindow.testload('/home/danc/data/meg/0611piez/e,rfhp1.0Hz,ra.mod')#/home/danc/data/meg/0611piez/e,rfhp1.0Hz,ra.mod')
     #cProfile.run('mainwindow.testload(None)')
     #import code; code.interact(local=locals()) #Interactive Shell
     gtk.main()
