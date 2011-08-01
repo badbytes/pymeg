@@ -181,7 +181,7 @@ def display(data, chanlocs, data2=None, subplot='off', animate='off', quiver='of
         if colorbar == 'on':
             p.colorbar()
 
-        p.ioff()
+        #p.ioff()
         #p.colorbar()
         p.show()
     else:

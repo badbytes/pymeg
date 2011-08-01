@@ -29,11 +29,21 @@ returns t, the indices to value u where the transition is from zero to u.
 import numpy as np
 
 def zero_to_nonzero_ind(data, val):
+    if type(val) == np.ndarray or type(val) == list: #make into a list
+        pass
+    else:
+        val = [val]
+
+    d = {}
     if len(np.shape(data)) > 1: #assume channel is second dim
-        f = np.roll(data,1,axis=0)
-        z2nz = data-f
-        out = np.argwhere(z2nz == val).T[0]
-        return out
+            f = np.roll(data,1,axis=0)
+            z2nz = data-f
+    for v in val:
+        print 'value found:',v
+        out = np.argwhere(z2nz == v).T[0]
+        d[v] = out
+
+    return d
 
 def vals(data):
     '''returns values,indices for all zero to non-zero transitions
@@ -79,20 +89,23 @@ def event_detection(data, sample_period, selectwin, slidingwin, thresh):
     for a sliding window of 50 msec
     and a threshold of .3 V'''
 
+    data = data - data[0]
     s = np.sqrt(np.square(data)) #make positive
+    s = s - np.mean(s)
+    print s
     win = int((1 / sample_period) * selectwin) #get ind for selction window
     indslid = int((1 / sample_period) * slidingwin) #get ind for slidingwin
     lastind = indslid*np.floor(len(data)/np.float(indslid))
-    print 'params',s,win,indslid,lastind
 
     t = np.where(s>thresh+s.min())[0] #reduce computation by picking points that could qualify.
-    print t.shape
     tind = []
     a = 0
     val = t[0] #starting val
     looping = True
     while looping == True:
         indx = val-indslid #step back from ind to start the peak-peak sliding window.
+        if indx < 0:
+            indx = 0
         stopindx = indx + win #create a stop point to keep the sliding window for going on forever
         while indx < stopindx:
             mini = min(s[indx:indx+indslid])
