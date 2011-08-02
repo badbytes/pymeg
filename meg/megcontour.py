@@ -94,7 +94,7 @@ def printlabels(chanlocs, labels):
 def titles(titletxt):
     print
 
-def display(data, chanlocs, data2=None, subplot='off', animate='off', quiver='off', title=None, labels=None, colorbar='off'):
+def display(data, chanlocs, data2=None, subplot='on', animate='off', quiver='off', title=None, labels=None, colorbar='off'):
 
     if len(shape(chanlocs)) != 2:
         print 'Chanlocs shape error. Should be 2D array "(2,N)"'

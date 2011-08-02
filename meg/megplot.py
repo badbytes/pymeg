@@ -22,7 +22,7 @@ def display(data):
     '''shape of data should be Times X Channels'''
     dmin=numpy.min(data)
     dmax=numpy.max(data)
-    step=-abs((dmin+dmax)/2)
+    step=-abs((dmin+dmax)*5)
     print 'step',step
     inc=0
     for i in range(0,numpy.size(data,1)):

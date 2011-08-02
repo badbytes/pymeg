@@ -74,6 +74,9 @@
       <placeholder/>
     </child>
     <child>
+      <placeholder/>
+    </child>
+    <child>
       <object class="GtkLabel" id="label31">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
@@ -2171,6 +2174,7 @@ Lead Field Matrix</property>
                         <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Independant Component Analysis</property>
                         <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_ica_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>

@@ -45,7 +45,7 @@ def calc(lf, xyz, qxqyqz):
         minpos = closestposition.run(lf.grid, xyz[i,:]);
         qn = transpose(qxqyqz[i,:]);
         L = lf.leadfield[minpos,:,:];
-        Li = linalg.pinv(L);
+        Li = linalg.pinv(L);print shape(Li),shape(qn)
         sim = append(sim,dot((L),dot(qn,10)));
     return sim.reshape(i+1,size(L,0))
     #return squeeze(sim.reshape(i+1, size(qxqyqz,0),size(L,0)))

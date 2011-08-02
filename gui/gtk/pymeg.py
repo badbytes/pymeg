@@ -42,7 +42,6 @@ from gui.gtk import errordialog
 try:
     from numpy import *
     from scipy import io
-    from numpy import * #shape, random, sort, array, append, size, arange, ndarray,vstack,mean,zeros, dot
 except ImportError:
     errordialog.errorwin('Numerical libraries missing. Install Numpy and Scipy. Exiting!')
     sys.exit()
@@ -67,7 +66,9 @@ print '3'
 try:
     from gui.gtk import filter, offset_correct, errordialog, preferences,\
     dipoledensity, coregister, timef, data_editor, event_process, parse_instance, \
-    meg_assistant, errordialog, viewmri, power_spectral_density, progressbar, spinner, filechooser
+    meg_assistant, errordialog, viewmri, power_spectral_density, progressbar, spinner, filechooser, \
+    ica
+
     from gui.gtk import contour as contour_gtk
 except ImportError:
     errordialog.errorwin('PyMEG not installed correctly, cant find pymeg code in path.')
@@ -160,6 +161,7 @@ class maingui():
             "on_write_changes_activate" : self.update_changes_meg,
             "on_message_dialog_response" : self.message_dialog_response,
             "on_message_dialog_cancel_clicked" : self.message_dialog_response,
+            "on_ica_activate" : self.independent_component_analysis,
         }
 
         self.builder.connect_signals(dic)
@@ -1013,6 +1015,10 @@ class maingui():
         self.offset.setupoffsetwin(widget, res['data_block'],res['eventtime'],res['frames'],res['numofepochs'],callback=offset_callback)
         self.offset.window.show()
         self.data_file_selected['offset_corrected'] = {}
+        
+    def independent_component_analysis(self,widget):
+        icawin = ica.setup()
+        icawin.window.show()
 
     def timef_handler(self,widget):
         def donetft(results):
@@ -1200,6 +1206,8 @@ class maingui():
                 predict['Power Spectral Density'] = ['data_block','srate','labellist','chanlocs']
                 predict['Filter'] = ['data_block','srate']
                 predict['Offset Correct'] = ['data_block','srate']
+                predict['Independant Component Analysis'] = ['data_block']
+                
 
             if itemtype == 'generalitem':
                 obj=self.treedata
