@@ -57,24 +57,27 @@
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <child>
-          <object class="GtkVBox" id="box1">
+          <object class="GtkVBox" id="box_main">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="spacing">13</property>
             <child>
-              <object class="GtkHBox" id="box2">
+              <object class="GtkHBox" id="box_options">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkVBox" id="box3">
+                  <object class="GtkVBox" id="box_names">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
                       <object class="GtkLabel" id="label4">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">        whitened -- Set whitened == True if input data are already whitened.
+                    Otherwise the node will whiten the data itself
+</property>
                         <property name="halign">end</property>
-                        <property name="label" translatable="yes">Whitened</property>
+                        <property name="label" translatable="yes">whitened</property>
                         <property name="justify">right</property>
                       </object>
                       <packing>
@@ -97,7 +100,7 @@
                       calculation (i.e., the input dimensions are reduced to
                       white_comp by keeping the components of largest variance).</property>
                         <property name="halign">end</property>
-                        <property name="label" translatable="yes">Data Reduction:</property>
+                        <property name="label" translatable="yes">white_comp</property>
                         <property name="justify">right</property>
                       </object>
                       <packing>
@@ -111,16 +114,12 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="has_tooltip">True</property>
-                        <property name="tooltip_markup" translatable="yes">white_parm -- a dictionary with additional parameters for whitening.
-                      It is passed directly to the WhiteningNode constructor.
-                      Ex: white_parm = { &amp;apos;svd&amp;apos; : True }
-</property>
                         <property name="tooltip_text" translatable="yes">white_parm -- a dictionary with additional parameters for whitening.
                       It is passed directly to the WhiteningNode constructor.
                       Ex: white_parm = { 'svd' : True }
 </property>
                         <property name="halign">end</property>
-                        <property name="label" translatable="yes">Whitened Paramaters:</property>
+                        <property name="label" translatable="yes">white_parm</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -138,7 +137,7 @@
                         <property name="tooltip_text" translatable="yes">limit -- convergence threshold.
 </property>
                         <property name="halign">end</property>
-                        <property name="label" translatable="yes">Limit:</property>
+                        <property name="label" translatable="yes">limit</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -160,7 +159,7 @@
                                           'symm' --&gt; symmetric
 </property>
                         <property name="halign">end</property>
-                        <property name="label" translatable="yes">Approach:</property>
+                        <property name="label" translatable="yes">approach</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -172,8 +171,14 @@
                       <object class="GtkLabel" id="label9">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">g  -- Nonlinearity to use. Possible values are:
+                                          'pow3' --&gt; x^3
+                                          'tanh' --&gt; tanh(fine_tanh*x)
+                                          'gaus' --&gt; x*exp(-fine_gaus*x^2/2)
+                                          'skew' --&gt; x^2 (for skewed signals)
+</property>
                         <property name="halign">end</property>
-                        <property name="label" translatable="yes">Nonlinearity (g):</property>
+                        <property name="label" translatable="yes">g</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -185,8 +190,12 @@
                       <object class="GtkLabel" id="label10">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">fine_g -- Nonlinearity for fine tuning. Possible values
+                     are the same as for 'g'. Set it to None to disable fine
+                     tuning.
+</property>
                         <property name="halign">end</property>
-                        <property name="label" translatable="yes">Nonlinearity fine tuning (fine_g):</property>
+                        <property name="label" translatable="yes">fine_g</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -199,16 +208,10 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="has_tooltip">True</property>
-                        <property name="tooltip_markup" translatable="yes">approach  -- Approach to use. Possible values are:
-                                          &amp;apos;defl&amp;apos; --&amp;gt; deflation
-                                          &amp;apos;symm&amp;apos; --&amp;gt; symmetric
-</property>
-                        <property name="tooltip_text" translatable="yes">approach  -- Approach to use. Possible values are:
-                                          'defl' --&gt; deflation
-                                          'symm' --&gt; symmetric
+                        <property name="tooltip_text" translatable="yes">mu -- Step size
 </property>
                         <property name="halign">end</property>
-                        <property name="label" translatable="yes">mu:</property>
+                        <property name="label" translatable="yes">mu</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -221,16 +224,14 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="has_tooltip">True</property>
-                        <property name="tooltip_markup" translatable="yes">approach  -- Approach to use. Possible values are:
-                                          &amp;apos;defl&amp;apos; --&amp;gt; deflation
-                                          &amp;apos;symm&amp;apos; --&amp;gt; symmetric
-</property>
-                        <property name="tooltip_text" translatable="yes">approach  -- Approach to use. Possible values are:
-                                          'defl' --&gt; deflation
-                                          'symm' --&gt; symmetric
-</property>
+                        <property name="tooltip_text" translatable="yes">stabilization -- Enable stabilization procedure: the value of mu can
+                     momentarily be halved if the algorithm is stuck between
+                     two points (this is called a stroke). Also if there is no
+                     convergence before half of the maximum number of
+                     iterations has been reached then mu will be halved for
+                     the rest of the rounds.</property>
                         <property name="halign">end</property>
-                        <property name="label" translatable="yes">stabilization:</property>
+                        <property name="label" translatable="yes">stabilization</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -243,16 +244,11 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="has_tooltip">True</property>
-                        <property name="tooltip_markup" translatable="yes">approach  -- Approach to use. Possible values are:
-                                          &amp;apos;defl&amp;apos; --&amp;gt; deflation
-                                          &amp;apos;symm&amp;apos; --&amp;gt; symmetric
-</property>
-                        <property name="tooltip_text" translatable="yes">approach  -- Approach to use. Possible values are:
-                                          'defl' --&gt; deflation
-                                          'symm' --&gt; symmetric
+                        <property name="tooltip_text" translatable="yes">sample_size -- Percentage of samples used in one iteration. If
+                     sample_size &lt; 1, samples are chosen in random order.
 </property>
                         <property name="halign">end</property>
-                        <property name="label" translatable="yes">sample size:</property>
+                        <property name="label" translatable="yes">sample_size</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -265,16 +261,10 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="has_tooltip">True</property>
-                        <property name="tooltip_markup" translatable="yes">approach  -- Approach to use. Possible values are:
-                                          &amp;apos;defl&amp;apos; --&amp;gt; deflation
-                                          &amp;apos;symm&amp;apos; --&amp;gt; symmetric
-</property>
-                        <property name="tooltip_text" translatable="yes">approach  -- Approach to use. Possible values are:
-                                          'defl' --&gt; deflation
-                                          'symm' --&gt; symmetric
+                        <property name="tooltip_text" translatable="yes">fine_tanh -- parameter for 'tanh' nonlinearity
 </property>
                         <property name="halign">end</property>
-                        <property name="label" translatable="yes">fine_tanh:</property>
+                        <property name="label" translatable="yes">fine_tanh</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -287,16 +277,10 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="has_tooltip">True</property>
-                        <property name="tooltip_markup" translatable="yes">approach  -- Approach to use. Possible values are:
-                                          &amp;apos;defl&amp;apos; --&amp;gt; deflation
-                                          &amp;apos;symm&amp;apos; --&amp;gt; symmetric
-</property>
-                        <property name="tooltip_text" translatable="yes">approach  -- Approach to use. Possible values are:
-                                          'defl' --&gt; deflation
-                                          'symm' --&gt; symmetric
+                        <property name="tooltip_text" translatable="yes">        fine_gaus -- parameter for 'gaus' nonlinearity
 </property>
                         <property name="halign">end</property>
-                        <property name="label" translatable="yes">fine_gaus:</property>
+                        <property name="label" translatable="yes">fine_gaus</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -309,16 +293,10 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="has_tooltip">True</property>
-                        <property name="tooltip_markup" translatable="yes">approach  -- Approach to use. Possible values are:
-                                          &amp;apos;defl&amp;apos; --&amp;gt; deflation
-                                          &amp;apos;symm&amp;apos; --&amp;gt; symmetric
-</property>
-                        <property name="tooltip_text" translatable="yes">approach  -- Approach to use. Possible values are:
-                                          'defl' --&gt; deflation
-                                          'symm' --&gt; symmetric
+                        <property name="tooltip_text" translatable="yes">            guess -- initial guess for the mixing matrix (ignored if None)
 </property>
                         <property name="halign">end</property>
-                        <property name="label" translatable="yes">guess:</property>
+                        <property name="label" translatable="yes">guess</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -331,16 +309,11 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="has_tooltip">True</property>
-                        <property name="tooltip_markup" translatable="yes">approach  -- Approach to use. Possible values are:
-                                          &amp;apos;defl&amp;apos; --&amp;gt; deflation
-                                          &amp;apos;symm&amp;apos; --&amp;gt; symmetric
-</property>
-                        <property name="tooltip_text" translatable="yes">approach  -- Approach to use. Possible values are:
-                                          'defl' --&gt; deflation
-                                          'symm' --&gt; symmetric
+                        <property name="tooltip_text" translatable="yes">
+           max_it -- maximum number of iterations
 </property>
                         <property name="halign">end</property>
-                        <property name="label" translatable="yes">max iterations:</property>
+                        <property name="label" translatable="yes">max_it</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -353,16 +326,10 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="has_tooltip">True</property>
-                        <property name="tooltip_markup" translatable="yes">approach  -- Approach to use. Possible values are:
-                                          &amp;apos;defl&amp;apos; --&amp;gt; deflation
-                                          &amp;apos;symm&amp;apos; --&amp;gt; symmetric
-</property>
-                        <property name="tooltip_text" translatable="yes">approach  -- Approach to use. Possible values are:
-                                          'defl' --&gt; deflation
-                                          'symm' --&gt; symmetric
+                        <property name="tooltip_text" translatable="yes">      max_it_fine -- maximum number of iterations for fine tuning
 </property>
                         <property name="halign">end</property>
-                        <property name="label" translatable="yes">maximum iterations fine:</property>
+                        <property name="label" translatable="yes">max_it_fine</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -375,16 +342,10 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="has_tooltip">True</property>
-                        <property name="tooltip_markup" translatable="yes">approach  -- Approach to use. Possible values are:
-                                          &amp;apos;defl&amp;apos; --&amp;gt; deflation
-                                          &amp;apos;symm&amp;apos; --&amp;gt; symmetric
-</property>
-                        <property name="tooltip_text" translatable="yes">approach  -- Approach to use. Possible values are:
-                                          'defl' --&gt; deflation
-                                          'symm' --&gt; symmetric
+                        <property name="tooltip_text" translatable="yes">         failures -- maximum number of failures to allow in deflation mode
 </property>
                         <property name="halign">end</property>
-                        <property name="label" translatable="yes">Failures:</property>
+                        <property name="label" translatable="yes">failures</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -400,12 +361,13 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkVBox" id="box7">
+                  <object class="GtkVBox" id="box_values">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
                       <object class="GtkComboBox" id="combobox1">
                         <property name="visible">True</property>
+                        <property name="sensitive">False</property>
                         <property name="can_focus">False</property>
                         <property name="model">liststore1</property>
                         <property name="active">1</property>
@@ -430,7 +392,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="invisible_char">●</property>
-                        <property name="text" translatable="yes">30</property>
+                        <property name="text" translatable="yes">6</property>
                         <property name="invisible_char_set">True</property>
                       </object>
                       <packing>
@@ -445,6 +407,7 @@
                         <property name="sensitive">False</property>
                         <property name="can_focus">True</property>
                         <property name="invisible_char">●</property>
+                        <property name="text" translatable="yes">None</property>
                         <property name="invisible_char_set">True</property>
                       </object>
                       <packing>
@@ -676,9 +639,6 @@
                     <property name="position">1</property>
                   </packing>
                 </child>
-                <child>
-                  <placeholder/>
-                </child>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -709,13 +669,14 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkButton" id="button1">
+                  <object class="GtkButton" id="button_apply">
                     <property name="label">gtk-apply</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_action_appearance">False</property>
                     <property name="use_stock">True</property>
+                    <signal name="clicked" handler="on_button_apply_clicked" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -780,16 +741,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkButton" id="button4">
-            <property name="label" translatable="yes">button</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="use_action_appearance">False</property>
-          </object>
-          <packing>
-            <property name="position">2</property>
-          </packing>
+          <placeholder/>
         </child>
         <child type="tab">
           <object class="GtkLabel" id="label3">
