@@ -1017,8 +1017,20 @@ class maingui():
         self.data_file_selected['offset_corrected'] = {}
         
     def independent_component_analysis(self,widget):
-        icawin = ica.setup()
+        def ica_callback(results):
+            self.data_file_selected['ica'] = self.res #results
+            self.data_file_selected['ica']['data_block'] = results['weights']
+            self.data_file_selected['ica']['activations'] = results['activations']
+            #self.data_file_selected['ica']['labellist'] = results['labellist']
+            #self.result_helper(self.data_file_selected['ica'],self.res)
+            self.updatestatusbar('ica correction complete')
+            self.refreshtree()
+        obj=self.treedata[self.selecteditem];
+        res = self.res = self.setup_helper(var=['data_block','channels','srate','wintime','labellist','chanlocs','numofepochs',\
+        'frames','eventtime'],obj=obj)
+        icawin = ica.setup(res['data_block'],callback=ica_callback)
         icawin.window.show()
+        
 
     def timef_handler(self,widget):
         def donetft(results):
@@ -1282,10 +1294,10 @@ class maingui():
 
         try:
             self.obj = obj=self.treedata[self.selecteditem];
-            r = (self.setup_helper(var=['data_block','srate','wintime',
+            res = (self.setup_helper(var=['data_block','srate','wintime',
             'labellist','chanlocs'],obj=obj));
-            print (len(r))
-            print r.keys()
+            print (len(res))
+            print res.keys()
 
         except:
             print ("Data Editor can't handle this type")
@@ -1296,7 +1308,7 @@ class maingui():
         try:
             self.de = data_editor.setup_gui()
             #self.de.data_handler(r[0],r[1],r[2],r[3],r[4], callback=self.data_editor_callback)
-            self.de.data_handler(widget, input_dict=r, callback=data_editor_callback)
+            self.de.data_handler(widget, input_dict=res, callback=data_editor_callback)
             self.de.window.show()
         except RuntimeError:
             self.errordialog("Can't do that Dave");

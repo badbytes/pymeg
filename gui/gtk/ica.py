@@ -18,6 +18,7 @@
 #       MA 02110-1301, USA.
 import sys,os,mdp
 from numpy import *
+from pylab import *
 
 try:
     import pygtk
@@ -37,26 +38,25 @@ max_it_fine=100, failures=5, limit=0.001, verbose=False, whitened=False, white_c
 white_parm=None, input_dim=None, dtype=None)'''
 
 class setup:
-    def __init__(self,data=None):
+    def __init__(self,data=None,callback=None):
+        self.callback = callback
         self.builder = gtk.Builder()
         self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
         self.window = self.builder.get_object("window")
 
         dic = {
-            "on_button_apply_clicked" : self.get_options,
+            "on_button_apply_clicked" : self.get_opts,
             }
 
         self.builder.connect_signals(dic)
         self.data = data
-
-
-    def get_options(self,widget):
+        #self.channels = channels
+        
+    def get_opts(self,widget):
         opts = {}
         print 'hello'
         names = self.builder.get_object("box_names").get_children()
         vals = self.builder.get_object("box_values").get_children()
-
-
         for i in arange(len(vals)):
             if vals[i].get_name() == 'GtkComboBox':
                 res = vals[i].get_active_text()
@@ -83,18 +83,21 @@ class setup:
         comp = ica.execute(self.data)
         #z = dot(self.data,ica.get_recmatrix().T)
         #z = z-z[0]
+        labels = []
+        for i in arange(size(comp,1)):
+            labels = append(labels,'comp'+str(i))
         print 'done'
-        from pylab import *
-        subplot(2,1,1)
-        plot(comp);
-        subplot(2,1,2)
-        plot(self.data-self.data[0]);
-        show()
-
-
-
-
-
+        
+        results = {'weights':comp,'activations':ica.get_recmatrix(),'labellist':labels}
+        try: self.callback(results)
+        except: return results
+        
+        
+        #subplot(2,1,1)
+        #plot(comp);
+        #subplot(2,1,2)
+        #plot(self.data-self.data[0]);
+        #show()
 
 if __name__ == "__main__":
     from pdf2py import pdf

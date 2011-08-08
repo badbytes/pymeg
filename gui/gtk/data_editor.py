@@ -208,11 +208,11 @@ class setup_gui:
     def scroll_event(self, widget, event):
         if event.direction == gdk.SCROLL_UP:
             direction = 1
-            self.space = self.space + .5*self.scalefact
+            self.space = self.space + 2*self.scalefact
             print 'sf',self.scalefact
         else:
             direction = -1
-            self.space = self.space - .5*self.scalefact
+            self.space = self.space - 2*self.scalefact
             print 'sf',self.scalefact
         if self.space < 0:
             self.space = 0
@@ -678,10 +678,10 @@ class setup_gui:
         if len(chanlabels) != size(data,1) or len(wintime) != size(data,0):
         #or size(chanlocs,1) != size(data,1):
             print 'error matching wintime or chlabels or chanlocs with data'
-            self.builder.get_object("messagedialog1").format_secondary_text\
-            ('error matching wintime or chlabels or chanlocs with data')
-            self.builder.get_object("messagedialog1").show()
-            raise RuntimeError
+            #self.builder.get_object("messagedialog1").format_secondary_text\
+            #('error matching wintime or chlabels or chanlocs with data')
+            #self.builder.get_object("messagedialog1").show()
+            #raise RuntimeError
 
         self.data = data
         self.srate = srate
