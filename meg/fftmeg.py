@@ -53,6 +53,11 @@ class calc():
         self.ipow = imag(Yi[0:NFFT/2]*2)
         self.freq = f
 
+    def plot_fft(self):
+        figure();plot(self.freq,self.pow);show()
+
+
+
 
 def nearest(array, target):
     '''ind = fftmeg.nearest(freqlist, 40)'''
@@ -66,6 +71,8 @@ def nearest(array, target):
         ind = append(ind,x.index(abs(array-targetint).min()))
     ind = ind.tolist()
     return ind
+
+
 
 #~ if __name__ == "__main__":
     #~ calc()

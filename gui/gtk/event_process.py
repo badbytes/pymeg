@@ -20,7 +20,7 @@
 
 import sys,os
 from pdf2py import pdf,readwrite
-from meg import trigger,event_logic,plot2dgtk,nearest, event_logic
+from meg import trigger,event_logic,plot2dgtk,nearest
 from numpy import append,array,shape,ceil,sqrt,int32
 
 try:
@@ -59,9 +59,6 @@ class setup_gui:
 
         self.builder.connect_signals(dic)
         self.updatestatusbar('Test logic of event prior to epoching/averaging')
-
-    def test(self,widget):
-        pass
 
 
     def updatestatusbar(self,string):
@@ -109,9 +106,9 @@ class setup_gui:
             self.wintime = self.p.data.wintime #timecourse
             u,n,nz = trigger.vals(self.data) #u is the event value
             self.event_dict = event_logic.get_ind(u,self.data) #dictionary with indices to events
-
-
+            print self.event_dict
             self.event_list = array(u,int32)
+            print self.event_list
             self.channellist = array([]) #ch list for custom trigger channel
             for i in self.p.hdr.channel_ref_data:
                 try: self.channellist = append(self.channellist, i.chan_label)
@@ -144,7 +141,8 @@ class setup_gui:
         for k in event_dict.keys(): #range(1,5):
             event_val = event_list[k]
             print event_val,type(event_val)
-            num_events = len(event_dict[k])
+            num_events = len(event_dict[k][event_val])
+            print 'num events',len(event_dict[k][event_val])#len(event_dict[k].values()[0])
             try:
                 event_val = int(event_val)
                 event_name = str(event_val)
@@ -213,7 +211,7 @@ class setup_gui:
                 print('indices dict',self.ind_dict)
                 if len(self.ind_dict.keys()) == 1: #no real logic, just get indices to this value.
                     self.result_ind = self.ind_dict[0]
-                    print('result',self.result_ind)
+                    print('result',self.result_ind.values()[0])
                 else: #boolean logic to solve.
                     self.result_ind = event_logic.ind_logic(self.ind_dict, timediff, self.wintime)
                     print(self.result_ind,'timediff',timediff)
@@ -233,7 +231,7 @@ class setup_gui:
 
         print self.result_all_ind
 
-        self.updatestatusbar('Logic Result: '+str(len(self.result_all_ind))+' events passed conditions')
+        self.updatestatusbar('Logic Result: '+str(len(self.result_all_ind[0].values()[0]))+' events passed conditions')
         self.check_status(None)
 
 
@@ -276,14 +274,14 @@ class setup_gui:
         prestim_ind = nearest.nearest(self.wintime,prestim_sec)[0]
         poststim_ind = nearest.nearest(self.wintime,poststim_sec)[0]
         #print prestim_ms,poststim_ms
-
-        print 'epoch'
-        startcut = self.result_ind-prestim_ind
-        endcut = self.result_ind+poststim_ind
+        ind = self.result_ind.values()[0]
+        print 'epoch', ind,prestim_ind
+        startcut = ind-prestim_ind
+        endcut = ind+poststim_ind
         try:self.callback(widget,startcut,endcut)
         except: pass
         return
-        epoched = self.data[self.result_ind-prestim_ind:self.result_ind+poststim_ind]
+        epoched = self.data[ind-prestim_ind:ind+poststim_ind]
         print epoched.shape,'shape'
 
     def populate_combo(self,widget):

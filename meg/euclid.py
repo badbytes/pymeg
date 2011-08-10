@@ -42,6 +42,25 @@ def dist_old(X1, X2, Y1, Y2, Z1, Z2):
     s = sqrt(((X1-X2)**2)+((Y1-Y2)**2)+((Z1-Z2)**2));
     return s
 
+def get_neighbors(target_channel_pos, other_channel_pos, neighbor_num):
+    d = dist(target_channel_pos,other_channel_pos)
+    distsort = d.argsort()
+    r = distsort[:,0:neighbor_num]
+    return r
+
+def get_proximity(target_channel_pos, other_channel_pos, distance_in_mm):
+    s = dist(target_channel_pos,other_channel_pos)
+    #distind = argwhere(s < distance_in_mm)
+    distind = where(s < distance_in_mm)
+    out = array([[]],dtype=object)
+    for i in s:
+        print i,'ch'
+        out = append(out,argwhere(i < 30))
+        #out = append(argwhere(i < 30).T)
+
+    fftout.pow[:,distind]
+
+
 if __name__ == '__main__':
     dist()
 

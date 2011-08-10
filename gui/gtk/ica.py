@@ -51,7 +51,7 @@ class setup:
         self.builder.connect_signals(dic)
         self.data = data
         #self.channels = channels
-        
+
     def get_opts(self,widget):
         opts = {}
         print 'hello'
@@ -78,6 +78,12 @@ class setup:
 
         '''ica = mdp.nodes.FastICANode(white_comp=10,approach='defl', g='pow3', guess=None, fine_g='pow3', mu=1, stabilization=False, sample_size=1, fine_tanh=1, fine_gaus=1, max_it=10000, max_it_fine=100, failures=5, limit=0.001, verbose=True)'''
 
+        if type(self.data[0,0]) == int16:
+            self.data = float16(self.data)
+        if type(self.data[0,0]) == int32:
+            self.data = float32(self.data)
+        if type(self.data[0,0]) == int64:
+            self.data = float64(self.data)
 
         ica.train(self.data)
         comp = ica.execute(self.data)
@@ -87,12 +93,12 @@ class setup:
         for i in arange(size(comp,1)):
             labels = append(labels,'comp'+str(i))
         print 'done'
-        
+
         results = {'weights':comp,'activations':ica.get_recmatrix(),'labellist':labels}
         try: self.callback(results)
         except: return results
-        
-        
+
+
         #subplot(2,1,1)
         #plot(comp);
         #subplot(2,1,2)

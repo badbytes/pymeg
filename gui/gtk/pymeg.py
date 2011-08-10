@@ -70,6 +70,7 @@ try:
     ica
 
     from gui.gtk import contour as contour_gtk
+
 except ImportError:
     errordialog.errorwin('PyMEG not installed correctly, cant find pymeg code in path.')
     #sys.exit()
@@ -97,6 +98,7 @@ class maingui():
         self.builder = gtk.Builder()
         self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
         self.window = self.builder.get_object("windowTreeview")
+        self.window.show()
         self.statusbar = self.builder.get_object("statusbar")
         self.statusbar_cid = self.statusbar.get_context_id("")
         #self.memorybar = self.builder.get_object("memorybar")
@@ -181,9 +183,9 @@ class maingui():
         #self.builder.get_object('updatefile_4D').set_sensitive(False)
 
         #preference data
-        try: 
+        try:
             self.prefs = readwrite.readdata(os.getenv('HOME')+'/.pymeg.pym')
-        except IOError: 
+        except IOError:
             self.prefs = {'VerboseTreeButton' : False};
             readwrite.writedata(self.prefs, os.getenv('HOME')+'/.pymeg')
         self.fill_combo_entries(None)
@@ -379,7 +381,7 @@ class maingui():
                 self.meg_assist()
                 self.prefs['LastMEGPath'] = self.fn#pathtofile
                 readwrite.writedata(self.prefs, os.getenv('HOME')+'/.pymeg')
-                
+
             except AttributeError:
                 print('Not a MEG file')
 
@@ -461,12 +463,12 @@ class maingui():
 
     def message_dialog_response(self,widget,button=False):
         print button
-        
+
         if button == -8: #OK
             #m = self.builder.get_object('messagedialog')
             #m(parent=None, flags=0, type=gtk.MESSAGE_INFO, buttons=gtk.BUTTONS_NONE, message_format=None)
-            
-            try: 
+
+            try:
                 self.builder.get_object('messagedialog-action_area').set_sensitive(False)
                 self.spin('start')
                 import shutil
@@ -482,17 +484,17 @@ class maingui():
                 print 'Error in copy'
                 self.updatestatusbar('Error in copy')
                 self.builder.get_object('messagedialog-action_area').set_sensitive(True)
-                
-            
+
+
         if button == -9: #No backup copy, but still proceed with save.
             self.spin('start')
             pdf.write_changes(self.data_file_selected['data'], self.treedata[self.selecteditem])
             self.builder.get_object('messagedialog').hide()
             self.updatestatusbar('changes saved for file:'+self.data_filename_selected)
-            
+
         if button == 0: #Cancel
             self.builder.get_object('messagedialog').hide()
-            
+
         self.spin('stop')
 
     def quit(self, widget):
@@ -1015,7 +1017,7 @@ class maingui():
         self.offset.setupoffsetwin(widget, res['data_block'],res['eventtime'],res['frames'],res['numofepochs'],callback=offset_callback)
         self.offset.window.show()
         self.data_file_selected['offset_corrected'] = {}
-        
+
     def independent_component_analysis(self,widget):
         def ica_callback(results):
             self.data_file_selected['ica'] = self.res #results
@@ -1219,7 +1221,7 @@ class maingui():
                 predict['Filter'] = ['data_block','srate']
                 predict['Offset Correct'] = ['data_block','srate']
                 predict['Independant Component Analysis'] = ['data_block']
-                
+
 
             if itemtype == 'generalitem':
                 obj=self.treedata
@@ -1231,7 +1233,7 @@ class maingui():
                 predict['Contour Plot'] = ['chanlocs','labellist']
                 predict['Plot TFT'] = ['tft']
                 #predict['Plot'] = True
-                
+
 
 
         except:
@@ -1337,6 +1339,7 @@ class maingui():
 
     def testload(self, fn):
         print('clicked')
+        from gui.gtk import parse_instance
         fns = [fn] #['/home/danc/python/data/0611/0611piez/e,rfhp1.0Hz,COH']
 
         for i in fns:
@@ -1384,8 +1387,9 @@ class MainThread(threading.Thread):
 
 if __name__ == "__main__":
     import cProfile, pstats
-    cProfile.run('mainwindow = maingui()')
-    mainwindow.window.show()
+    #cProfile.run('mainwindow = maingui()')
+    mainwindow = maingui()
+    #mainwindow.window.show()
     mainwindow.testload('/home/danc/data/meg/0611piez/e,rfhp1.0Hz,ra.mod')#/home/danc/data/meg/0611piez/e,rfhp1.0Hz,ra.mod')
     #cProfile.run('mainwindow.testload(None)')
     #import code; code.interact(local=locals()) #Interactive Shell

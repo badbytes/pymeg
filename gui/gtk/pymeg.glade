@@ -77,6 +77,9 @@
       <placeholder/>
     </child>
     <child>
+      <placeholder/>
+    </child>
+    <child>
       <object class="GtkLabel" id="label31">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
@@ -2032,16 +2035,6 @@ Either dipole report text file or binary *lA</property>
                     <property name="resize_mode">immediate</property>
                     <property name="tearoff_title">Function Menu</property>
                     <child>
-                      <object class="GtkMenuItem" id="filter">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="tooltip_text" translatable="yes">Requires objects ['data_block','srate']</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="label" translatable="yes">Filter</property>
-                        <signal name="activate" handler="on_menufilter_activate" swapped="no"/>
-                      </object>
-                    </child>
-                    <child>
                       <object class="GtkMenuItem" id="epoch_data">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
@@ -2050,6 +2043,34 @@ Either dipole report text file or binary *lA</property>
                         <property name="label" translatable="yes">Epoch Data</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_menu_epoch_data_activated" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="badchanneldetect">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="label" translatable="yes">Bad Channel Detection</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="channelinterpolation">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="label" translatable="yes">Channel Interpolation</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="filter">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">Requires objects ['data_block','srate']</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="label" translatable="yes">Filter</property>
+                        <signal name="activate" handler="on_menufilter_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
