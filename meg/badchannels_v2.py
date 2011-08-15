@@ -28,8 +28,15 @@ from numpy import median,corrcoef
 
 class initialize():
     def __init__(self, method='fft',comparison='proximity'):
+        '''method can be fft
+        neighboring channel pickup can be based on 'proximity' or 'neighbors'
+        eg
+        b = badchannels_v2.initialize(method='fft',comparison='proximity')'''
+        
         self.method = method
         self.comparison = comparison
+        print 'Using method of family channel comparison based on:',comparison
+        
 
     def fft_method(self, data, srate, epochs, hz_range=[4,50]):
         from meg import fftmeg,nearest
