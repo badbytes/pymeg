@@ -26,7 +26,7 @@ try:
 except:
     pass
 try:
-    import gtk
+    import gtk,gobject
     import gtk.glade
 except:
     print("GTK Not Availible")
@@ -57,19 +57,40 @@ class setup_gui:
     def channel_tree(self,widget):
         print('updating list')
         self.View = self.builder.get_object("treeview1")
-        self.dataList = gtk.ListStore(int,str)
+        self.dataList = gtk.ListStore(int,str,gobject.TYPE_BOOLEAN)
         self.AddListColumn('Number', 0, self.View)
         self.AddListColumn('Label', 1, self.View)
+        self.AddBoolColumn('test', 2, self.View)
         
         
         self.numchannels=np.size(self.data,1)#300
         self.chanlabels=np.arange(np.size(self.data,1))#300)
         
         for k in range(0,self.numchannels):
-            iter = self.dataList.append([k,self.chanlabels[k]])
+            iter = self.dataList.append([k,self.chanlabels[k],k])
+            self.dataList[k][2] = False
+            
 
         self.View.set_model(self.dataList)
         print 'adding channels'
+        
+    def AddBoolColumn(self, title, columnId, viewtype):
+        self.render = gtk.CellRendererToggle()
+        self.render.set_property('activatable', True)
+        self.render.connect( 'toggled', self.checkit, self.dataList )
+        column = gtk.TreeViewColumn(title,self.render)#,text=columnId)
+        column.set_resizable(True)
+        column.add_attribute( self.render, "active", 2)
+        column.set_sort_column_id(columnId)
+        viewtype.append_column(column)
+        #viewtype.set_activatable(True)
+        viewtype.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+        #viewtype.get_selection().set_mode(gtk.set_activatable(True))
+        
+    def checkit(self,cell,path,model):
+        model[path][2] = not model[path][2]
+        print "Toggle '%s' to: %s" % (model[path][1], model[path][2],)
+        
 
     def AddListColumn(self, title, columnId, viewtype):
         column = gtk.TreeViewColumn(title,gtk.CellRendererText(),text=columnId)
@@ -77,6 +98,7 @@ class setup_gui:
         column.set_sort_column_id(columnId)
         viewtype.append_column(column)
         viewtype.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+        
     
     def test(self,widget):
         print 'test',widget
@@ -103,7 +125,11 @@ class setup_gui:
             x = liststore[i][0]
             self.chanind.append(int(liststore[i][0]))
             self.axes.scatter(self.data[1,x],self.data[0,x],marker='o',color='r')
+            #liststore[i][2] = True
+            #liststore[i][2] = not liststore[i][2]
             
+            
+            #print liststore[i][2]
         self.canvas.draw()
         #self.canvas.show()
             
