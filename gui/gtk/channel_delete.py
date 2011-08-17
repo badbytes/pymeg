@@ -31,7 +31,7 @@ try:
 except:
     print("GTK Not Availible")
     sys.exit(1)
-    
+
 from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as \
 FigureCanvas
 import matplotlib.cm as cm
@@ -50,7 +50,7 @@ class setup_gui:
             }
 
         self.builder.connect_signals(dic)
-        
+
         self.create_draw_frame(None)
         self.channel_tree(None)
 
@@ -61,19 +61,19 @@ class setup_gui:
         self.AddListColumn('Number', 0, self.View)
         self.AddListColumn('Label', 1, self.View)
         self.AddBoolColumn('test', 2, self.View)
-        
-        
+
+
         self.numchannels=np.size(self.data,1)#300
         self.chanlabels=np.arange(np.size(self.data,1))#300)
-        
+
         for k in range(0,self.numchannels):
             iter = self.dataList.append([k,self.chanlabels[k],k])
             self.dataList[k][2] = False
-            
+
 
         self.View.set_model(self.dataList)
         print 'adding channels'
-        
+
     def AddBoolColumn(self, title, columnId, viewtype):
         self.render = gtk.CellRendererToggle()
         self.render.set_property('activatable', True)
@@ -86,11 +86,11 @@ class setup_gui:
         #viewtype.set_activatable(True)
         viewtype.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
         #viewtype.get_selection().set_mode(gtk.set_activatable(True))
-        
+
     def checkit(self,cell,path,model):
         model[path][2] = not model[path][2]
         print "Toggle '%s' to: %s" % (model[path][1], model[path][2],)
-        
+
 
     def AddListColumn(self, title, columnId, viewtype):
         column = gtk.TreeViewColumn(title,gtk.CellRendererText(),text=columnId)
@@ -98,8 +98,8 @@ class setup_gui:
         column.set_sort_column_id(columnId)
         viewtype.append_column(column)
         viewtype.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
-        
-    
+
+
     def test(self,widget):
         print 'test',widget
         toggled = widget #self.builder.get_object("togglebutton1")
@@ -112,10 +112,10 @@ class setup_gui:
             for i in box_children:
                 i.set_sensitive(False)
         toggled.set_sensitive(True)
-        
+
     def test2(self,widget):
         try: self.axes.clear()
-        except: pass 
+        except: pass
         self.axes.axis('off')
         self.axes.scatter(self.data[1],self.data[0],marker='o',facecolors='none');
         liststore,iter = self.View.get_selection().get_selected_rows()
@@ -127,13 +127,13 @@ class setup_gui:
             self.axes.scatter(self.data[1,x],self.data[0,x],marker='o',color='r')
             #liststore[i][2] = True
             #liststore[i][2] = not liststore[i][2]
-            
-            
+
+
             #print liststore[i][2]
         self.canvas.draw()
         #self.canvas.show()
-            
-                
+
+
     def create_draw_frame(self,widget):
         #ion()
         self.fig = Figure(figsize=[200,200], dpi=100)
@@ -149,7 +149,7 @@ class setup_gui:
         #self.vb.pack_start(self.canvas, gtk.TRUE, gtk.TRUE)
         self.vb.show()
         from pdf2py import readwrite
-        self.data = readwrite.readdata('/home/danc/programming/python/chlocs.pym')
+        self.data = readwrite.readdata('/home/danc/vault/decrypted/programming/python/chanlocs.pym')
         #self.data = np.arange(300)#np.random.randn(300)
         self.axes.scatter(self.data[1],self.data[0],marker='o',facecolors='none');
 

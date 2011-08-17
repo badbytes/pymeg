@@ -21,7 +21,7 @@
 from pdf2py import io_wrapper
 fread = io_wrapper.fread
 fwrite = io_wrapper.fwrite
-from numpy import reshape, shape, float32, array, arange, size, single
+from numpy import reshape, shape, float32, array, arange, size, single, append
 from pdf2py import align, header, config, channel_new #channel
 import os
 from meg import functions
@@ -82,6 +82,7 @@ class read(initialize):
         data_blockreshape=(data_block.reshape([ (end-start),self.total_chans]))
 
         if self.format == 1:
+            print 'WARNING, bug in scalefactor order here. NEED TO FIX'
             print 'short format, multiplying units_per_bit from cfg'
             if os.path.isfile(os.path.dirname(self.datapdf)+'/config')==True:
                 print 'found config file in same dir. Reading config'
@@ -89,11 +90,11 @@ class read(initialize):
                 cfgchlist = []
                 for t in range(0, self.cfg.data_total_chans):
                     cfgchlist.append(self.cfg.channel_data[t].chan_no)
+                self.scalefact = []
                 for c in range(0, self.hdr.header_data.total_chans):
                     scalefact = self.cfg.channel_data[cfgchlist.index(self.hdr.channel_ref_data[c].chan_no)].units_per_bit
-                    data_blockreshape[:,c] = data_blockreshape[:,c]*scalefact
-                    self.scalefact = scalefact
-
+                    self.scalefact = append(self.scalefact, scalefact)
+                data_blockreshape = data_blockreshape*scalefact
 
             else:
                 print "can't read config from same directory"
@@ -183,7 +184,7 @@ class write_changes:
     def __init__(self, dataobj, data2write):
         '''
         ex.
-        
+
         fn = '/home/danc/data/meg/0611piez/e,rfhp1.0Hz,ra.mod'
         p = pdf.read(fn)
         p.data.setchannellabels(['A1','A100'])
