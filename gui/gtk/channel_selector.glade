@@ -28,6 +28,7 @@
         <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">View Labels</property>
         <property name="use_underline">True</property>
+        <signal name="toggled" handler="on_view_label_toggle" object="liststore1" swapped="no"/>
       </object>
     </child>
   </object>
@@ -54,6 +55,7 @@
                   <object class="GtkViewport" id="viewport1">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="events">GDK_POINTER_MOTION_MASK | GDK_STRUCTURE_MASK</property>
                     <property name="hscroll_policy">natural</property>
                     <property name="vscroll_policy">natural</property>
                     <signal name="button-press-event" handler="showpopupmenu" swapped="no"/>
