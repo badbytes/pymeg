@@ -64,12 +64,14 @@ except ImportError:
 print '3'
 #gui modules
 try:
-    from gui.gtk import filter, offset_correct, errordialog, preferences,\
-    dipoledensity, coregister, timef, data_editor, event_process, parse_instance, \
-    meg_assistant, errordialog, viewmri, power_spectral_density, progressbar, spinner, filechooser, \
-    ica
+    pass
+    from gui.gtk import parse_instance, progressbar, spinner, filechooser, errordialog
+    #from gui.gtk import filter, offset_correct, errordialog, preferences,\
+    #dipoledensity, coregister, timef, data_editor, event_process, parse_instance, \
+    #meg_assistant, viewmri, power_spectral_density, progressbar, spinner, filechooser, \
+    #ica
 
-    from gui.gtk import contour as contour_gtk
+    #from gui.gtk import contour as contour_gtk
 
 except ImportError:
     errordialog.errorwin('PyMEG not installed correctly, cant find pymeg code in path.')
@@ -77,12 +79,14 @@ except ImportError:
 print '4'
 #load required methods
 try:
-    from pdf2py import pdf, readwrite,lA2array
-    from meg import dipole,plotvtk,plot2dgtk,signalspaceprojection,nearest
-    from meg import leadfield_parallel as leadfield
-    from mri import img_nibabel as img
-    from mri import sourcesolution2img
-    from beamformers import minimumnorm
+    pass
+    from pdf2py import pdf, readwrite#,lA2array
+    from meg import nearest
+    #from meg import dipole,plotvtk,plot2dgtk,signalspaceprojection,nearest
+    #from meg import leadfield_parallel as leadfield
+    #from mri import img_nibabel as img
+    #from mri import sourcesolution2img
+    #from beamformers import minimumnorm
 except ImportError:
     errordialog.errorwin('PyMEG not installed correctly, cant find pymeg code in path.')
     #sys.exit()
@@ -164,6 +168,7 @@ class maingui():
             "on_message_dialog_response" : self.message_dialog_response,
             "on_message_dialog_cancel_clicked" : self.message_dialog_response,
             "on_ica_activate" : self.independent_component_analysis,
+            "on_channel_editor_activated" : self.channel_select,
         }
 
         self.builder.connect_signals(dic)
@@ -1032,7 +1037,7 @@ class maingui():
         'frames','eventtime'],obj=obj)
         icawin = ica.setup(res['data_block'],callback=ica_callback)
         icawin.window.show()
-        
+
 
     def timef_handler(self,widget):
         def donetft(results):
@@ -1155,6 +1160,7 @@ class maingui():
         return newobj
 
     def epoch_data(self,widget):
+        from gui.gtk import event_process
         def epoch_callback(widget,startcut,endcut):
 
             ed = self.data_file_selected['epoched_data'] = {}
@@ -1221,6 +1227,7 @@ class maingui():
                 predict['Filter'] = ['data_block','srate']
                 predict['Offset Correct'] = ['data_block','srate']
                 predict['Independant Component Analysis'] = ['data_block']
+                predict['Channel Editor'] = ['labellist','chanlocs']
 
 
             if itemtype == 'generalitem':
@@ -1268,6 +1275,7 @@ class maingui():
             pass
 
     def data_editor(self, widget):
+        from gui.gtk import data_editor
         def data_editor_callback(widget):
             print ('de calling back'), widget.get_label()
             try:
@@ -1332,6 +1340,18 @@ class maingui():
         if status == 'stop':
             self.spinner_gui.stop()
             self.spinner_gui.window.hide()
+
+    def channel_select(self,widget):
+        def channel_select_handler(chanind):
+            print 'done',chanind
+
+        from gui.gtk import channel_selector
+        obj=self.treedata[self.selecteditem];
+        res = (self.setup_helper(var=['labellist','chanlocs'],obj=obj));
+        cs = channel_selector.setup(res['chanlocs'],res['labellist'],channel_select_handler)
+        cs.window.show()
+
+
 
     def testhandler(self, widget):
         self.prnt(None)
