@@ -36,9 +36,6 @@ class prefs:
         self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
         self.window = self.builder.get_object("window")
 
-        #for j in self.builder.get_objects():
-            #n = gtk.Buildable.get_name(j)
-
         try:
             self.prefs = readwrite.readdata(os.getenv('HOME')+'/.pymeg.pym')
             print 'reading pref file'
@@ -58,12 +55,8 @@ class prefs:
         self.builder.connect_signals(dic)
 
     def updateprefs(self,widget):
-        #print widget, 'state',widget.get_state(), widget.get_active()
         self.prefs[gtk.Buildable.get_name(widget)] = widget.get_active()
         readwrite.writedata(self.prefs, os.getenv('HOME')+'/.pymeg')
-
-
-
 
 if __name__ == "__main__":
     mainwindow = prefs()

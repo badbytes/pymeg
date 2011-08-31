@@ -2,305 +2,10 @@
 <interface>
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-local-resource-path /home/danc/programming/python/pymeg/gui/gtk/images -->
-  <object class="GtkAssistant" id="MEGassistant">
-    <property name="can_focus">False</property>
-    <property name="border_width">12</property>
-    <property name="title" translatable="yes">MEG Data Load</property>
-    <property name="window_position">mouse</property>
-    <property name="opacity">0.90000000000000002</property>
-    <signal name="close" handler="gtk_widget_hide" swapped="no"/>
-    <signal name="cancel" handler="gtk_widget_hide" swapped="no"/>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <placeholder/>
-    </child>
-    <child>
-      <object class="GtkLabel" id="label31">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="label" translatable="yes">MEG load assistant</property>
-      </object>
-      <packing>
-        <property name="page_type">intro</property>
-      </packing>
-    </child>
-    <child>
-      <object class="GtkTable" id="table1">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="events">GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_STRUCTURE_MASK | GDK_PROPERTY_CHANGE_MASK</property>
-        <property name="n_rows">4</property>
-        <property name="n_columns">4</property>
-        <child>
-          <object class="GtkCheckButton" id="checkbutton29">
-            <property name="label" translatable="yes">meg</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="events">GDK_BUTTON_PRESS_MASK | GDK_STRUCTURE_MASK</property>
-            <property name="use_action_appearance">False</property>
-            <property name="yalign">0.47999998927116394</property>
-            <property name="draw_indicator">True</property>
-            <signal name="toggled" handler="on_checkbutton_toggled" swapped="no"/>
-          </object>
-        </child>
-        <child>
-          <object class="GtkCheckButton" id="checkbutton30">
-            <property name="label" translatable="yes">ref</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="use_action_appearance">False</property>
-            <property name="draw_indicator">True</property>
-            <signal name="toggled" handler="on_checkbutton_toggled" swapped="no"/>
-          </object>
-          <packing>
-            <property name="top_attach">1</property>
-            <property name="bottom_attach">2</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkCheckButton" id="checkbutton31">
-            <property name="label" translatable="yes">trig</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="use_action_appearance">False</property>
-            <property name="draw_indicator">True</property>
-            <signal name="toggled" handler="on_checkbutton_toggled" swapped="no"/>
-          </object>
-          <packing>
-            <property name="right_attach">2</property>
-            <property name="top_attach">2</property>
-            <property name="bottom_attach">3</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkCheckButton" id="checkbutton32">
-            <property name="label" translatable="yes">ext</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="use_action_appearance">False</property>
-            <property name="draw_indicator">True</property>
-          </object>
-          <packing>
-            <property name="top_attach">3</property>
-            <property name="bottom_attach">4</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkCheckButton" id="checkbutton33">
-            <property name="label" translatable="yes">eeg</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="use_action_appearance">False</property>
-            <property name="draw_indicator">True</property>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="right_attach">2</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkCheckButton" id="checkbutton34">
-            <property name="label" translatable="yes">derived</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="use_action_appearance">False</property>
-            <property name="draw_indicator">True</property>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="right_attach">2</property>
-            <property name="top_attach">1</property>
-            <property name="bottom_attach">2</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkCheckButton" id="checkbutton35">
-            <property name="label" translatable="yes">utility</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="use_action_appearance">False</property>
-            <property name="draw_indicator">True</property>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="right_attach">2</property>
-            <property name="top_attach">2</property>
-            <property name="bottom_attach">3</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkCheckButton" id="checkbutton36">
-            <property name="label" translatable="yes">shorted</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="use_action_appearance">False</property>
-            <property name="draw_indicator">True</property>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="right_attach">2</property>
-            <property name="top_attach">3</property>
-            <property name="bottom_attach">4</property>
-          </packing>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-        <child>
-          <placeholder/>
-        </child>
-      </object>
-    </child>
-    <child>
-      <object class="GtkTable" id="table2">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="n_rows">2</property>
-        <property name="n_columns">2</property>
-        <child>
-          <object class="GtkLabel" id="label32">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="label" translatable="yes">First Point   </property>
-          </object>
-        </child>
-        <child>
-          <object class="GtkEntry" id="entry29">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="invisible_char">•</property>
-            <property name="text" translatable="yes">0</property>
-          </object>
-          <packing>
-            <property name="top_attach">1</property>
-            <property name="bottom_attach">2</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkEntry" id="entry30">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="invisible_char">•</property>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="right_attach">2</property>
-            <property name="top_attach">1</property>
-            <property name="bottom_attach">2</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkLabel" id="label33">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Last Point    </property>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="right_attach">2</property>
-          </packing>
-        </child>
-      </object>
-      <packing>
-        <property name="page_type">confirm</property>
-        <property name="title" translatable="yes">MEG load</property>
-        <property name="header_image">fityk.png</property>
-      </packing>
-    </child>
+  <object class="GtkAction" id="action1">
+    <property name="label" translatable="yes">Close</property>
+    <property name="stock_id">gtk-close</property>
+    <signal name="activate" handler="gtk_widget_hide" swapped="no"/>
   </object>
   <object class="GtkListStore" id="PlotShape">
     <columns>
@@ -323,7 +28,7 @@
     <property name="type_hint">normal</property>
     <property name="deletable">False</property>
     <property name="program_name">PyMEG</property>
-    <property name="website">http://wiki.neuromeg.org/PyMEG</property>
+    <property name="website">https://github.com/badbytes/pymeg</property>
     <property name="license" translatable="yes">#
 #       Copyright 2010 dan collins &lt;danc@badbytes.net&gt;
 #
@@ -342,7 +47,7 @@
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.</property>
     <signal name="delete-event" handler="gtk_widget_hide" swapped="no"/>
-    <signal name="response" handler="on_aboutdialog1_hide" swapped="no"/>
+    <signal name="response" handler="gtk_widget_hide" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkBox" id="dialog-vbox3">
         <property name="visible">True</property>
@@ -367,6 +72,69 @@
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkDialog" id="file_info_dialog">
+    <property name="can_focus">False</property>
+    <property name="events">GDK_BUTTON_PRESS_MASK | GDK_STRUCTURE_MASK | GDK_VISIBILITY_NOTIFY_MASK</property>
+    <property name="border_width">5</property>
+    <property name="title" translatable="yes">File Information</property>
+    <property name="window_position">center</property>
+    <property name="type_hint">dialog</property>
+    <signal name="destroy-event" handler="gtk_widget_hide" swapped="no"/>
+    <signal name="destroy" handler="gtk_widget_hide" swapped="no"/>
+    <signal name="delete-event" handler="gtk_widget_hide" swapped="no"/>
+    <signal name="response" handler="gtk_widget_hide" swapped="no"/>
+    <child internal-child="vbox">
+      <object class="GtkBox" id="dialog-vbox7">
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox" id="dialog-action_area7">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="layout_style">center</property>
+            <child>
+              <object class="GtkButton" id="button5">
+                <property name="label">gtk-close</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
+                <property name="use_stock">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkTextView" id="textview_fileinfo">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="editable">False</property>
+            <property name="buffer">textbuffer1</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <action-widgets>
+      <action-widget response="0">button5</action-widget>
+    </action-widgets>
   </object>
   <object class="GtkFileChooserDialog" id="filechooserdialog">
     <property name="can_focus">False</property>
@@ -1647,6 +1415,7 @@
     <property name="skip_pager_hint">True</property>
     <property name="decorated">False</property>
     <property name="deletable">False</property>
+    <signal name="response" handler="gtk_widget_hide" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkBox" id="dialog-vbox9">
         <property name="visible">True</property>
@@ -1715,6 +1484,11 @@
       <action-widget response="0">button3</action-widget>
     </action-widgets>
   </object>
+  <object class="GtkTextBuffer" id="textbuffer1">
+    <property name="tag_table">texttagtable1</property>
+    <property name="text" translatable="yes">This is a test</property>
+  </object>
+  <object class="GtkTextTagTable" id="texttagtable1"/>
   <object class="GtkWindow" id="windowTreeview">
     <property name="width_request">700</property>
     <property name="height_request">400</property>
@@ -1945,6 +1719,31 @@ Either dipole report text file or binary *lA</property>
                         <property name="label" translatable="yes">About PyMEG</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_menuAbout_activate" swapped="no"/>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkMenuItem" id="menuitem_view">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="use_action_appearance">False</property>
+                <property name="label" translatable="yes">_View</property>
+                <property name="use_underline">True</property>
+                <child type="submenu">
+                  <object class="GtkMenu" id="menu4">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkMenuItem" id="menuitem_fileproperties">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="label" translatable="yes">File Info</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_file_info_activate" swapped="no"/>
                       </object>
                     </child>
                   </object>

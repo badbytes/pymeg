@@ -95,12 +95,14 @@ class density:
 
     def startdensity(self, widget):
         from meg import density
-        import nifti
+        from mri import img_nibabel as img
+        #import nifti
         gofscale = float(self.builder.get_object('entry1').get_text())
         sigma = int(self.builder.get_object('entry2').get_text())
         print self.builder.get_object("filechooserbutton2").get_filename()
         self.mrfilename = self.builder.get_object("filechooserbutton2").get_filename()
-        mr = nifti.NiftiImage(self.mrfilename)
+        #mr = nifti.NiftiImage(self.mrfilename)
+        mr = img.loadimage(self.mrfilename)
 
         try:
             points = self.data_selected

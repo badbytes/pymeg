@@ -5,9 +5,9 @@ c = array([[1, 1, 1],
            [2, 2, 2],
            [3, 3, 3],
            [2, 2, 2]])
-           
+
 d = density.calc(c)
-           
+
 d...
 array([[ 0.        ,  0.57735027,  0.28867513,  0.57735027],
        [ 0.57735027,  0.        ,  0.57735027,  1.        ],
@@ -37,7 +37,8 @@ def handler(points,mr,gofscale,gof,sigma):
     from meg import density
     from mri import transform
     from scipy import ndimage
-    from nifti import NiftiImage
+    #from nifti import NiftiImage
+    from mri import img_nifti as img
     from numpy import float32, int16, array
 
 
@@ -79,6 +80,7 @@ def handler(points,mr,gofscale,gof,sigma):
 
     scaledf = int16((z.max()/f.max())*f*1000)
     print 'writing nifti output image'
+    #overlay = NiftiImage(int16(scaledf))
     overlay = NiftiImage(int16(scaledf))
 
     overlay.setDescription(mr.description)

@@ -23,10 +23,10 @@ c = array([[1, 1, 1],
            [2, 2, 2],
            [3, 3, 3],
            [2, 2, 2]])
-           
+
 density.calc(c)
-           
-Out[50]: 
+
+Out[50]:
 array([[ 0.        ,  0.57735027,  0.28867513,  0.57735027],
        [ 0.57735027,  0.        ,  0.57735027,  1.        ],
        [ 0.28867513,  0.57735027,  0.        ,  0.57735027],
@@ -37,7 +37,7 @@ array([[ 0.        ,  0.57735027,  0.28867513,  0.57735027],
 
 from meg import euclid
 from numpy import size, zeros, array, inf, shape, sum, mean
-import wx
+#import wx
 import os
 
 #poximity based density method
@@ -94,12 +94,12 @@ def val2img(mrdata, value, voxel):
             print 'warning, possible dipole #',i,'outside field of view'
     return emptymri
 
-def readdipolefile(self):
-    dlg = wx.FileDialog(self, "Select a meg 4d type dipole textfile", os.getcwd(), "", "*", wx.OPEN)
-    if dlg.ShowModal() == wx.ID_OK:
-        filepath = path = dlg.GetPath()
-        dlg.Destroy()
-        return filepath
+#def readdipolefile(self):
+    #dlg = wx.FileDialog(self, "Select a meg 4d type dipole textfile", os.getcwd(), "", "*", wx.OPEN)
+    #if dlg.ShowModal() == wx.ID_OK:
+        #filepath = path = dlg.GetPath()
+        #dlg.Destroy()
+        #return filepath
 
 class parsedipolereport:
     def __init__(self,filepath):

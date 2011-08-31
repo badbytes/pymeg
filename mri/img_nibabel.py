@@ -187,6 +187,8 @@ class loadimage():
         self.getscalespace(path2pdf)
         self.getcorrelationfit(weights)
 
+    def savefile(self,filepath):
+        self.nifti.to_filename(filepath+'test.nii.gz')
 
 
 #### OLD STUFF BELOW. LEFT FOR COMPATIBILITY.

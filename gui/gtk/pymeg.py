@@ -25,19 +25,21 @@ import threading
 if sys.version >= '3':
     print ('Wrong Python Version. Only Python2 supported.')
     sys.exit(1)
+
 try:
     import pygtk
     pygtk.require("2.0")
 except:
     print("PyGTK Version Import Error")
     sys.exit(1)
+
 try:
     import gtk
     import gtk.glade
 except:
     print("GTK import error")
     sys.exit(1)
-print '1'
+
 from gui.gtk import errordialog
 try:
     from numpy import *
@@ -45,15 +47,14 @@ try:
 except ImportError:
     errordialog.errorwin('Numerical libraries missing. Install Numpy and Scipy. Exiting!')
     sys.exit()
-print '2'
+
 try:
     import nibabel
 except ImportError:
     errordialog.errorwin('MRI module Nibabel missing, MRI tools will not function properly.')
     sys.exit()
 
-#pylab methods
-try:
+try:#pylab methods
     from matplotlib import use;use('GTK')
     from matplotlib.figure import Figure
     from matplotlib.axes import Subplot
@@ -61,37 +62,22 @@ try:
 except ImportError:
     errordialog.errorwin('Matplotlib missing. Plotting tools will not work properly')
     sys.exit()
-print '3'
-#gui modules
-try:
+
+try:#gui modules
     pass
     from gui.gtk import parse_instance, progressbar, spinner, filechooser, errordialog
-    #from gui.gtk import filter, offset_correct, errordialog, preferences,\
-    #dipoledensity, coregister, timef, data_editor, event_process, parse_instance, \
-    #meg_assistant, viewmri, power_spectral_density, progressbar, spinner, filechooser, \
-    #ica
-
-    #from gui.gtk import contour as contour_gtk
-
 except ImportError:
     errordialog.errorwin('PyMEG not installed correctly, cant find pymeg code in path.')
     #sys.exit()
-print '4'
-#load required methods
-try:
+
+try:#load required methods
     pass
     from pdf2py import pdf, readwrite#,lA2array
-    from meg import nearest
-    #from meg import dipole,plotvtk,plot2dgtk,signalspaceprojection,nearest
-    #from meg import leadfield_parallel as leadfield
-    #from mri import img_nibabel as img
-    #from mri import sourcesolution2img
-    #from beamformers import minimumnorm
+    from meg import nearest#, dipole
 except ImportError:
     errordialog.errorwin('PyMEG not installed correctly, cant find pymeg code in path.')
     #sys.exit()
 
-print '5'
 #from IPython.Shell import IPShellEmbed
 #ipshell = IPShellEmbed()
 #ipshell() # this call anywhere in your program will start IPython
@@ -105,10 +91,7 @@ class maingui():
         self.window.show()
         self.statusbar = self.builder.get_object("statusbar")
         self.statusbar_cid = self.statusbar.get_context_id("")
-        #self.memorybar = self.builder.get_object("memorybar")
-        #self.progressbar = self.builder.get_object("progressbar")
-        #self.progressbar = progressbar.setup()
-
+        #self.memorybar = self.builder.get_object("memorybar")        #self.progressbar = self.builder.get_object("progressbar")#self.progressbar = progressbar.setup()
         self.datatree(self)
 
         dic = {
@@ -169,6 +152,7 @@ class maingui():
             "on_message_dialog_cancel_clicked" : self.message_dialog_response,
             "on_ica_activate" : self.independent_component_analysis,
             "on_channel_editor_activated" : self.channel_select,
+            "on_file_info_activate" : self.file_info,
         }
 
         self.builder.connect_signals(dic)
@@ -185,7 +169,6 @@ class maingui():
             if m.get_name() ==  'GtkMenuItem':
                 m.set_sensitive(False)
         self.builder.get_object('savefile').set_sensitive(False)
-        #self.builder.get_object('updatefile_4D').set_sensitive(False)
 
         #preference data
         try:
@@ -250,11 +233,9 @@ class maingui():
             newname = str(entryfield.get_text())
             self.treedata[newname] = self.treedata[self.selecteditem]
             self.treedata.pop(self.selecteditem)
-            self.rename_win.hide()
             self.refreshtree()
         if widget.get_label() == 'Cancel':
             print 'canceling'
-            self.rename_win.hide()
 
     def close_file(self, widget):
         self.datadict.pop(self.data_filename_selected)
@@ -262,6 +243,7 @@ class maingui():
         self.treegohome(self)
 
     def hideinsteadofdelete(self,widget, ev=None):
+        print 'closing widget:', widget, type(widget)
         widget.hide()
         return True
 
@@ -272,6 +254,7 @@ class maingui():
         self.builder.get_object('aboutdialog1').hide()
 
     def meg_assist(self):
+        from gui.gtk import meg_assistant
         self.data_assist = meg_assistant.setup(path = self.fn, callback=self.load_megdata_callback)
 
     def load_megdata_callback(self,widget=None):
@@ -281,6 +264,7 @@ class maingui():
         self.builder.get_object('updatefile_4D').set_sensitive(True)
 
     def loadMRI(self,widget):
+        from mri import img_nibabel as img
         self.builder.get_object("filechooserdialog").show()
         self.mr = img.read(self.fn)
 
@@ -355,7 +339,7 @@ class maingui():
         filter = gtk.FileFilter()
         filter.set_name("Matlab Files")
         filter.add_pattern("*.mat")
-        #filter.add_pattern("*.set")
+        filter.add_pattern("*.set")
         self.clear_filters()
         fcd.add_filter(filter)
         try:fcd.set_current_folder(self.prefs['LastMATPath'])
@@ -391,6 +375,7 @@ class maingui():
                 print('Not a MEG file')
 
         if self.filetype == 'MRI':
+            from mri import img_nibabel as img
             print('filetype MRI')
             self.datadict[self.fn] = {'mri':img.loadimage(self.fn)}
             self.prefs['LastMRIPath'] = pathtofile
@@ -417,6 +402,7 @@ class maingui():
             self.treegohome(None)
 
         if self.filetype == 'DIP':
+            from meg import dipole
             print('filetype Dipole')
 
             class dipoledata():
@@ -461,8 +447,6 @@ class maingui():
 
     def update_changes_meg(self,widget):
         self.builder.get_object('messagedialog').set_markup('You are saving object '+self.selecteditem+' to file. Do you want to make a copy of the original file as a backup?')
-        #print 'is active',self.builder.get_object('messagedialog').is_active()
-        #self.builder.get_object('messagedialog').add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CLOSE)
         self.builder.get_object('messagedialog').show()
         print 'Using',self.selecteditem,'for the rewrite'
 
@@ -470,9 +454,6 @@ class maingui():
         print button
 
         if button == -8: #OK
-            #m = self.builder.get_object('messagedialog')
-            #m(parent=None, flags=0, type=gtk.MESSAGE_INFO, buttons=gtk.BUTTONS_NONE, message_format=None)
-
             try:
                 self.builder.get_object('messagedialog-action_area').set_sensitive(False)
                 self.spin('start')
@@ -489,7 +470,6 @@ class maingui():
                 print 'Error in copy'
                 self.updatestatusbar('Error in copy')
                 self.builder.get_object('messagedialog-action_area').set_sensitive(True)
-
 
         if button == -9: #No backup copy, but still proceed with save.
             self.spin('start')
@@ -524,7 +504,6 @@ class maingui():
         self.View = self.builder.get_object("treeview2")
         self.AddListColumn('Variable', 0)
         self.AddListColumn('Data', 1)
-        #self.AddListColumn('Data', True)
         self.dataList = gtk.ListStore(str,str)
         self.View.set_model(self.dataList)
 
@@ -584,7 +563,6 @@ class maingui():
         model,rows = b.get_selection().get_selected()
         iter = self.dataList.get_iter(c[0])
         print('you selected', self.dataList.get_value(iter,0))#, self.dataList.get_value(iter,1))
-        #self.refreshdatasummary()
 
         print('you selected position',c[0])
         print('length of tree', len(self.treedict))
@@ -595,10 +573,7 @@ class maingui():
             except AttributeError: self.treedict = {0 :self.treedata}
             except IndexError: self.treedict = {0 :self.treedata}
             self.builder.get_object('statusbar').push(self.builder.get_object("statusbar").get_context_id(''),self.dataList.get_value(iter,0))
-
-            #self.data_file_selected = self.datadict[self.selecteditem]
-            #self.data_filename_selected = self.selecteditem
-            print('Data File Selected:')#,self.data_file_selected
+            print('Data File Selected:')
         else:
             print('lower lvl')
             try: self.treedict[self.treedict.keys()[-1]+1] = self.treedata[self.dataList.get_value(iter,0)]
@@ -716,6 +691,7 @@ class maingui():
             shape_type[i].set_active(0)
 
     def plotdata(self,widget): #plot points in 3D
+        from meg import plotvtk
         print('trying to plot in vtk')
         colordict = {}
         sizedict = {}
@@ -749,6 +725,7 @@ class maingui():
         plotvtk.display(self.sel2plot, color = colordict, radius = sizedict)
 
     def plot2D(self, widget):
+        from meg import plot2dgtk
         D = self.treedata[self.selecteditem]
         try:
             if shape(D)[0] == 3 and shape(D)[0] != 3:
@@ -783,7 +760,6 @@ class maingui():
         '''
         import copy, types, inspect
 
-        #v = [];
         v = {}
         if type(var) == str:
             var = [var] #make list
@@ -860,6 +836,7 @@ class maingui():
             F.say(errormesg)
 
     def loadpreferences(self, widget):
+        from gui.gtk import preferences
         self.prefinit = preferences.prefs()
         self.prefinit.window.show()
         self.prefs = self.prefinit.prefs
@@ -867,11 +844,8 @@ class maingui():
     def plot2Dmri(self, widget):
         try:
             self.vm.fig.clf()
-            #if self.vm.window.get_property('visible') == False:
-            #    self.vm.window.show()
         except AttributeError, NameError:
             self.vm = viewmri.setup_gui()
-            #self.vm.window.show()
 
         obj=self.treedata#[self.selecteditem];
         try:
@@ -882,8 +856,6 @@ class maingui():
                 self.mrimousepos = self.vm.display(data=squeeze(res['data']),pixdim=res['pixdim'],translation=res['translation'])
         except AttributeError:
             print('displaying custom data:',self.selecteditem)
-            #obj=self.treedata;
-            #res = (self.setup_helper(var=['data'],obj=obj));
             data = self.treedata[self.selecteditem];
             self.mrimousepos = self.vm.display(data,pixdim=[1,1,1],translation=[0,0,0])#squeeze(res['data']))
         self.vm.window.show()
@@ -913,7 +885,6 @@ class maingui():
         gridwin.builder.get_object("filechooserbutton2").set_sensitive(False)
         gridwin.datahandler(setgrid)
         gridwin.window.show()# = grid.gridwin()
-
 
     def leadfieldcalc(self, widget):
         def leadfieldthread():
@@ -969,13 +940,13 @@ class maingui():
         res = (self.setup_helper(var=['ind','data','img'],obj=obj));
         solution = self.treedata[self.selecteditem]
         c = sourcesolution2img.build(solution,ind=res['ind'],origimg=res['data'],img=res['img'])
-
         self.data_file_selected['source_space']['total_power'] = mean(c,axis=0);
         self.datadict[self.data_filename_selected] = self.data_file_selected
         self.updatestatusbar('solution to image complete')
         self.refreshtree()
 
     def dipoledensityhandle(self,widget):
+        from gui.gtk import dipoledensity
         self.dd = dipoledensity.density() #window
 
         try:
@@ -993,6 +964,7 @@ class maingui():
         self.cr.window.show()
 
     def filter_handler(self,widget):
+        from gui.gtk import filter
         def donefilt(results):
             res['data_block'] = results
             self.result_helper(self.data_file_selected['filtered'],self.res)
@@ -1011,6 +983,7 @@ class maingui():
         self.fil.builder.get_object('label1').set_text('Item to filter:'+str(self.selecteditem))
 
     def offset_handler(self,widget):
+        from gui.gtk import offset_correct
         def offset_callback(results):
             res['data_block'] = results
             self.result_helper(self.data_file_selected['offset_corrected'],self.res)
@@ -1024,12 +997,11 @@ class maingui():
         self.data_file_selected['offset_corrected'] = {}
 
     def independent_component_analysis(self,widget):
+        from gui.gtk import ica
         def ica_callback(results):
             self.data_file_selected['ica'] = self.res #results
             self.data_file_selected['ica']['data_block'] = results['weights']
             self.data_file_selected['ica']['activations'] = results['activations']
-            #self.data_file_selected['ica']['labellist'] = results['labellist']
-            #self.result_helper(self.data_file_selected['ica'],self.res)
             self.updatestatusbar('ica correction complete')
             self.refreshtree()
         obj=self.treedata[self.selecteditem];
@@ -1038,8 +1010,8 @@ class maingui():
         icawin = ica.setup(res['data_block'],callback=ica_callback)
         icawin.window.show()
 
-
     def timef_handler(self,widget):
+        from gui.gtk import timef
         def donetft(results):
             self.data_file_selected['tft'] = results
             print(self.data_file_selected['tft'].npoints)
@@ -1082,7 +1054,6 @@ class maingui():
             and make selections. Then highlight selection with selector tool.')
             raise TypeError
 
-
         for i in iter:
             print ('highlighted', liststore[i][1])
             self.de.get_time_selection(widget,current=False)
@@ -1113,7 +1084,6 @@ class maingui():
             pass
 
         ssp = signalspaceprojection.calc(res['data_block'], weight=weights)
-
         sp['ssp'] = sp['data_block'] = ssp
         var = ['channels','srate','numofepochs','labellist','chanlocs','frames','eventtime','wintime']
         obj = self.treedata[self.selecteditem]
@@ -1126,6 +1096,7 @@ class maingui():
         sp['labellist'] = labels
 
     def contour_plot(self,widget):
+        from gui.gtk import contour as contour_gtk
         try:
             print ('state',self.mc.window.get_property('visible'))
             if self.mc.window.get_property('visible') == False:
@@ -1141,12 +1112,8 @@ class maingui():
         print 'label state',self.mc.builder.get_object('channellabels').get_active()
         chanlocs = self.setup_helper(var='chanlocs',obj=self.treedata)['chanlocs']
         labellist = self.setup_helper(var='labellist',obj=self.treedata)['labellist']
-        #if self.mc.builder.get_object('channellabels').get_active() == True:
-            #self.mc.display(self.treedata[self.selecteditem],chanlocs, labels=labellist, subplot='on')
-        #else:
 
-        #Limit data to 50 subplots
-        if shape(self.treedata[self.selecteditem])[0] > 50:
+        if shape(self.treedata[self.selecteditem])[0] > 50:#Limit data to 50 subplots
             print('Your data has too many indices, \n and this is an expensive function that you can not afford. Limiting you to the first 50 indices')
             self.errordialog('Your data has too many indices')
             data2plot = self.treedata[self.selecteditem][0:51]
@@ -1203,7 +1170,6 @@ class maingui():
         var = self.var = ['data_block','channels','srate','numofepochs','labellist','chanlocs','frames','eventtime','wintime']
         res = self.res = (self.setup_helper(var,obj=obj));
 
-        #filepath = self.setup_helper(var='filepath',obj=self.treedata[self.selecteditem])['filepath']
         filepath = self.data_filename_selected
         if os.path.isfile(filepath) == False:
             return -1
@@ -1229,7 +1195,6 @@ class maingui():
                 predict['Independant Component Analysis'] = ['data_block']
                 predict['Channel Editor'] = ['labellist','chanlocs']
 
-
             if itemtype == 'generalitem':
                 obj=self.treedata
                 predict['Calculate Grid'] = ['hs']
@@ -1239,9 +1204,6 @@ class maingui():
                 predict['Plot MRI'] = ['pixdim','data']
                 predict['Contour Plot'] = ['chanlocs','labellist']
                 predict['Plot TFT'] = ['tft']
-                #predict['Plot'] = True
-
-
 
         except:
             #probably at home. no treedata to parse
@@ -1317,13 +1279,13 @@ class maingui():
 
         try:
             self.de = data_editor.setup_gui()
-            #self.de.data_handler(r[0],r[1],r[2],r[3],r[4], callback=self.data_editor_callback)
             self.de.data_handler(widget, input_dict=res, callback=data_editor_callback)
             self.de.window.show()
         except RuntimeError:
             self.errordialog("Can't do that Dave");
 
     def power_spectral_density(self,widget):
+        from gui.gtk import power_spectral_density
         obj=self.treedata[self.selecteditem];
         res = (self.setup_helper(var=['data_block','srate','labellist','chanlocs'],obj=obj));
         self.psd = power_spectral_density.setup_gui()
@@ -1351,8 +1313,6 @@ class maingui():
         cs = channel_selector.setup(res['chanlocs'],res['labellist'],channel_select_handler)
         cs.window.show()
 
-
-
     def testhandler(self, widget):
         self.prnt(None)
         self.timef_handler(None)
@@ -1360,7 +1320,7 @@ class maingui():
     def testload(self, fn):
         print('clicked')
         from gui.gtk import parse_instance
-        fns = [fn] #['/home/danc/python/data/0611/0611piez/e,rfhp1.0Hz,COH']
+        fns = [fn]
 
         for i in fns:
             print('i', i)
@@ -1370,11 +1330,20 @@ class maingui():
             self.datadict[path].data.getdata(0, self.datadict[path].data.pnts_in_file)
             self.chanlist = ['meg']
             self.readMEG()
-        #self.fn = ['/home/danc/programming/python/data/standardmri/colin_1mm.img']
-        ##self.datadict[path] = self.fn
-        #self.filetype = 'MRI'
-        #self.builder.get_object("filechooserdialog").set_uri('file://'+self.fn[0])
-        #self.builder.get_object("filechooserdialog").show()
+
+    def file_info(self, widget):
+        fid = self.builder.get_object('file_info_dialog');
+        print 'fid stat', fid.get_visible()
+        fid.show()
+        print 'widparent',fid.get_visible()
+        textview = self.builder.get_object('textview_fileinfo')
+        #textview.show()
+        textbuffer = textview.get_buffer()
+        string = 'Hello World'
+        textbuffer.set_text(string)
+        print 'BUFFER', textbuffer
+
+
 
 class MainThread(threading.Thread):
     def run(self):
@@ -1409,12 +1378,26 @@ if __name__ == "__main__":
     import cProfile, pstats
     #cProfile.run('mainwindow = maingui()')
     mainwindow = maingui()
-    #mainwindow.window.show()
-    mainwindow.testload('/home/danc/data/meg/0611piez/e,rfhp1.0Hz,ra.mod')#/home/danc/data/meg/0611piez/e,rfhp1.0Hz,ra.mod')
+    mainwindow.testload('../../data/MEGsample/e,rfhp1.0Hz,n,x,baha001-1SEF,f50lp')#/home/danc/data/meg/0611piez/e,rfhp1.0Hz,ra.mod')
     #cProfile.run('mainwindow.testload(None)')
     #import code; code.interact(local=locals()) #Interactive Shell
     gtk.main()
 
 
+'''Trash
+    #from gui.gtk import filter, offset_correct, errordialog, preferences,\
+    #dipoledensity, coregister, timef, data_editor, event_process, parse_instance, \
+    #meg_assistant, viewmri, power_spectral_density, progressbar, spinner, filechooser, \
+    #ica
+
+    #from gui.gtk import contour as contour_gtk
 
 
+    #from meg import dipole,plotvtk,plot2dgtk,signalspaceprojection,nearest
+    #from meg import leadfield_parallel as leadfield
+    #from mri import img_nibabel as img
+    #from mri import sourcesolution2img
+    #from beamformers import minimumnorm
+
+
+'''
