@@ -241,6 +241,7 @@ class maingui():
         self.datadict.pop(self.data_filename_selected)
         self.parseddatadict.pop(self.data_filename_selected)
         self.treegohome(self)
+        #self.refreshtree()
 
     def hideinsteadofdelete(self,widget, ev=None):
         print 'closing widget:', widget, type(widget)
@@ -260,6 +261,8 @@ class maingui():
     def load_megdata_callback(self,widget=None):
         path = self.data_assist.pdfdata.data.filepath
         self.datadict[path] = self.data_assist.pdfdata
+        #----------------------------------------------------------
+        #self.datadict[self.fn] = {'MEG':self.data_assist.pdfdata}
         self.readMEG()
         self.builder.get_object('updatefile_4D').set_sensitive(True)
 
@@ -274,10 +277,11 @@ class maingui():
         #convert pdf object to dictonary
         self.parseinstance(self.datadict[path])
         self.refreshdatasummary()
-
+        
         for i in self.parseddatadict:
             print('appending model', i)
             iter = self.dataList.append([i, self.datadict[path]])#,True])
+        self.treegohome(None)
 
     def refreshdatasummary(self):
         self.parseinstance(self.datadict[self.fn])
@@ -303,7 +307,6 @@ class maingui():
         fcd.add_filter(filter)
         try:fcd.set_current_folder(self.prefs['LastMRIPath'])
         except: pass
-
         fcd.show()
         self.filetype = 'MRI'
 
@@ -368,8 +371,11 @@ class maingui():
             try:
                 pdf.read(self.fn)
                 self.meg_assist()
-                self.prefs['LastMEGPath'] = self.fn#pathtofile
+                self.prefs['LastMEGPath'] = pathtofile#self.fn#pathtofile
+                self.datadict[self.fn] = {'mri':img.loadimage(self.fn)}
                 readwrite.writedata(self.prefs, os.getenv('HOME')+'/.pymeg')
+                self.refreshdatasummary()
+                #self.treegohome(None)
 
             except AttributeError:
                 print('Not a MEG file')
@@ -621,6 +627,7 @@ class maingui():
             print('data items...',i)
         self.builder.get_object('treebutton2').set_sensitive(False)
         self.prerequisite(itemtype='generalitem')
+        #self.refreshtree()
 
     def treeuplevel(self,widget):
         print('stepping up a level')
@@ -842,6 +849,7 @@ class maingui():
         self.prefs = self.prefinit.prefs
 
     def plot2Dmri(self, widget):
+        from gui.gtk import viewmri
         try:
             self.vm.fig.clf()
         except AttributeError, NameError:
@@ -887,6 +895,7 @@ class maingui():
         gridwin.window.show()# = grid.gridwin()
 
     def leadfieldcalc(self, widget):
+        from meg import leadfield_parallel as leadfield
         def leadfieldthread():
             if self.checkreq() == -1:
                     print('caught error')
@@ -921,6 +930,7 @@ class maingui():
         MT.main(leadfieldthread)
 
     def minimunnorm_handler(self,widget):
+        from beamformers import minimumnorm
         def minnormthread():
             obj=self.treedata;
             res = (self.setup_helper(var=['selection_event','leadfield','selection_noise','channels'],obj=obj));
@@ -936,6 +946,7 @@ class maingui():
         MT.main(minnormthread)
 
     def sourcesolution2img_handler(self,widget):
+        from mri import sourcesolution2img
         obj=self.treedata;
         res = (self.setup_helper(var=['ind','data','img'],obj=obj));
         solution = self.treedata[self.selecteditem]
@@ -1016,7 +1027,7 @@ class maingui():
             self.data_file_selected['tft'] = results
             print(self.data_file_selected['tft'].npoints)
             self.datadict[self.data_filename_selected] = self.data_file_selected
-            self.treegohome(None)
+            self.refreshtree()
 
         self.tf = timef.setup() #window
         try:
@@ -1332,17 +1343,33 @@ class maingui():
             self.readMEG()
 
     def file_info(self, widget):
+        def get_file_info():
+            pass
+            
         fid = self.builder.get_object('file_info_dialog');
         print 'fid stat', fid.get_visible()
-        fid.show()
         print 'widparent',fid.get_visible()
         textview = self.builder.get_object('textview_fileinfo')
         #textview.show()
+        
+        print 'DFS',self.data_filename_selected
+        filepath = self.data_filename_selected
+        filename = os.path.basename(self.data_filename_selected)
+        filesize = os.path.getsize(filepath)#self.data_file_selected.keys()[0] #'Hello World'
+        
+        
         textbuffer = textview.get_buffer()
-        string = 'Hello World'
-        textbuffer.set_text(string)
-        print 'BUFFER', textbuffer
+        
+        textbuffer.set_text('Filename:'+filename+'\n')
+        
+        iter = textbuffer.get_end_iter()
+        textbuffer.insert(iter,'Filesize: '+str(os.path.getsize(filepath)/1000)+'K\n')
+        iter = textbuffer.get_end_iter()
+        textbuffer.insert(iter,'Filepath: '+str(os.path.realpath(filepath)))
+        
+        textview.set_buffer(textbuffer)
 
+        fid.show()
 
 
 class MainThread(threading.Thread):
