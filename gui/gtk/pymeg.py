@@ -153,6 +153,7 @@ class maingui():
             "on_ica_activate" : self.independent_component_analysis,
             "on_channel_editor_activated" : self.channel_select,
             "on_file_info_activate" : self.file_info,
+            "on_drag_start" : self.drag_test,
         }
 
         self.builder.connect_signals(dic)
@@ -177,6 +178,9 @@ class maingui():
             self.prefs = {'VerboseTreeButton' : False};
             readwrite.writedata(self.prefs, os.getenv('HOME')+'/.pymeg')
         self.fill_combo_entries(None)
+        
+    def drag_test(self,widget,a,b,c,d):
+        print widget,a,b.get_text(),c,d
 
     def menu_tearoff(self,widget): #dev default function
         print 'tested'
@@ -1074,6 +1078,7 @@ class maingui():
             self.data_file_selected['signal_projection']['signal_weights'] = data[self.de.sel_ind]
 
     def signal_space_filter(self,widget):
+        from meg import signalspaceprojection
         self.datadict[self.data_filename_selected] = self.data_file_selected
 
         if self.signal_space_build_weights(widget) == -1:
@@ -1096,7 +1101,7 @@ class maingui():
 
         ssp = signalspaceprojection.calc(res['data_block'], weight=weights)
         sp['ssp'] = sp['data_block'] = ssp
-        var = ['channels','srate','numofepochs','labellist','chanlocs','frames','eventtime','wintime']
+        var = ['channels','srate','numofepochs','labellist','frames','eventtime','wintime']
         obj = self.treedata[self.selecteditem]
         res = (self.setup_helper(var,obj=obj));
         self.result_helper(sp,res)
@@ -1205,6 +1210,7 @@ class maingui():
                 predict['Offset Correct'] = ['data_block','srate']
                 predict['Independant Component Analysis'] = ['data_block']
                 predict['Channel Editor'] = ['labellist','chanlocs']
+                predict['Signal Space Projection'] = ['data_block','srate']
 
             if itemtype == 'generalitem':
                 obj=self.treedata
@@ -1236,14 +1242,17 @@ class maingui():
                         j.set_sensitive(False)
 
         try:
-            if type(self.treedata[self.selecteditem]) == ndarray:
-                for j in menufunctions:
-                    if j.get_label() == 'Plot' or j.get_label() == 'Contour Plot':
+            #if type(self.treedata[self.selecteditem]) == ndarray:
+            for j in menufunctions:
+                if j.get_label() == 'Plot' or j.get_label() == 'Contour Plot' or j.get_label() == 'Add to 3D plot':
+                    if type(self.treedata[self.selecteditem]) == ndarray:
                         j.set_sensitive(True)
-            else:
-                for j in menufunctions:
-                    if j.get_label() == 'Plot' or j.get_label() == 'Contour Plot':
+                    else:
                         j.set_sensitive(False)
+            #else:
+                #for j in menufunctions:
+                    #if j.get_label() == 'Plot' or j.get_label() == 'Contour Plot'or j.get_label() == 'Add to 3D plot':
+                        #j.set_sensitive(False)
         except:
             pass
 
