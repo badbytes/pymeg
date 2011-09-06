@@ -178,7 +178,7 @@ class maingui():
             self.prefs = {'VerboseTreeButton' : False};
             readwrite.writedata(self.prefs, os.getenv('HOME')+'/.pymeg')
         self.fill_combo_entries(None)
-
+        
     def drag_test(self,widget,a,b,c,d):
         print widget,a,b.get_text(),c,d
 
@@ -281,7 +281,7 @@ class maingui():
         #convert pdf object to dictonary
         self.parseinstance(self.datadict[path])
         self.refreshdatasummary()
-
+        
         for i in self.parseddatadict:
             print('appending model', i)
             iter = self.dataList.append([i, self.datadict[path]])#,True])
@@ -403,15 +403,13 @@ class maingui():
             self.treegohome(None)
 
         if self.filetype == 'MAT':
-            from pdf2py import matlab_wrapper
             print('filetype MATLAB')
-            d = matlab_wrapper.loadmat(self.fn)
+            d = io.loadmat(self.fn)
             self.datadict[self.fn] = d
             self.refreshdatasummary()
             self.prefs['LastMATPath'] = pathtofile
             readwrite.writedata(self.prefs, os.getenv('HOME')+'/.pymeg')
             self.treegohome(None)
-
 
         if self.filetype == 'DIP':
             from meg import dipole
@@ -531,6 +529,7 @@ class maingui():
         self.View.append_column(column)
 
     def parseinstance(self,data):
+        self.currentDataName = str(data)
         try:
             if self.prefs['VerboseTreeButton'] == True:
                 verbose=True
@@ -1355,28 +1354,28 @@ class maingui():
     def file_info(self, widget):
         def get_file_info():
             pass
-
+            
         fid = self.builder.get_object('file_info_dialog');
         print 'fid stat', fid.get_visible()
         print 'widparent',fid.get_visible()
         textview = self.builder.get_object('textview_fileinfo')
         #textview.show()
-
+        
         print 'DFS',self.data_filename_selected
         filepath = self.data_filename_selected
         filename = os.path.basename(self.data_filename_selected)
         filesize = os.path.getsize(filepath)#self.data_file_selected.keys()[0] #'Hello World'
-
-
+        
+        
         textbuffer = textview.get_buffer()
-
+        
         textbuffer.set_text('Filename:'+filename+'\n')
-
+        
         iter = textbuffer.get_end_iter()
         textbuffer.insert(iter,'Filesize: '+str(os.path.getsize(filepath)/1000)+'K\n')
         iter = textbuffer.get_end_iter()
         textbuffer.insert(iter,'Filepath: '+str(os.path.realpath(filepath)))
-
+        
         textview.set_buffer(textbuffer)
 
         fid.show()
