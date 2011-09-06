@@ -2,11 +2,6 @@
 <interface>
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-local-resource-path /home/danc/programming/python/pymeg/gui/gtk/images -->
-  <object class="GtkAction" id="action1">
-    <property name="label" translatable="yes">Close</property>
-    <property name="stock_id">gtk-close</property>
-    <signal name="activate" handler="gtk_widget_hide" swapped="no"/>
-  </object>
   <object class="GtkListStore" id="PlotShape">
     <columns>
       <!-- column-name gchararray1 -->
@@ -20,6 +15,11 @@
         <col id="0" translatable="yes">disks</col>
       </row>
     </data>
+  </object>
+  <object class="GtkAction" id="action1">
+    <property name="label" translatable="yes">Close</property>
+    <property name="stock_id">gtk-close</property>
+    <signal name="activate" handler="gtk_widget_hide" swapped="no"/>
   </object>
   <object class="GtkAboutDialog" id="aboutdialog1">
     <property name="can_focus">False</property>
@@ -1447,6 +1447,8 @@
                 <property name="label" translatable="yes">Save</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="can_default">True</property>
+                <property name="has_default">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
                 <signal name="clicked" handler="on_rename_activate" swapped="no"/>
@@ -1700,6 +1702,31 @@ Either dipole report text file or binary *lA</property>
               </object>
             </child>
             <child>
+              <object class="GtkMenuItem" id="menuitem_view">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="use_action_appearance">False</property>
+                <property name="label" translatable="yes">_View</property>
+                <property name="use_underline">True</property>
+                <child type="submenu">
+                  <object class="GtkMenu" id="menu4">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkMenuItem" id="menuitem_fileproperties">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="label" translatable="yes">File Info</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_file_info_activate" swapped="no"/>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
               <object class="GtkMenuItem" id="menuitem_help">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -1719,31 +1746,6 @@ Either dipole report text file or binary *lA</property>
                         <property name="label" translatable="yes">About PyMEG</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_menuAbout_activate" swapped="no"/>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-              </object>
-            </child>
-            <child>
-              <object class="GtkMenuItem" id="menuitem_view">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="use_action_appearance">False</property>
-                <property name="label" translatable="yes">_View</property>
-                <property name="use_underline">True</property>
-                <child type="submenu">
-                  <object class="GtkMenu" id="menu4">
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <child>
-                      <object class="GtkMenuItem" id="menuitem_fileproperties">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="use_action_appearance">False</property>
-                        <property name="label" translatable="yes">File Info</property>
-                        <property name="use_underline">True</property>
-                        <signal name="activate" handler="on_file_info_activate" swapped="no"/>
                       </object>
                     </child>
                   </object>
@@ -2081,6 +2083,16 @@ Requires ['ind','data','img']</property>
                       </object>
                     </child>
                     <child>
+                      <object class="GtkMenuItem" id="add_to_3d_plot">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="label" translatable="yes">Add to 3D plot</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_addto3Dplot_clicked" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkMenuItem" id="plot_contour">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
@@ -2239,6 +2251,7 @@ Requires ['tft']</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
+                <property name="visible_horizontal">False</property>
                 <property name="label" translatable="yes">3D Plot Add</property>
                 <property name="use_underline">True</property>
                 <property name="icon_widget">image2</property>
@@ -2254,6 +2267,7 @@ Requires ['tft']</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
+                <property name="visible_horizontal">False</property>
                 <property name="label" translatable="yes">Data Editor</property>
                 <property name="use_underline">True</property>
                 <property name="icon_widget">image1</property>
@@ -2382,6 +2396,7 @@ Requires ['tft']</property>
                 <signal name="cursor-changed" handler="on_selection" swapped="no"/>
                 <signal name="key-press-event" handler="on_key_press_event" swapped="no"/>
                 <signal name="row-activated" handler="on_row_activated" swapped="no"/>
+                <signal name="drag-data-get" handler="on_drag_start" swapped="no"/>
                 <child internal-child="selection">
                   <object class="GtkTreeSelection" id="treeview-selection1"/>
                 </child>
