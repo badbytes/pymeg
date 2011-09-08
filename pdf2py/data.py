@@ -21,7 +21,7 @@
 from pdf2py import io_wrapper
 fread = io_wrapper.fread
 fwrite = io_wrapper.fwrite
-from numpy import reshape, shape, float32, array, arange, size, single, append
+from numpy import reshape, shape, float32, array, arange, size, single, append, delete
 from pdf2py import align, header, config, channel_new #channel
 import os
 from meg import functions
@@ -123,7 +123,7 @@ class read(initialize):
         self.numofchannels = size(self.data_block,1)
         self.srate = 1/self.hdr.header_data.sample_period[0]
         self.frames = self.data_block.shape[0] / self.numofepochs
-
+        print 'DATA DEBUG', shape(self.data_block)
     def setchannels(self, chtype):
         '''chtype = = type of channel (meg | eeg | ref | trig | ext | derived | utility | shorted)'''
         self.setchanneltype(chtype)
@@ -151,6 +151,11 @@ class read(initialize):
     def analyze(self):
         from meg import analyze
         self.analyze = analyze
+
+    def deletechannel(self,index):
+        self.data_block = delete(self.data_block,index,axis=1)
+        self.channel.deletechannel(index)
+        self.numofchannels = self.numofchannels - len(index)
 
 
 ##------------------------------------------------------------------------------------------

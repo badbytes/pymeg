@@ -25,7 +25,7 @@ p = pdf.read(fn);p.data.getdata(0,p.data.pnts_in_file, chindex=i.indexlist)
 '''
 
 from pdf2py import config, header, headshape#, pdf
-from numpy import zeros, array, unique, append, size, sort, loadtxt
+from numpy import zeros, array, unique, append, size, sort, loadtxt,delete
 import re, sys, os
 #try:from scipy.io.numpyio import *
 #except ImportError: from extra.numpyio import *
@@ -258,3 +258,16 @@ class index:
         returns
         p.data.channels.sensorpos'''
         self.getchannellocations()
+
+    def deletechannel(self, index):
+        self.chlpos = delete(self.chlpos,index,axis=0)
+        self.chupos = delete(self.chupos,index)
+        self.chldir = delete(self.chldir,index)
+        self.chudir = delete(self.chudir,index)
+        self.chanlocs = delete(self.chanlocs,index,axis=1)
+        self.indexlist = delete(self.indexlist,index,axis=1)
+        self.labellist = delete(self.labellist,index,axis=1)
+        self.reverseindex = delete(self.reverseindex,index,axis=1)
+        self.chanlocs = delete(self.chanlocs,index,axis=1)
+        self.chanlocs = delete(self.chanlocs,index,axis=1)
+

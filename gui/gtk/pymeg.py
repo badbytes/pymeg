@@ -177,12 +177,9 @@ class maingui():
             self.prefs = {'VerboseTreeButton' : False};
             readwrite.writedata(self.prefs, os.getenv('HOME')+'/.pymeg')
         self.fill_combo_entries(None)
-<<<<<<< HEAD
 
     def drag_test(self,widget,a,b,c,d):
         print widget,a,b.get_text(),c,d
-=======
->>>>>>> parent of 0d52b02... fixes
 
     def menu_tearoff(self,widget): #dev default function
         print 'tested'
@@ -237,9 +234,11 @@ class maingui():
             print 'renaming item'
             entryfield = self.builder.get_object('rename_entry')
             newname = str(entryfield.get_text())
-            self.treedata[newname] = self.treedata[self.selecteditem]
+            try:self.treedata[newname] = self.treedata[self.selecteditem]
+            except: self.updatestatusbar("Can't rename that item"); return
             self.treedata.pop(self.selecteditem)
             self.refreshtree()
+            self.updatestatusbar("Item renamed")
         if widget.get_label() == 'Cancel':
             print 'canceling'
 
