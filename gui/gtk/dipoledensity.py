@@ -103,6 +103,7 @@ class density:
         self.mrfilename = self.builder.get_object("filechooserbutton2").get_filename()
         #mr = nifti.NiftiImage(self.mrfilename)
         mr = img.loadimage(self.mrfilename)
+        print 'loaded MRI',mr
 
         try:
             points = self.data_selected

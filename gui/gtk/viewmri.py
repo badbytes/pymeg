@@ -410,7 +410,7 @@ if __name__ == "__main__":
     mainwindow.window.show()
     from pdf2py import pdf
     from mri import img_nibabel
-    fn = '/home/danc/python/data/standardmri/colin_brain_1mm.img'
+    fn = '/home/danc/data/standardmri/colin_1mm.img'
     #fn = '/home/danc/python/data/standardmri/ch3.nii.gz'
     img = nibabel.load(fn)
     h = img.get_header()

@@ -38,15 +38,23 @@ def handler(points,mr,gofscale,gof,sigma):
     from mri import transform
     from scipy import ndimage
     #from nifti import NiftiImage
-    from mri import img_nifti as img
+    from mri import img_nibabel as img
     from numpy import float32, int16, array
-
+    from pdf2py import readwrite
+    import nibabel,os
 
     report = {}
-    fids = eval(mr.description)
-    lpa = fids[0]
-    rpa = fids[1]
-    nas = fids[2]
+    filename = mr.nifti.get_filename()
+    
+    #try: xfm = readwrite.readdata(os.path.splitext(filename)[0]+'.pym')
+    #except: print 'Error reading coregistration info'
+    lpa = mr.lpa
+    rpa = mr.rpa
+    nas = mr.nas
+    #fids = eval(mr.description)
+    #lpa = fids[0]
+    #rpa = fids[1]
+    #nas = fids[2]
     #self.points = array([[0,0,0],[10,0,0],[0,20,0]])#DEBUG-----------------
     xyz = transform.meg2mri(lpa,rpa,nas, dipole=points)
     #readwrite.writedata(xyz, os.path.dirname(mripath)+'/'+'xyz')
@@ -55,7 +63,8 @@ def handler(points,mr,gofscale,gof,sigma):
 
 
     #do some scaling of the dips using the GOF as a weight.
-    VoxDim = mr.voxdim[::-1]
+    #VoxDim = mr.voxdim[::-1]
+    VoxDim = mr.pixdim
     xyzscaled = (xyz/VoxDim).T
     print xyzscaled
     d = density.calc(xyz)
@@ -81,11 +90,14 @@ def handler(points,mr,gofscale,gof,sigma):
     scaledf = int16((z.max()/f.max())*f*1000)
     print 'writing nifti output image'
     #overlay = NiftiImage(int16(scaledf))
-    overlay = NiftiImage(int16(scaledf))
-
-    overlay.setDescription(mr.description)
-    overlay.setFilename(mr.filename+'dd')
-    overlay.setQForm(mr.getQForm())
+    overlay = nibabel.Nifti1Image(scaledf,mr.nifti.get_affine(),mr.nifti.get_header())
+    #overlay = NiftiImage(int16(scaledf))
+    #overlay.setDescription(mr.description)
+    filename = os.path.splitext(mr.nifti.get_filename())[0]
+    overlay.to_filename(filename+'dd.nii.gz')
+    print 'Density Image Saved', filename+'dd.nii.gz'
+    #overlay.setFilename(mr.filename+'dd')
+    #overlay.setQForm(mr.getQForm())
 
     return overlay
 

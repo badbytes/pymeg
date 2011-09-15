@@ -57,10 +57,9 @@ def calc(points):
     distmat=zeros([size(points ,0), size(points ,0)]);
     for i in range(0,size(points,0)):# %get euclid dist between all pairs of points
         for ii in range(0,size(points ,0)):
-            dist = 1/euclid.dist_old(
-            points[i,0], points[ii,0],\
-            points[i,1], points[ii,1], \
-            points[i,2], points[ii,2]);
+            dist = 1/euclid.dist(points[i], points[ii])
+            #points[i,1], points[ii,1], \
+            #points[i,2], points[ii,2]);
 
             if dist == inf:
                 if i == ii:
@@ -69,6 +68,7 @@ def calc(points):
                     distmat[i,ii] = 1
             else:
                 distmat[i,ii] = dist
+    
 
     return distmat
 
@@ -143,6 +143,6 @@ class parsedipolereport:
 
 
 if __name__ == '__main__':
-    points = array([[0,0,40],[100,0,0],[1,2,3],[1,2,5],[1,2,10]])
+    points = array([[0,0,40],[100,0,0],[0,0,0]])
     x=calc(points)
     print x
