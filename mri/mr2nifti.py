@@ -6,6 +6,7 @@ mr = mr2nifti.start(dataarray, filename2saveas)
 #from nifti import *
 from numpy import argmax, array, abs, int16, shape, float32, flipud, fliplr \
 ,swapaxes, round_, zeros, sum, reshape, append, tile, copy
+import nibabel
 
 def check(mr):
     try:
@@ -119,14 +120,16 @@ def start(mr, fn, method='reorient'):
         if method == 'reorient':
             print 'reorienting', mr.datareshaped[i].shape, mr.imageorientation[i], mr.pixdim[i]
             redata,qform = reorient(mr.datareshaped[i], mr.imageorientation[i], mr.pixdim[i])
-            nim = NiftiImage(int16(redata))
-            nim.setQForm(qform)
+            nim = nibabel.Nifti1Image(redata,qform)
+            #nim = NiftiImage(int16(redata))
+            #nim.setQForm(qform)
 
         fnbase = fn.split('.')[0]
         fnnew = fnbase+i+'.nii.gz'
 
         print 'writing',fnnew
-        nim.save(fnnew)
+        #nim.save(fnnew)
+        nim.to_filename(fnnew)
 
     #return redata
 

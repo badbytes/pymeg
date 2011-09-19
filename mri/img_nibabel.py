@@ -1,3 +1,6 @@
+#!/usr/bin/python2
+
+
 # Copyright 2008 Dan Collins
 # This is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -46,11 +49,11 @@ class loadimage():
             self.getfiducals(h)
         else:
             try: #This is a shitty way in which fiducal point were saved in descrip field in header, as there were no user avail fields to store the 3X3 matrix.
-                self.lpa = eval(str(h['descrip']))[0]
-                self.rpa = eval(str(h['descrip']))[1]
-                self.nas = eval(str(h['descrip']))[2]
+                self.lpa# = eval(str(h['descrip']))[0]
+                self.rpa# = eval(str(h['descrip']))[1]
+                self.nas# = eval(str(h['descrip']))[2]
                 print('got fiducal info from description field in header')
-            except NameError:
+            except:
                 print 'no fiducal file or info found. you will not be able to perform any transforms with other data.'
 
     #def reorient(self):

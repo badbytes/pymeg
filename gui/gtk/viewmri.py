@@ -134,7 +134,7 @@ class setup_gui:
         self.update()
 
     def save_coregister_info(self,widget):
-        print 'current aux field in header',self.hdr['aux_file']
+        #print 'current aux field in header',self.hdr['aux_file']
         #filepath = os.path.splitext(self.img.file_map['header'].filename)[0]
         try:
             filepath = os.path.splitext(self.filename)[0]
@@ -380,7 +380,7 @@ class setup_gui:
                 data = squeeze(data.get_data())
                 self.img = data
         except:
-            #Not a nifti or analyze file, raw data
+            print 'Not a nifti or analyze file, raw data'
             pass
 
         if translation == None:

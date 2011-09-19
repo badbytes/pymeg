@@ -1,3 +1,5 @@
+#!/usr/bin/python2
+
 #       pydicom.py
 #
 #       Copyright 2010 dan collins <danc@badbytes.net>
@@ -16,8 +18,6 @@
 #       along with this program; if not, write to the Free Software
 #       Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #       MA 02110-1301, USA.
-
-
 
 '''read and write dicom series
 mr = pydicom.loadfiles(pathtodicom, prefix='MR')
@@ -56,7 +56,7 @@ def build3d(data):
 
 
 class loadfiles:
-
+    
     def __init__(self, pathtodicom, prefix):
         '''mr = pydicom.read(pathtodicom, prefix='MR')'''
         self.pathtodicom = pathtodicom
@@ -73,34 +73,32 @@ class loadfiles:
             else:
                 print 'found file without selected prefix', f
 
-        files = filesMR
-
-        #make emtpy array
         try:
             dicomfile = dicom.ReadFile(pathtodicom+'/'+files[0]) #read 1st file
         except IndexError:
             print 'you probably have the wrong prefix option. prefix="MR"'
             print 'try again'
             return
-        self.files = files
+        self.files = filesMR
         self.pathtodicom = pathtodicom
         return
 
-    def __dicomread__(self, i):
+    def __dicomread__(self, dcmfile):
         '''load data from filelist and uncompress if necessary'''
-        dicomfile = dicom.ReadFile(self.pathtodicom+'/'+i)
+        dicomfile = dicom.ReadFile(self.pathtodicom+'/'+dcmfile)
         try: #check compression
             comp = 'no'
             b = dicomfile.PixelArray
         except NotImplementedError: #uncompress
             comp = 'yes'
             #b = frombuffer(j.PixelArray, dtype='uint8')
-            dicomfile = uncompress(self.pathtodicom, i)
+            dicomfile = uncompress(self.pathtodicom, dcmfile)
         return dicomfile
 
 
     def __importfiles__(self):
         d = array([])
+        self.dicomdict = {}
         for i in self.files:
             #dicomfile = dicom.ReadFile(self.pathtodicom+'/'+i)
             print('reading',i)
@@ -112,8 +110,10 @@ class loadfiles:
                 #comp = 'yes'
                 ##b = frombuffer(j.PixelArray, dtype='uint8')
                 #dicomfile = uncompress(self.pathtodicom, i)
-            d = append(d,dicomfile)
-        self.dicomdict = {dicomfile.SeriesTime : d}
+            #d = append(d,dicomfile)
+            try: self.dicomdict[dicomfile.SeriesTime] = append(self.dicomdict[dicomfile.SeriesTime],dicomfile)}
+            except KeyError: self.dicomdict[dicomfile.SeriesTime] = dicomfile
+        #self.dicomdict = {dicomfile.SeriesTime : d}
         return
 
     def __rename__(self, writepath=None, descriptor_field=None, slice_field=None, extra_field=None):
