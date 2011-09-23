@@ -40,15 +40,16 @@ class density:
             "on_filechooserbutton2_file_set" : self.fileset,
             "on_button1_clicked" : self.startdensity,
             "on_startdensity_clicked" : self.startdensity,
-            "on_radiobuttonfileopen_clicked" : self.loaddipolefiletoggle,
-            "on_radiobuttonselected_clicked" : self.selectedtoggle,
+            #"on_radiobuttonfileopen_clicked" : self.loaddipolefiletoggle,
+            #"on_radiobuttonselected_clicked" : self.selectedtoggle,
             "on_button1_clicked" : self.savemri,
             "on_button2_clicked" : self.cancel,
+            "on_toggled" : self.item_select,
 
             }
 
         self.builder.connect_signals(dic)
-        fcb1 = self.builder.get_object("filechooserbutton1")
+        fcb1 = self.builder.get_object("fileopenitem")
         filter = gtk.FileFilter()
         filter.set_name("Dipole Files")
         filter.add_pattern("*lA")
@@ -62,21 +63,32 @@ class density:
         fcb2.add_filter(filter)
 
 
+    def item_select(self,widget):
+        self.itemselected =  gtk.Buildable.get_name(widget).split('_')[1]
+        for i in self.builder.get_object('vbuttonbox2').get_children():
+            i.set_sensitive(False)
+        self.paired_item = paired_item = self.builder.get_object(self.itemselected+'item')
+        paired_item.set_sensitive(True)
+
+        self.builder.get_object('startdensity').set_sensitive(True)
+        self.builder.get_object('entry1').set_sensitive(True)
+        self.builder.get_object('entry2').set_sensitive(True)
 
     def fileset(self,widget):
-        fcb1 = self.builder.get_object("filechooserbutton1")
+        fcb1 = self.builder.get_object("fileopenitem")
         fcb2 = self.builder.get_object("filechooserbutton2")
         if fcb1.get_uri() != None and fcb2.get_uri() != None:
             self.builder.get_object('entry1').set_sensitive(True)
             self.builder.get_object('entry2').set_sensitive(True)
             self.builder.get_object('startdensity').set_sensitive(True)
 
-    def loaddipolefiletoggle(self, widget):
-        self.builder.get_object("currentitem").set_sensitive(False)
-        self.builder.get_object("filechooserbutton1").set_sensitive(True)
-    def selectedtoggle(self, widget):
-        self.builder.get_object("currentitem").set_sensitive(True)
-        self.builder.get_object("filechooserbutton1").set_sensitive(False)
+    #def loaddipolefiletoggle(self, widget):
+        #self.builder.get_object("currentitem").set_sensitive(False)
+        #self.builder.get_object("fileopenitem").set_sensitive(True)
+
+    #def selectedtoggle(self, widget):
+        #self.builder.get_object("currentitem").set_sensitive(True)
+        #self.builder.get_object("fileopenitem").set_sensitive(False)
 
     def cancel(self, widget):
         import sys
@@ -96,6 +108,8 @@ class density:
     def startdensity(self, widget):
         from meg import density
         from mri import img_nibabel as img
+        from numpy import array, append, size, ones
+
         #import nifti
         gofscale = float(self.builder.get_object('entry1').get_text())
         sigma = int(self.builder.get_object('entry2').get_text())
@@ -105,22 +119,22 @@ class density:
         mr = img.loadimage(self.mrfilename)
         print 'loaded MRI',mr
 
-        try:
+        if self.itemselected == 'manual':
+            points = array(eval(self.paired_item.get_text()))
+            gof = ones(size(points,0))
+        if self.itemselected == 'selected':
             points = self.data_selected
-        except AttributeError:
+        if self.itemselected == 'fileopen':
             from pdf2py import lA2array, readwrite
-            from numpy import array, append, size
             from meg import dipole
 
-            datafile = self.builder.get_object("filechooserbutton1").get_filename()
+            datafile = self.builder.get_object("fileopenitem").get_filename()
             print 'datafile=',datafile
-            #if datafile[-2:] == 'lA':
 
             try:
                 lA = lA2array.calc(datafile)
             except AttributeError: #probably not an MEG 4D file, try parsereport
                 lA = dipole.parsereport(datafile)
-                #lA.points = array([])
                 lA.dips[:,1:4] = lA.dips[:,1:4]/100 #xyz in meters (this is the units in the 4D,lA file)
 
             points = lA.dips[:,1:4]*1000 # units in mm
@@ -128,24 +142,24 @@ class density:
             gof_ind = lA.labels.index('GoF')
             gof = lA.dips[:,gof_ind]
 
-            from meg import dipole2densitynifti
-            self.dipoledensityimage = dipole2densitynifti.handler(points,mr,gofscale,gof,sigma)
+        from meg import dipole2densitynifti
+        self.dipoledensityimage = dipole2densitynifti.handler(points,mr,gofscale,gof,sigma)
 
-            self.fcd = self.builder.get_object("filechooserdialog1")
-            self.fcd.show()
-            self.fcd.set_current_name('*dd.nii.gz')
-            filter = gtk.FileFilter()
-            filter.set_name("Nifti files")
-            filter.add_pattern("*nii.gz")
-            filter.add_pattern("*nii")
-            self.fcd.add_filter(filter)
+        self.fcd = self.builder.get_object("filechooserdialog1")
+        self.fcd.show()
+        self.fcd.set_current_name('*dd.nii.gz')
+        filter = gtk.FileFilter()
+        filter.set_name("Nifti files")
+        filter.add_pattern("*nii.gz")
+        filter.add_pattern("*nii")
+        self.fcd.add_filter(filter)
 
-            #uridefault = self.fcd.set_uri(self.fcd.get_current_folder_uri())
-            self.fcd.set_uri('file://'+self.mrfilename)
+        #uridefault = self.fcd.set_uri(self.fcd.get_current_folder_uri())
+        self.fcd.set_uri('file://'+self.mrfilename)
 
-            uridefault = self.fcd.get_current_folder_uri()
-            print 'uri', uridefault
-            self.fcd.set_uri(uridefault)
+        uridefault = self.fcd.get_current_folder_uri()
+        print 'uri', uridefault
+        self.fcd.set_uri(uridefault)
 
     def savemri(self, widget):
         self.dipoledensityimage.save(self.fcd.get_filename())

@@ -45,7 +45,7 @@ def handler(points,mr,gofscale,gof,sigma):
 
     report = {}
     filename = mr.nifti.get_filename()
-    
+
     #try: xfm = readwrite.readdata(os.path.splitext(filename)[0]+'.pym')
     #except: print 'Error reading coregistration info'
     lpa = mr.lpa
@@ -59,7 +59,8 @@ def handler(points,mr,gofscale,gof,sigma):
     xyz = transform.meg2mri(lpa,rpa,nas, dipole=points)
     #readwrite.writedata(xyz, os.path.dirname(mripath)+'/'+'xyz')
     print 'lpa, rpa, nas', lpa, rpa, nas
-    print mr.pixdim
+    print 'xyz in mri space', xyz
+    print 'pixdim', mr.pixdim
 
 
     #do some scaling of the dips using the GOF as a weight.

@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <requires lib="gtk+" version="2.16"/>
-  <!-- interface-naming-policy project-wide -->
   <object class="GtkWindow" id="dipoledensitywindow">
+    <property name="can_focus">False</property>
     <property name="title" translatable="yes">Dipole Density Window</property>
     <child>
       <object class="GtkTable" id="table1">
         <property name="visible">True</property>
+        <property name="can_focus">False</property>
         <property name="n_rows">7</property>
         <property name="n_columns">2</property>
         <child>
           <object class="GtkHSeparator" id="hseparator1">
             <property name="visible">True</property>
+            <property name="can_focus">False</property>
           </object>
           <packing>
             <property name="top_attach">2</property>
@@ -22,6 +24,7 @@
         <child>
           <object class="GtkHSeparator" id="hseparator2">
             <property name="visible">True</property>
+            <property name="can_focus">False</property>
           </object>
           <packing>
             <property name="left_attach">1</property>
@@ -33,10 +36,12 @@
         <child>
           <object class="GtkHButtonBox" id="hbuttonbox1">
             <property name="visible">True</property>
+            <property name="can_focus">False</property>
             <property name="layout_style">center</property>
             <child>
               <object class="GtkLabel" id="label3">
                 <property name="visible">True</property>
+                <property name="can_focus">False</property>
                 <property name="label" translatable="yes">GOF Weight:</property>
               </object>
               <packing>
@@ -71,9 +76,11 @@
         <child>
           <object class="GtkHButtonBox" id="hbuttonbox2">
             <property name="visible">True</property>
+            <property name="can_focus">False</property>
             <child>
               <object class="GtkLabel" id="label4">
                 <property name="visible">True</property>
+                <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Sigma:</property>
               </object>
               <packing>
@@ -108,20 +115,25 @@
         <child>
           <object class="GtkHButtonBox" id="hbuttonbox3">
             <property name="visible">True</property>
+            <property name="can_focus">False</property>
             <property name="spacing">5</property>
             <property name="layout_style">center</property>
             <child>
               <object class="GtkVButtonBox" id="vbuttonbox1">
                 <property name="visible">True</property>
+                <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkRadioButton" id="radiobuttonselected">
+                  <object class="GtkRadioButton" id="radiobutton_selected">
                     <property name="label" translatable="yes">Use Selected Item</property>
+                    <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="draw_indicator">True</property>
-                    <property name="group">radiobuttonfileopen</property>
-                    <signal name="clicked" handler="on_radiobuttonselected_clicked"/>
-                    <signal name="group_changed" handler="on_radiobuttonselected_group_changed"/>
+                    <property name="group">radiobutton_manual</property>
+                    <signal name="toggled" handler="on_toggled" swapped="no"/>
+                    <signal name="clicked" handler="on_radiobuttonselected_clicked" swapped="no"/>
+                    <signal name="group-changed" handler="on_group_changed" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -130,22 +142,45 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkRadioButton" id="radiobuttonfileopen">
+                  <object class="GtkRadioButton" id="radiobutton_manual">
+                    <property name="label" translatable="yes">Manual Entry</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">False</property>
+                    <property name="use_action_appearance">False</property>
+                    <property name="xalign">0</property>
+                    <property name="active">True</property>
+                    <property name="draw_indicator">True</property>
+                    <property name="group">radiobutton_selected</property>
+                    <signal name="toggled" handler="on_toggled" swapped="no"/>
+                    <signal name="group-changed" handler="on_group_changed" swapped="no"/>
+                    <signal name="clicked" handler="on_toggled" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkRadioButton" id="radiobutton_fileopen">
                     <property name="label" translatable="yes">Load Dipole File</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="has_default">True</property>
                     <property name="receives_default">False</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="active">True</property>
                     <property name="draw_indicator">True</property>
-                    <property name="group">radiobuttonselected</property>
-                    <signal name="clicked" handler="on_radiobuttonfileopen_clicked"/>
-                    <signal name="group_changed" handler="on_radiobutton_group_changed"/>
+                    <property name="group">radiobutton_selected</property>
+                    <signal name="toggled" handler="on_toggled" swapped="no"/>
+                    <signal name="clicked" handler="on_radiobuttonfileopen_clicked" swapped="no"/>
+                    <signal name="group-changed" handler="on_group_changed" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
-                    <property name="position">1</property>
+                    <property name="position">2</property>
                   </packing>
                 </child>
               </object>
@@ -158,10 +193,12 @@
             <child>
               <object class="GtkVButtonBox" id="vbuttonbox2">
                 <property name="visible">True</property>
+                <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkLabel" id="currentitem">
+                  <object class="GtkLabel" id="selecteditem">
                     <property name="visible">True</property>
                     <property name="sensitive">False</property>
+                    <property name="can_focus">False</property>
                     <property name="label" translatable="yes">Nothing Selected</property>
                   </object>
                   <packing>
@@ -171,15 +208,30 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkFileChooserButton" id="filechooserbutton1">
+                  <object class="GtkEntry" id="manualitem">
                     <property name="visible">True</property>
+                    <property name="sensitive">False</property>
+                    <property name="can_focus">True</property>
+                    <property name="invisible_char">●</property>
+                    <property name="text" translatable="yes">[[0.,0.,40.],[0.,0.,0.]]</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkFileChooserButton" id="fileopenitem">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
                     <property name="width_chars">20</property>
-                    <signal name="file_set" handler="on_filechooserbutton1_file_set"/>
+                    <signal name="file-set" handler="on_filechooserbutton1_file_set" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
-                    <property name="position">1</property>
+                    <property name="position">2</property>
                   </packing>
                 </child>
               </object>
@@ -200,10 +252,12 @@
         <child>
           <object class="GtkHButtonBox" id="hbuttonbox4">
             <property name="visible">True</property>
+            <property name="can_focus">False</property>
             <property name="layout_style">center</property>
             <child>
               <object class="GtkLabel" id="label2">
                 <property name="visible">True</property>
+                <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Load MRI</property>
               </object>
               <packing>
@@ -215,8 +269,9 @@
             <child>
               <object class="GtkFileChooserButton" id="filechooserbutton2">
                 <property name="visible">True</property>
+                <property name="can_focus">False</property>
                 <property name="width_chars">20</property>
-                <signal name="file_set" handler="on_filechooserbutton2_file_set"/>
+                <signal name="file-set" handler="on_filechooserbutton2_file_set" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -240,8 +295,9 @@
             <property name="can_default">True</property>
             <property name="has_default">True</property>
             <property name="receives_default">True</property>
-            <signal name="clicked" handler="on_startdensity_clicked"/>
-            <signal name="activate" handler="on_button1_activate"/>
+            <property name="use_action_appearance">False</property>
+            <signal name="activate" handler="on_button1_activate" swapped="no"/>
+            <signal name="clicked" handler="on_startdensity_clicked" swapped="no"/>
           </object>
           <packing>
             <property name="top_attach">5</property>
@@ -270,20 +326,21 @@
     </child>
   </object>
   <object class="GtkFileChooserDialog" id="filechooserdialog1">
+    <property name="can_focus">False</property>
     <property name="border_width">5</property>
     <property name="type_hint">normal</property>
     <property name="action">save</property>
     <property name="do_overwrite_confirmation">True</property>
+    <property name="select_multiple">True</property>
     <child internal-child="vbox">
-      <object class="GtkVBox" id="dialog-vbox1">
+      <object class="GtkBox" id="dialog-vbox1">
         <property name="visible">True</property>
+        <property name="can_focus">False</property>
         <property name="spacing">2</property>
-        <child>
-          <placeholder/>
-        </child>
         <child internal-child="action_area">
-          <object class="GtkHButtonBox" id="dialog-action_area1">
+          <object class="GtkButtonBox" id="dialog-action_area1">
             <property name="visible">True</property>
+            <property name="can_focus">False</property>
             <property name="layout_style">end</property>
             <child>
               <object class="GtkButton" id="button2">
@@ -291,7 +348,8 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <signal name="clicked" handler="on_button2_clicked"/>
+                <property name="use_action_appearance">False</property>
+                <signal name="clicked" handler="on_button2_clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -305,7 +363,8 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <signal name="clicked" handler="on_button1_clicked"/>
+                <property name="use_action_appearance">False</property>
+                <signal name="clicked" handler="on_button1_clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -316,9 +375,13 @@
           </object>
           <packing>
             <property name="expand">False</property>
+            <property name="fill">True</property>
             <property name="pack_type">end</property>
             <property name="position">0</property>
           </packing>
+        </child>
+        <child>
+          <placeholder/>
         </child>
       </object>
     </child>

@@ -39,7 +39,8 @@ class loadimage():
         self.data = copy(self.nifti.get_data())#.T
         #self.nifti.data = self.data
         h = self.nifti.get_header()
-        self.pixdim = h['pixdim'][1:4]
+        self.pixdim = abs(sum(h.get_best_affine().T[0:3,0:3]))
+        #self.pixdim = h['pixdim'][1:4]
         self.gettransform(h)
         #self.reorient()
         xfm_fn = os.path.splitext(filepath)[0]+'.pym'
@@ -56,37 +57,6 @@ class loadimage():
             except:
                 print 'no fiducal file or info found. you will not be able to perform any transforms with other data.'
 
-    #def reorient(self):
-        #'''27 possible combinations of orientations
-        #('LAI' or 'LIA' or 'ALI' or 'AIL' or 'ILA' or 'IAL' or 'LAS' or 'LSA' or 'ALS' or 'ASL' or 'SLA' or 'SAL' or 'LPI' or 'LIP' or 'PLI' or 'PIL' or 'ILP' or 'IPL' or 'LPS' or 'LSP' or 'PLS' or 'PSL' or 'SLP' or 'SPL' or 'RAI' or 'RIA' or 'ARI' or 'AIR' or 'IRA' or 'IAR' or 'RAS' or 'RSA' or 'ARS' or 'ASR' or 'SRA' or 'SAR' or 'RPI' or 'RIP' or 'PRI' or 'PIR' or 'IRP' or 'IPR' or 'RPS' or 'RSP' or 'PRS' or 'PSR' or 'SRP' or 'SPR')'''
-        #print 'transform',self.transform[:,0],abs(self.transform[:,0]).argmax(),
-        #self.t = copy(self.translation)
-
-        #rot = self.transform[0:3,0:3]
-        #arot = abs(rot)
-        #print arot
-        #if abs(rot[:,0]).argmax() == 0: #RL first dim
-            ##if rot[0,0] < 0:
-                ##self.data = self.data[::-1,:,:]
-                ##rot[0,0] = rot[0,0] * -1
-                ##print 'flipping'
-            #print 'swapping'
-            #self.data = self.data.swapaxes(0,1)
-            #self.t[0] = self.translation[1]; self.t[1] = self.translation[0]
-            #rot[0,:] = rot[0,]
-        #if arot[:,0].argmax() == 1: #AP first dim
-            ##self.origimg = self.origimg.swapaxes(0,1)
-            #pass
-
-        #if arot[:,1].argmax() == 1: #AP second dim
-            #if rot[0,1] < 0:
-                #self.data = self.data[::-1,:,:]
-            #pass
-        #if arot[:,2].argmax() == 2: #IS third dim
-            #pass
-        #if self.transform[:,0:4].argmax() == 2: #IS first dim
-            #pass
-
     def getfiducals(self,header):
         self.lpa = self.fiddata['lpa']
         self.rpa = self.fiddata['rpa']
@@ -95,8 +65,9 @@ class loadimage():
     def gettransform(self,header):
         print 'Affine Transform is'
         print header.get_base_affine()
-        self.transform = header.get_base_affine()
+        self.transform = header.get_best_affine()
         self.translation = self.transform[0:3,3]#[::-1]
+
 
     def decimate(self, dec):
         '''nim is the mri data in python format

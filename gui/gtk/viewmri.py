@@ -138,7 +138,9 @@ class setup_gui:
         #filepath = os.path.splitext(self.img.file_map['header'].filename)[0]
         try:
             filepath = os.path.splitext(self.filename)[0]
+            print 'fn',self.filename
         except:
+            print self.filename
             print 'Couldnt find filename for saving XFM, saving in current dir as MRI_XFM_DATA'
             filepath = 'MRI_XFM_DATA'
         coreg_dict = {'lpa': self.lpa,'rpa': self.rpa, 'nas':self.nas}
@@ -273,7 +275,9 @@ class setup_gui:
         def printcoord():
             #coordinates = round(self.ind3*self.pixdim[0]+(self.translation[0])), round(self.ind2*self.pixdim[1]+(self.translation[1])), round(self.ind1*self.pixdim[2]+(self.translation[2]))
             #coordinates = self.coordinates = array([round(self.ind2*self.pixdim[1]+(self.translation[1])), round(self.ind3*self.pixdim[0]+(self.translation[0])), round(self.ind1*self.pixdim[2]+(self.translation[2]))])
+
             coordinates = self.coordinates = array([round(self.ind3*self.pixdim[0]), round(self.ind2*self.pixdim[1]), round(self.ind1*self.pixdim[2])])
+            #coordinates = self.coordinates = array([round(self.ind3), round(self.ind2), round(self.ind1)])
             print coordinates, 'mm'#, self.ind3, self.pixdim,(self.translation[0])
             return coordinates
 
@@ -297,7 +301,7 @@ class setup_gui:
             self.update()
         #print self.ind1,self.ind2,self.ind3
         #self.coord.title.set_text([round(self.ind3*self.pixdim[0]), round(self.ind2*self.pixdim[1]), round(self.ind1*self.pixdim[2])])
-        return self.ind3*self.pixdim[0], self.ind2*self.pixdim[1], self.ind1*self.pixdim[2]#event
+        return self.coordinates #self.ind3*self.pixdim[0], self.ind2*self.pixdim[1], self.ind1*self.pixdim[2]#event
 
     def showpopupmenu(self,widget,event):
         print('button ',event.button)
@@ -369,14 +373,17 @@ class setup_gui:
 
     def display(self,data=None, overlay=None, colormap=cm.gray, pixdim=None, translation=None):
         self.get_color_maps()
+
+        #pixdim = abs(sum(data._affine.T)[0:3])
         try:
             if os.path.splitext(data.__module__)[0] == 'nibabel':
                 print 'nibabel loaded data'
                 self.filename = data.get_filename()
                 self.hdr = data.get_header()
-                pixdim = self.hdr['pixdim'][1:4]
+                #pixdim = self.hdr['pixdim'][1:4]
+                pixdim = abs(data._affine.sum(axis=1)[0:3])
                 transform = data._affine[0:3,0:3];print 'orig trans',transform
-                translation = data._affine[0:3,3]; print 'translation', translation
+                #translation = data._affine[0:3,3]; print 'translation', translation
                 data = squeeze(data.get_data())
                 self.img = data
         except:
@@ -410,7 +417,9 @@ if __name__ == "__main__":
     mainwindow.window.show()
     from pdf2py import pdf
     from mri import img_nibabel
-    fn = '/home/danc/data/standardmri/colin_1mm.img'
+    fn = '/home/danc/python/data/clinical/E0064/E-0064_165103_b.nii.gz'
+
+    #fn = '/home/danc/data/mri/standardmri/colin_1mm.img'
     #fn = '/home/danc/python/data/standardmri/ch3.nii.gz'
     img = nibabel.load(fn)
     h = img.get_header()

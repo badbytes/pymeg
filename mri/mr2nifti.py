@@ -121,14 +121,18 @@ def start(mr, fn, method='reorient'):
             print 'reorienting', mr.datareshaped[i].shape, mr.imageorientation[i], mr.pixdim[i]
             redata,qform = reorient(mr.datareshaped[i], mr.imageorientation[i], mr.pixdim[i])
             nim = nibabel.Nifti1Image(redata,qform)
+            nim.set_data_dtype(int8)
             #nim = NiftiImage(int16(redata))
             #nim.setQForm(qform)
+            h = nim.get_header()
+
 
         fnbase = fn.split('.')[0]
         fnnew = fnbase+i+'.nii.gz'
 
         print 'writing',fnnew
         #nim.save(fnnew)
+
         nim.to_filename(fnnew)
 
     #return redata
