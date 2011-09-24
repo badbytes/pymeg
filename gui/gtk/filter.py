@@ -77,11 +77,12 @@ class filtwin:
 
     def startfiltfilt(self,widget):
         from meg import filtfilt
+        self.updatefiltbox(None)
         srate = float(self.builder.get_object('entry24').get_text())
         order = int(self.builder.get_object('entry27').get_text())
+        print 'filterering with, srate, Wn, order, band:',srate, self.Wn, order, self.band
 
         self.filter_results = filtfilt.calc(self.data_selected, srate, self.Wn, order, self.band)
-        print 'filtererd with, srate, Wn, order, band:',srate, self.Wn, order, self.band
         self.callback(self.filter_results)
 
 
