@@ -1307,7 +1307,7 @@ class maingui():
         res = (self.setup_helper(var=['data_block','srate','labellist','chanlocs'],obj=obj));
         self.psd = power_spectral_density.setup_gui()
         self.psd.datahandler(res)
-        self.psd.window.show()
+        #self.psd.window.show()
 
     def spin(self, status):
         try: print self.spinner_gui.window.get_visible()

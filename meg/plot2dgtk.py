@@ -26,7 +26,7 @@ import gtk
 
 from matplotlib.figure import Figure
 from numpy import arange, sin, pi, random
-from pylab import get_current_fig_manager
+from pylab import get_current_fig_manager, psd
 from matplotlib.patches import Ellipse
 
 # uncomment to select /GTK/GTKAgg/GTKCairo
@@ -36,18 +36,18 @@ from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanva
 from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
 
 class makewin():
-    def __init__(self,data,xaxis,plottype='lines',labels=None):
+    def __init__(self,data='None',xaxis='None',plottype='lines',labels=None,size=[700,500],NFFT='None', Fs='None'):
 
         self.win = gtk.Window()
         #win.connect("destroy", lambda x: gtk.main_quit())
         self.win.connect("delete-event", self.hideinsteadofdelete)
-        self.win.set_default_size(400,300)
+        self.win.set_default_size(size[0],size[1])
         self.win.set_title("PyMEG Simple Plot")
 
         vbox = gtk.VBox()
         self.win.add(vbox)
 
-        f = Figure(figsize=(500,4000), dpi=100)
+        f = Figure(figsize=(500,500), dpi=75)
         a = f.add_subplot(111)
         t = arange(0.0,3.0,0.01)
         s = sin(2*pi*t)
@@ -55,6 +55,10 @@ class makewin():
 
         if plottype == 'lines':
             a.plot(xaxis,data)
+        if plottype == 'psd':
+            a.psd(data,NFFT=NFFT, Fs=Fs)
+        if plottype == 'empty':
+            pass
         if plottype == 'imshow':
             timevals=xaxis
             extent=(int(timevals[0]), int(timevals[-1]),int(0), int(1));
@@ -110,5 +114,7 @@ if __name__ == '__main__':
     data = random.randn(10,10)
     xaxis = arange(0,10)
     makewin(data,xaxis,plottype='imshow',labels=None)
+    #makewin(data,plottype='psd',labels=None)
+
     #import code; code.interact(local=locals())
     gtk.main()

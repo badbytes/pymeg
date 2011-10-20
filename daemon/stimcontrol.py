@@ -31,9 +31,9 @@ class MyDaemon(Daemon):
             '''
             if command[-1] == '\r':
                 command = command.split('\r')[0]+'\n'
-                
+
             cmd = command.split(' ')
-            
+
             #for i in cmd:
             print cmd
             self.writelog(command, 'receive')
@@ -55,6 +55,10 @@ class MyDaemon(Daemon):
                 self.writelog('RESPONSE:'+resp+'\n', 'receive')
             elif cmd[0] == 'trialnum\n':
                 pass
+            elif cmd[0] == 'log\n':
+                self.writelog(cmd[1]+'\n', 'receive')
+            elif cmd[0] == 'debug\n':
+                self.writelog('debug:'+cmd[1],'debug')
 
             elif cmd[0] == 'startacq':
                 stat = self.acqstatus()
@@ -82,22 +86,22 @@ class MyDaemon(Daemon):
                     except:
                         pass
                     #aip -m data0 -v A1 -C Colorado_Jan2010 -P phantom -S SEF -s '07/23/09 11:02' -r 2 -q
-                    
-                    if RUN == '1':
-                        currenttime = self.datenow()
-                        self.ct = currenttime
-                        
-                    else: #use current session
-                        currenttime = self.ct
-                        
+
+                    #if RUN == '1':
+                    currenttime = self.datenow()
+                    self.ct = currenttime
+
+                    #else: #use current session
+                    #    currenttime = self.ct
+
                     #resp = self.datenow()
                     try:
                         #os.system('ape')
                         #stat = os.system('aip -m data0 -v A1 -C Colorado_June2010 -P '+PID+' -S '+TEMPLATE+\
                         #' -s '+currenttime+' -r '+RUN+' -q')
 
-                        stat = subprocess.Popen(['aip', '-m', 'data0', '-v', 'A1', '-C', 'Colorado_June2010', '-P', PID,'-S',TEMPLATE,'-s',currenttime,'-r',RUN,'-q','-c 5'], stdout=subprocess.PIPE)
-                        self.writelog('aip -m data0 -v A1 -C Colorado_June2010 -P'+PID+'-S'+TEMPLATE+'-s'+currenttime+'-r'+RUN+'-q'+'-c 5', 'receive')
+                        stat = subprocess.Popen(['aip', '-m', 'data0', '-v', 'DC_SUB+frontline', '-C', 'Colorado_June2010', '-P', PID,'-S',TEMPLATE,'-s',currenttime,'-r',RUN,'-q','-c 5'], stdout=subprocess.PIPE)
+                        self.writelog('aip -m data0 -v DC_SUB+frontline -C Colorado_June2010 -P'+PID+'-S'+TEMPLATE+'-s'+currenttime+'-r'+RUN+'-q'+'-c 5', 'receive')
                         stat.poll()
                         if stat.returncode == 2:
                             #if stat.stdout.readlines([0].index('Database record not found'))
@@ -133,7 +137,7 @@ class MyDaemon(Daemon):
                 #self.pid = 'noid'
                 #self.writelog(self.pid, 'receive')
                 #return resp
-                
+
         try:
             resp
         except NameError:
@@ -184,25 +188,25 @@ if __name__ == "__main__":
 
 use: aip [-P patient -S scan -s session -r run | [-P patient] -S scan] [-q] [-w] [-d] [-C config_file ] [-m file_system] [-a {x,y,z}offset] [-z trace_flags] [-D] [-x] [-o] [-c #_of_coils,[coh_prompt]] [-H] [-I] [-R run_comment_text_file] [-K weight file] [-E analog,high,low,gradient] [-M montage_file] [-v video_setup]
 
--q		quiet mode (not implemented)
-	 -w		do not display window (not implemented)
-	 -d		debug mode
-	 -C config	config file (default is set by APE)
-	 -m FileSystem	data partition
-	 -a {x,y,z}offset
-	 		analog offset for x, y, or z direction
-	 -z trace	hex trace flags for debugging
-	 -x		turn on message tracing
-	 -o		(attempt to) overwrite an existing run
-	 -c coils	turn COH off (coils == 0) or on (coils from 3 to 16)
+-q      quiet mode (not implemented)
+     -w     do not display window (not implemented)
+     -d     debug mode
+     -C config  config file (default is set by APE)
+     -m FileSystem  data partition
+     -a {x,y,z}offset
+            analog offset for x, y, or z direction
+     -z trace   hex trace flags for debugging
+     -x     turn on message tracing
+     -o     (attempt to) overwrite an existing run
+     -c coils   turn COH off (coils == 0) or on (coils from 3 to 16)
       [coh_prompt]   1 to prompt for the first COH acquisition;
                      2 for the verification;  3 for both;  0 for none(default)
-	 -E		0 to turn of analog, high gain, low gain, and gradiometer weights
-	 -G		display GUI only; do not talk to DAS
-	 -H		detailed help
-	 -I		send as idle parameters
-	 -K		weight table
-	 -M		montage file
-	 -v		video setup file
-	 -R file	run comments text file
+     -E     0 to turn of analog, high gain, low gain, and gradiometer weights
+     -G     display GUI only; do not talk to DAS
+     -H     detailed help
+     -I     send as idle parameters
+     -K     weight table
+     -M     montage file
+     -v     video setup file
+     -R file    run comments text file
 '''

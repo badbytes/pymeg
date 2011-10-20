@@ -48,7 +48,6 @@ from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanva
 from numpy import shape, mgrid, interp, isnan, ceil, sqrt,arange , size
 import time
 
-
 class setup_gui:
     def __init__(self):
         self.builder = gtk.Builder()
@@ -98,8 +97,6 @@ class setup_gui:
     def create_draw_frame(self,widget):
         self.fig = Figure(figsize=[500,500], dpi=40)
         self.canvas = FigureCanvas(self.fig)
-        #self.canvas.connect("scroll_event", self.scroll_event)
-        #self.canvas.connect('button_press_event', self.button_press_event)
         self.canvas.show()
         self.figure = self.canvas.figure
         self.axes = self.fig.add_axes([0.045, 0.05, 0.93, 0.925], axisbg='#FFFFCC')
@@ -107,6 +104,8 @@ class setup_gui:
         self.vb = self.builder.get_object("vbox1")
         self.vb.pack_start(self.canvas, gtk.TRUE, gtk.TRUE)
         self.vb.show()
+        #self.canvas.connect("scroll_event", self.scroll_event)
+        #self.canvas.connect('button_press_event', self.button_press_event)
 
     def plot_data(self,xi,yi,zi,intx,inty):
         """provide...

@@ -225,6 +225,7 @@
                   <object class="GtkFileChooserButton" id="fileopenitem">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="local_only">False</property>
                     <property name="width_chars">20</property>
                     <signal name="file-set" handler="on_filechooserbutton1_file_set" swapped="no"/>
                   </object>
