@@ -33,10 +33,10 @@ logger2.addHandler(logging.FileHandler('/tmp/logger2',mode='w'))
 class read:
     def __init__(self, fid,log=None):
         align.check(fid);
-        
+
         #logging.basicConfig(filename='/tmp/MSWconfigread.log',filemode='w',level=logging.DEBUG)
-        self.name = array(fread(fid, 16, 'c', 'c', 1))
-        self.name_short = ''.join(list(self.name));
+        self.name_array = array(fread(fid, 16, 'c', 'c', 1))
+        self.name = ''.join(list(self.name_array));
         #print self.name,fid.tell()
         #self.name = fid.read(16)
         self.chan_no = fread(fid, 1, 'H', 'H', 1);
@@ -51,12 +51,11 @@ class read:
         self.aar_val = fread(fid, 1, 'd', 'd', 1);
         self.checksum = fread(fid, 1, 'i', 'i', 1);
         #self.reserved = ''.join(list(fread(fid, 32, 'c', 'c', 1)));
-        
+
         #self.reserved = fid.read(32)
         self.reserved = array(fread(fid, 32, 'c', 'c', 1))
         fid.seek( 4, os.SEEK_CUR);
-        logger1.error((self.name_short,str(fid.tell())))
-        print 'CD POS',fid.tell()
+        #logger1.error((self.name_short,str(fid.tell())))
 
         if self.type in [1,3]: self.device_data = device_data.readmeg(fid); #meg/ref
         elif self.type in [2]: self.device_data = device_data.readeeg(fid); #eeg
@@ -78,8 +77,8 @@ class write:
         #logging.basicConfig(filename='/tmp/MSWconfigwrite.log',filemode='w',level=logging.DEBUG)
         #self.name = ''.join(list(fread(fid, 16, 'c', 'c', 1)));
         #fid.seek(16, os.SEEK_CUR);
-        
-        fwrite(fid, 1, array([channeldata.name]), 'c', 1); #16b
+
+        fwrite(fid, 1, array([channeldata.name_array]), 'c', 1); #16b
         #print channeldata.name,fid,fid.tell()
         fwrite(fid, 1, channeldata.chan_no, 'H', 1); #4b
         fwrite(fid, 1, channeldata.type, 'H', 1); #4b
@@ -98,7 +97,6 @@ class write:
         fid.seek( 4, os.SEEK_CUR); #4b
         logger2.error((channeldata.name_short,str(fid.tell())))
         #fid.seek(77, os.SEEK_CUR);
-        print 'CD POS',fid.tell()
         if channeldata.type in [1,3]: device_data.writemeg(fid,channeldata.device_data); #meg/ref
         elif channeldata.type in [2]: device_data.writeeeg(fid,channeldata.device_data); #eeg
         elif channeldata.type in [4]: device_data.writeexternal(fid,channeldata.device_data); #external
