@@ -17,8 +17,6 @@
 
 #add-danc-writesupport
 
-#try:from scipy.io.numpyio import *
-#except ImportError: from extra.numpyio import *
 from numpy import char, reshape, arange, vstack
 from pdf2py import io_wrapper
 fread = io_wrapper.fread
@@ -38,6 +36,12 @@ class read:
         self.user_block_data_user_space_size = fread(fid, 1, 'I', 'I', 1);
         self.user_block_data_reserved = fread(fid, 32, 'c', 'c', 1);
         fid.seek(4, os.SEEK_CUR);
+
+        if self.user_block_data_hdr_type == 'B_weights_used':
+            st = fid.tell()
+
+            print('WEIGHTS',(st,self.user_block_data_user_space_size))
+
 
 
         if self.user_block_data_hdr_type == 'b_eeg_elec_locs':

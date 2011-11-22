@@ -56,7 +56,7 @@ def build3d(data):
 
 
 class loadfiles:
-    
+
     def __init__(self, pathtodicom, prefix):
         '''mr = pydicom.read(pathtodicom, prefix='MR')'''
         self.pathtodicom = pathtodicom
@@ -66,20 +66,20 @@ class loadfiles:
         files = path.next()[2]
         files.sort()
 
-        filesMR = []
+        self.files = filesMR = []
         for f in files:
             if f.startswith(prefix) == True:
                 filesMR.append(f)
+                print 'found file WITH selected prefix', f
             else:
                 print 'found file without selected prefix', f
-
         try:
             dicomfile = dicom.ReadFile(pathtodicom+'/'+files[0]) #read 1st file
         except IndexError:
             print 'you probably have the wrong prefix option. prefix="MR"'
             print 'try again'
             return
-        self.files = filesMR
+        #self.files = filesMR
         self.pathtodicom = pathtodicom
         return
 
@@ -91,7 +91,6 @@ class loadfiles:
             b = dicomfile.PixelArray
         except NotImplementedError: #uncompress
             comp = 'yes'
-            #b = frombuffer(j.PixelArray, dtype='uint8')
             dicomfile = uncompress(self.pathtodicom, dcmfile)
         return dicomfile
 
@@ -100,20 +99,10 @@ class loadfiles:
         d = array([])
         self.dicomdict = {}
         for i in self.files:
-            #dicomfile = dicom.ReadFile(self.pathtodicom+'/'+i)
             print('reading',i)
             dicomfile = self.__dicomread__(i)
-            #try: #check compression
-                #comp = 'no'
-                #b = dicomfile.PixelArray
-            #except NotImplementedError: #uncompress
-                #comp = 'yes'
-                ##b = frombuffer(j.PixelArray, dtype='uint8')
-                #dicomfile = uncompress(self.pathtodicom, i)
-            #d = append(d,dicomfile)
-            try: self.dicomdict[dicomfile.SeriesTime] = append(self.dicomdict[dicomfile.SeriesTime],dicomfile)}
+            try: self.dicomdict[dicomfile.SeriesTime] = append(self.dicomdict[dicomfile.SeriesTime],dicomfile)
             except KeyError: self.dicomdict[dicomfile.SeriesTime] = dicomfile
-        #self.dicomdict = {dicomfile.SeriesTime : d}
         return
 
     def __rename__(self, writepath=None, descriptor_field=None, slice_field=None, extra_field=None):
@@ -140,18 +129,14 @@ class loadfiles:
                 filename_descriptor = str(eval(('dicomfile.'+df))).replace(' ','')
             except AttributeError:
                 time.sleep(1.5)
-                #self.tmp = dicomfile
                 dicomfile = self.__dicomread__(i)
                 filename_descriptor = str(eval(('dicomfile.'+df))).replace(' ','')
             filename_slice = str(eval(('dicomfile.'+sf))).replace(' ','')
             filename_rowscolumns = str(dicomfile.Rows)+'X'+str(dicomfile.Columns)
             sid = str(dicomfile.SeriesInstanceUID)#.split('.')[-1])
             fn = writepath+filename_descriptor+'_'+sid+'_'+filename_slice+'_'+filename_rowscolumns
-            #if os.path.exists(fn+'.dcm') == True:
-                #fn = fn+'B'
             fn = fn+'.dcm'
             print('saving',fn)
-            #if filename_descriptor == 'SegStructuralMentalRhyming':
             self.d = append(self.d, i+filename_descriptor)
             dicomfile.SaveAs(fn)
 
@@ -244,16 +229,17 @@ class write:
         filesindir.sort()
 
 
-        filelist = dicom_instance.fndict[seqID]
-        fnlist = dicom_instance.fndict[seqID].tolist()
+        filelist = dicom_instance.dicomdict[seqID]
+        fnlist = dicom_instance.dicomdict[seqID].tolist()
 
         for f in filelist:
             self.fnlist = fnlist
             self.f = f
+            return
 
             try:
                 ind = filesindir.index(f)
-                print ind
+                #print ind
             except ValueError:
                 pass #not in file list...skip
                 print 'cant find file, skipping', f
@@ -282,7 +268,6 @@ class write:
                 print 'dataslice', fnlist.index(f) #dicom_instance.fndict[seqID].index(f)
                 dicomfile.PixelData = data[:,:,fnlist.index(f)].tostring()#data[fnlist.index(f),:,:].tostring()
                 fnamestripped = os.path.splitext(f)[0]
-                #dicomfile.SaveAs(dicom_instance.pathtodicom+'/'+fnamestripped+'_'+savename+'.dcm')
                 dicomfile.SaveAs(dicom_instance.pathtodicom+fnamestripped+'_'+savename+'.dcm')
 
 
