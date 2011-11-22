@@ -24,14 +24,20 @@ fwrite = io_wrapper.fwrite
 from pdf2py import user_block_data, channel_data
 import shutil
 import os, subprocess
+import logging
 
+logger1 = logging.getLogger('1')
+logger1.addHandler(logging.FileHandler('/tmp/logger1',mode='w'))
+logger2 = logging.getLogger('2')
+logger2.addHandler(logging.FileHandler('/tmp/logger2',mode='w'))
 
 class read:
     def __init__(self, configfile):
         fid=open(configfile, "r")
         dataype = 's'
         self.data_version = fread(fid, 1, 'H', 'H', 1);
-        self.data_site_name = ''.join(list(fread(fid, 32, 'c', 'c', 1)))
+        self.data_site_name = array(fread(fid, 32, 'c', 'c', 1))
+        self.data_site_name_short = ''.join(list(self.data_site_name))
         #self.data_site_name = fid.read(32)
         self.data_dap_hostname = ''.join(list(fread(fid, 16, 'c', 'c', 1)));
         #self.data_dap_hostname = fid.read(16)
@@ -72,15 +78,17 @@ class write:
 
         '''
         output = configfile+'T'
-        shutil.copy(configfile, output)
-
+        os.chmod(output, 0660) 
+        shutil.copyfile(configfile, output)
+        
         fid = open(output, 'r+')
         dataype = 's'
 
         fwrite(fid, 1, pyconfig.data_version, 'H', 1);
-        fid.seek(32, 1)
+        #fid.seek(32, 1)
+        fwrite(fid, 32, array([pyconfig.data_site_name]), 'c', 1);
         fid.seek(16, 1)
-
+        #fwrite(fid, 16, array([pyconfig.data_dap_hostname]), 'c', 1);
         fwrite(fid, 1, pyconfig.data_sys_type, 'H', 1);
         fwrite(fid, 1, pyconfig.data_sys_options, 'i', 1);
         fwrite(fid, 1, pyconfig.data_supply_freq, 'H', 1);
@@ -93,6 +101,7 @@ class write:
         fid.seek(2, 1)
         fwrite(fid, 1, pyconfig.data_checksum, 'i', 1);
         fid.seek(32, 1)
+        #fwrite(fid, 1, array([pyconfig.data_reserved]), 'c', 1);
 
         fwrite(fid, 16, pyconfig.Xfm, 'd', 1);
         print 'XFM',pyconfig.Xfm
@@ -100,18 +109,19 @@ class write:
 
         for i in range(0, pyconfig.data_total_user_blocks[0]):
             user_block_data.write(fid, pyconfig.user_block_data[i])
-            return
+            #return
         for i in range(0, pyconfig.data_total_chans[0]):
             channel_data.write(fid, pyconfig.channel_data[i])
-            if i == 2:
-                return
+            #if i == 2:
+                #return
 
         fid.close()
 
 
 if __name__ == "__main__":
-    configfile = '/media/2TB/4D_data/msw_data/spartan_data0/0611/IB_MOTb/04%13%11@14:55/1/config'
+    configfile = '/home/danc/programming/python/Colorado_Oct2011_Cal-Refs.config'
     hsfile = '/opt/msw/data/spartan_data0/1337/sef+eeg/03%31%09@11:17/1/hs_file'
     c = read(configfile)
+    write(configfile,c)
     print dir(c), c.data_dap_hostname
 

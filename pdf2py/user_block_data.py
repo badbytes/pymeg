@@ -29,16 +29,23 @@ import os, subprocess
 class read:
     def __init__(self, fid):
         align.check(fid);
+        
         self.user_block_data_hdr_nbytes = fread(fid, 1, 'I', 'I', 1); #4 bytes
-        #self.user_block_data_hdr_type = fread(fid, 20, 'c', 'c', 1); #20  bytes
-        self.user_block_data_hdr_type = ''.join(list(fread(fid, 20, 'c', 'c', 1)));
-        self.user_block_data_hdr_checksum = fread(fid, 1, 'i', 'i', 1);
-        self.user_block_data_user = fread(fid, 32, 'c', 'c', 1);
-        self.user_block_data_timestamp = fread(fid, 1, 'I', 'I', 1);
-        self.user_block_data_user_space_size = fread(fid, 1, 'I', 'I', 1);
-        self.user_block_data_reserved = fread(fid, 32, 'c', 'c', 1);
-        fid.seek(4, os.SEEK_CUR);
-
+        
+        self.user_block_data_hdr_type = ''.join(list(fread(fid, 20, 'c', 'c', 1))); #20b
+        
+        self.user_block_data_hdr_checksum = fread(fid, 1, 'i', 'i', 1);#4b
+        
+        self.user_block_data_user = fread(fid, 32, 'c', 'c', 1);#32b
+        
+        self.user_block_data_timestamp = fread(fid, 1, 'I', 'I', 1);#4b
+        
+        self.user_block_data_user_space_size = fread(fid, 1, 'I', 'I', 1);#4b
+        
+        self.user_block_data_reserved = fread(fid, 32, 'c', 'c', 1);#32
+        
+        fid.seek(4, os.SEEK_CUR);#4b
+        
 
         if self.user_block_data_hdr_type == 'b_eeg_elec_locs':
             st = fid.tell()
@@ -66,40 +73,46 @@ class read:
 
         #print self.user_block_data_hdr_type, fid.tell(), self.user_block_data_user_space_size
         fid.seek(self.user_block_data_user_space_size, os.SEEK_CUR) #skip user space
+        
+
 
 
 class write:
     def __init__(self, fid, user_block_data):
 
         align.check(fid);
+        
 
         fwrite(fid, 1, user_block_data.user_block_data_hdr_nbytes, 'I', 1);
+        
         #fid.seek(1, os.SEEK_CUR);
-        print 'cksum';fid.close()
-        subprocess.Popen('cksum /opt/msw/data/spartan_data0/1337/sef+eeg/03%31%09@11:17/1/configT', shell=True)
-        return
+        #print 'cksum';fid.close()
+        #subprocess.Popen('cksum /opt/msw/data/spartan_data0/1337/sef+eeg/03%31%09@11:17/1/configT', shell=True)
+        #return
 
         #fwrite(fid, 20, pyconfig.user_block_data_hdr_type, 'c', 1);
 
         fid.seek(20, os.SEEK_CUR);
-
+        
         #fwrite(fid, 1, user_block_data.user_block_data_hdr_checksum, 'i', 1);
-        fid.seek(1, os.SEEK_CUR);
-
+        fid.seek(4, os.SEEK_CUR);
+        
         #fwrite(fid, 32, pyconfig.user_block_data_user, 'c', 1);
         fid.seek(32, os.SEEK_CUR);
-
+        
         #fwrite(fid, 1, user_block_data.user_block_data_timestamp, 'I', 1);
-        fid.seek(1, os.SEEK_CUR);
-
+        fid.seek(4, os.SEEK_CUR);
+        
         #fwrite(fid, 1, user_block_data.user_block_data_user_space_size, 'I', 1);
-        fid.seek(1, os.SEEK_CUR);
-
+        fid.seek(4, os.SEEK_CUR);
+        
 
         #fwrite(fid, 32, pyconfig.user_block_data_reserved, 'c', 1);
         fid.seek(32, os.SEEK_CUR);
+        
         fid.seek(4, os.SEEK_CUR);
-
+        
         fid.seek(user_block_data.user_block_data_user_space_size, os.SEEK_CUR) #skip user space
+        
 
 

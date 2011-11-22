@@ -39,8 +39,7 @@ class read:
 class write:
     def __init__(self, fid, loop_data):
         align.check(fid);
-
-        fwrite(fid, 3, loop_data.position, 'd', 1)/1000; #convert to meters
+        fwrite(fid, 3, loop_data.position/1000, 'd', 1); #convert to meters
         fwrite(fid, 3, loop_data.direction, 'd', 1);
         fwrite(fid, 1, loop_data.radius, 'd', 1);
         fwrite(fid, 1, loop_data.wire_radius, 'd', 1);

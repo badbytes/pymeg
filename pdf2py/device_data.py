@@ -84,7 +84,7 @@ class readshorted:
         align.check(fid);
         self.hdr = device_header.read(fid);
         self.reserved = ''.join(list(fread(fid, 32, 'c', 'c', 1 )));
-
+        #fid.seek(4, os.SEEK_CUR);
 
 #-----------WRITE----------------
 
@@ -115,6 +115,7 @@ class writeeeg:
         fwrite(fid, 4*4, device_data.Xfm, 'd', 1);
         #self.reserved = ''.join(list(fread(fid, 32,  'c', 'c', 1 )));
         fid.seek(32, os.SEEK_CUR);
+        #fid.seek(4, os.SEEK_CUR);
 
 class writeexternal:
     def __init__(self, fid, device_data):
@@ -132,7 +133,6 @@ class writetrigger:
         fwrite(fid, 1, device_data.user_space_size, 'I', 1);
         #self.reserved = ''.join(list(fread(fid, 32,  'c', 'c', 1 )));
         fid.seek(32, os.SEEK_CUR);
-
         fid.seek(4, os.SEEK_CUR);
 
 class writeutility:
@@ -159,3 +159,4 @@ class writeshorted:
         device_header.write(fid, device_data.hdr);
         #self.reserved = ''.join(list(fread(fid, 32, 'c', 'c', 1 )));
         fid.seek(32, os.SEEK_CUR);
+        #fid.seek(4, os.SEEK_CUR);

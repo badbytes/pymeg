@@ -23,13 +23,22 @@ fread = io_wrapper.fread
 fwrite = io_wrapper.fwrite
 from pdf2py import align, device_data
 import os, subprocess
+from numpy import array
+import logging
 
+logger1 = logging.getLogger('1')
+logger1.addHandler(logging.FileHandler('/tmp/logger1',mode='w'))
+logger2 = logging.getLogger('2')
+logger2.addHandler(logging.FileHandler('/tmp/logger2',mode='w'))
 class read:
-    def __init__(self, fid):
+    def __init__(self, fid,log=None):
         align.check(fid);
-
-        #self.name = ''.join(list(fread(fid, 16, 'c', 'c', 1)));
-        self.name = fid.read(16)
+        
+        #logging.basicConfig(filename='/tmp/MSWconfigread.log',filemode='w',level=logging.DEBUG)
+        self.name = array(fread(fid, 16, 'c', 'c', 1))
+        self.name_short = ''.join(list(self.name));
+        #print self.name,fid.tell()
+        #self.name = fid.read(16)
         self.chan_no = fread(fid, 1, 'H', 'H', 1);
         self.type = fread(fid, 1, 'H', 'H', 1);
         self.sensor_no = fread(fid, 1, 'h', 'h', 1);
@@ -37,12 +46,17 @@ class read:
         self.gain = fread(fid, 1, 'f', 'f', 1);
         self.units_per_bit = fread(fid, 1, 'f', 'f', 1);
         #self.yaxis_label = ''.join(list(fread(fid, 16, 'c', 'c', 1)));
-        self.yaxis_label = fid.read(16)
+        #self.yaxis_label = fid.read(16)
+        self.yaxis_label = array(fread(fid, 16, 'c', 'c', 1))
         self.aar_val = fread(fid, 1, 'd', 'd', 1);
         self.checksum = fread(fid, 1, 'i', 'i', 1);
         #self.reserved = ''.join(list(fread(fid, 32, 'c', 'c', 1)));
-        self.reserved = fid.read(32)
+        
+        #self.reserved = fid.read(32)
+        self.reserved = array(fread(fid, 32, 'c', 'c', 1))
         fid.seek( 4, os.SEEK_CUR);
+        logger1.error((self.name_short,str(fid.tell())))
+        print 'CD POS',fid.tell()
 
         if self.type in [1,3]: self.device_data = device_data.readmeg(fid); #meg/ref
         elif self.type in [2]: self.device_data = device_data.readeeg(fid); #eeg
@@ -51,32 +65,40 @@ class read:
         elif self.type in [6]: self.device_data = device_data.readutility(fid); #utility
         elif self.type in [7]: self.device_data = device_data.readderived(fid); #derived
         elif self.type in [8]: self.device_data = device_data.readshorted(fid); #shorted
-        else: print 'device type unknown'
+        else:
+            print 'device type unknown',self.type,self.name
+            #sys.exit()
 
 
 class write:
-    def __init__(self, fid, channeldata):
+    def __init__(self, fid, channeldata, log=None):
+        #logging.basicConfig(filename='/tmp/MSWconfigwrite.log',filemode='w',level=logging.DEBUG)
 
         align.check(fid);
-
+        #logging.basicConfig(filename='/tmp/MSWconfigwrite.log',filemode='w',level=logging.DEBUG)
         #self.name = ''.join(list(fread(fid, 16, 'c', 'c', 1)));
-        fid.seek(16, os.SEEK_CUR);
-
-        fwrite(fid, 1, channeldata.chan_no, 'H', 1);
-        fwrite(fid, 1, channeldata.type, 'H', 1);
-        fwrite(fid, 1, channeldata.sensor_no, 'h', 1);
-        fid.seek(2, os.SEEK_CUR);
-        fwrite(fid, 1, channeldata.gain, 'f', 1);
-        fwrite(fid, 1, channeldata.units_per_bit, 'f', 1);
+        #fid.seek(16, os.SEEK_CUR);
+        
+        fwrite(fid, 1, array([channeldata.name]), 'c', 1); #16b
+        #print channeldata.name,fid,fid.tell()
+        fwrite(fid, 1, channeldata.chan_no, 'H', 1); #4b
+        fwrite(fid, 1, channeldata.type, 'H', 1); #4b
+        fwrite(fid, 1, channeldata.sensor_no, 'h', 1); #4b
+        fid.seek(2, os.SEEK_CUR); #2b
+        fwrite(fid, 1, channeldata.gain, 'f', 1); #4b
+        fwrite(fid, 1, channeldata.units_per_bit, 'f', 1); #4b
         #self.yaxis_label = ''.join(list(fread(fid, 16, 'c', 'c', 1)));
-        fid.seek(16, os.SEEK_CUR);
-        fwrite(fid, 1, channeldata.aar_val, 'd', 1);
-        fwrite(fid, 1, channeldata.checksum, 'i', 1);
+        #fid.seek(16, os.SEEK_CUR);
+        fwrite(fid, 1, array([channeldata.yaxis_label]), 'c', 1); #16
+        fwrite(fid, 1, channeldata.aar_val, 'd', 1); #4
+        fwrite(fid, 1, channeldata.checksum, 'i', 1); #4
         #self.reserved = ''.join(list(fread(fid, 32, 'c', 'c', 1)));
-        fid.seek(32, os.SEEK_CUR);
-        fid.seek( 4, os.SEEK_CUR);
-        fid.seek(77, os.SEEK_CUR);
-
+        #fid.seek(32, os.SEEK_CUR);
+        fwrite(fid, 1, array([channeldata.reserved]), 'c', 1); #32
+        fid.seek( 4, os.SEEK_CUR); #4b
+        logger2.error((channeldata.name_short,str(fid.tell())))
+        #fid.seek(77, os.SEEK_CUR);
+        print 'CD POS',fid.tell()
         if channeldata.type in [1,3]: device_data.writemeg(fid,channeldata.device_data); #meg/ref
         elif channeldata.type in [2]: device_data.writeeeg(fid,channeldata.device_data); #eeg
         elif channeldata.type in [4]: device_data.writeexternal(fid,channeldata.device_data); #external
