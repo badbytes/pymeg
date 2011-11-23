@@ -20,7 +20,7 @@
 
 '''initialize badchannel class
     p = pdf.read('/path2data/e,rfhp1.0Hz,COH')
-    b = badchannels_v2.initialize(hz_range=[4,50])
+    b = badchannels_v2.initialize(hz_range=[1,200])
 get the fft correlation coefficients from each channel and a family of channels within 25mm of that channel
     b.builder(p,distance=25)
     #then take a look at b.correl'''
@@ -29,7 +29,7 @@ from meg import euclid
 from numpy import median,corrcoef
 
 class initialize():
-    def __init__(self, method='fft',comparison='proximity',hz_range=[4,50]):
+    def __init__(self, method='fft',comparison='proximity',hz_range=[4,50],threshold=.4):
         '''method can be fft
         neighboring channel pickup can be based on 'proximity' or 'neighbors'
         eg
@@ -38,7 +38,10 @@ class initialize():
         self.method = method
         self.comparison = comparison
         self.hz_range = hz_range
-        print 'Using method of family channel comparison based on:',comparison, 'using', self.method, ',within freq range of', hz_range
+        self.threshold = threshold
+        print 'Using method of family channel comparison based on: '+ \
+        comparison+' using '+method+' ,within freq range of '+str(hz_range)+ \
+        ' with a threshold of '+str(threshold)
 
     def fft_method(self, data, srate, epochs):
         from meg import fftmeg,nearest
@@ -76,6 +79,11 @@ class initialize():
                 m = median(self.result[:,self.proxind[i]],axis=1)
                 cc[i] = corrcoef(self.result[:,i],m)[0,1]
                 self.correlation_coef.append(cc[i])
+        self.badchannelindex = []
+        for i in self.correlation_coef:
+            if i < self.threshold:
+                self.badchannelindex.append(self.correlation_coef.index(i))
+
 
 if __name__=='__main__':
     pass
