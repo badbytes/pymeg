@@ -72,7 +72,7 @@ except ImportError:
 
 try:#load required methods
     pass
-    from pdf2py import pdf, readwrite#,lA2array
+    from pdf2py import pdf, readwrite,lA2array
     from meg import nearest#, dipole
 except ImportError:
     errordialog.errorwin('PyMEG not installed correctly, cant find pymeg code in path.')

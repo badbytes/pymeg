@@ -36,6 +36,7 @@ import os
 import subprocess
 import time
 from numpy import size, shape, zeros, int16, int8, append, array, argsort, random, frombuffer, squeeze
+from mri import mr2nifti
 
 def uncompress(pathtodicom,file):
     s = subprocess.Popen('dcmdjpeg '+pathtodicom+'/'+file+' /tmp/'+'un_'+file, shell=True,stdout=True)
@@ -201,6 +202,10 @@ class loadfiles:
         self.__importfiles__()
         self.__createarray__()
         self.__niftiinfo__()
+
+    def write_nifti(self):
+        ni = mr2nifti.start(self, '/tmp/test.nii.gz')
+
 
 class write:
     def __init__(self, dicom_instance, seqID, data, savename=None, studydate='', studytime=''):

@@ -275,10 +275,11 @@ class setup_gui:
         def printcoord():
             #coordinates = round(self.ind3*self.pixdim[0]+(self.translation[0])), round(self.ind2*self.pixdim[1]+(self.translation[1])), round(self.ind1*self.pixdim[2]+(self.translation[2]))
             #coordinates = self.coordinates = array([round(self.ind2*self.pixdim[1]+(self.translation[1])), round(self.ind3*self.pixdim[0]+(self.translation[0])), round(self.ind1*self.pixdim[2]+(self.translation[2]))])
-
+            ind = array([self.ind3,self.ind2,self.ind1])
             coordinates = self.coordinates = array([round(self.ind3*self.pixdim[0]), round(self.ind2*self.pixdim[1]), round(self.ind1*self.pixdim[2])])
             #coordinates = self.coordinates = array([round(self.ind3), round(self.ind2), round(self.ind1)])
-            print coordinates, 'mm'#, self.ind3, self.pixdim,(self.translation[0])
+            print 'COORDS:', coordinates, 'mm. INDEX: ',ind#, self.ind3, self.pixdim,(self.translation[0])
+
             return coordinates
 
         if event.inaxes == self.ax1:
@@ -375,20 +376,21 @@ class setup_gui:
         self.get_color_maps()
 
         #pixdim = abs(sum(data._affine.T)[0:3])
-        try:
-            if os.path.splitext(data.__module__)[0] == 'nibabel':
-                print 'nibabel loaded data'
-                self.filename = data.get_filename()
-                self.hdr = data.get_header()
-                #pixdim = self.hdr['pixdim'][1:4]
-                pixdim = abs(data._affine.sum(axis=1)[0:3])
-                transform = data._affine[0:3,0:3];print 'orig trans',transform
-                #translation = data._affine[0:3,3]; print 'translation', translation
-                data = squeeze(data.get_data())
-                self.img = data
-        except:
-            print 'Not a nifti or analyze file, raw data'
-            pass
+        #try:
+        print os.path.splitext(data.__module__)[0]# == 'nibabel':
+        print 'nibabel loaded data'
+        self.filename = data.get_filename()
+        self.hdr = data.get_header()
+        #pixdim = self.hdr['pixdim'][1:4]
+        pixdim = abs(data._affine.sum(axis=1)[0:3])
+        print 'PixDim', pixdim
+        transform = data._affine[0:3,0:3];print 'orig trans',transform
+        #translation = data._affine[0:3,3]; print 'translation', translation
+        data = squeeze(data.get_data())
+        self.img = data
+        #except:
+        #print 'Not a nifti or analyze file, raw data'
+        #pass
 
         if translation == None:
             translation == [0,0,0]
@@ -417,7 +419,7 @@ if __name__ == "__main__":
     mainwindow.window.show()
     from pdf2py import pdf
     from mri import img_nibabel
-    fn = '/home/danc/python/data/clinical/E0064/E-0064_165103_b.nii.gz'
+    fn = '/home/danc/python/data/clinical/E0066/test.nii.gz'
 
     #fn = '/home/danc/data/mri/standardmri/colin_1mm.img'
     #fn = '/home/danc/python/data/standardmri/ch3.nii.gz'

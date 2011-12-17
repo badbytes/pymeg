@@ -19,7 +19,6 @@
 
 '''lA dipole conversion to diparray'''
 
-
 from pdf2py import channel,data
 from numpy import nonzero, zeros, size, shape, tile
 
@@ -40,9 +39,7 @@ def getnonzerosind(datafile, chdict, ch):
     return ind, d
 
 def formatdata(d, chdict, ind, ch):
-    #for i in range(0, len(chdict)):
     diparray = zeros([size(ind),len(chdict)+1])
-    #print shape(diparray), d.eventtime, ind
     labels = ['x pos','y pos','z pos','Qx','Qy','Qz','Radius','||Q||','Rms','Correlation','GoF','Iter']
     diparray[:,0] = tile(d.eventtime,d.numofepochs)[ind] #time
 
@@ -51,8 +48,6 @@ def formatdata(d, chdict, ind, ch):
 
     labels.insert(0,'time')
     return diparray, labels
-
-
 
 class calc:
     def __init__(self, datafile):

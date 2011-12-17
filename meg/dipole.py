@@ -5,9 +5,23 @@ from numpy import size, zeros, array, inf, shape, sum, mean
 #import wx
 from gui.gtk import filechooser
 import os
+from pdf2py import lA2array
 
 #poximity based density method
 #def proximity(points, scale=None):
+
+def lA2spreadsheet(lAfilename,textoutputfilename):
+    lA = lA2array.calc(lAfilename)
+    f = open('/tmp/'+textoutputfilename+'.csv', 'w')
+    for i in lA.labels:
+        f.write(i+',')
+    f.write('\n')
+    for i in arange(shape(lA.dips)[0]):
+        lA.dips[i].tofile(f,sep=',',format='%s')
+        f.write('\n')
+    f.close()
+    print('finished writing /tmp/'+textoutputfilename+'.csv')
+
 def density(points):
     '''scale is the slice thickness
     if 3D and non cubic then scale'''
@@ -23,10 +37,9 @@ def density(points):
     distmat=zeros([size(points ,0), size(points ,0)]);
     for i in range(0,size(points,0)):# %get euclid dist between all pairs of points
         for ii in range(0,size(points ,0)):
-            dist = 1/euclid.dist(
-            points[i,0], points[ii,0],\
-            points[i,1], points[ii,1], \
-            points[i,2], points[ii,2]);
+            dist = 1/euclid.dist(points[i], points[ii])
+            #points[i,1], points[ii,1], \
+            #points[i,2], points[ii,2]);
 
             if dist == inf:
                 if i == ii:
