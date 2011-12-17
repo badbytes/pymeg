@@ -9,6 +9,7 @@ scipy
 matplotlib
 pynifti
 vtk
+nibable
 
 If using debian based linux for instance you would install the necessary dependencies with something like this.
 

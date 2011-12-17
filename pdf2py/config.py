@@ -78,9 +78,9 @@ class write:
 
         '''
         output = configfile+'T'
-        os.chmod(output, 0660) 
+        os.chmod(output, 0660)
         shutil.copyfile(configfile, output)
-        
+
         fid = open(output, 'r+')
         dataype = 's'
 
@@ -120,7 +120,6 @@ class write:
 
 if __name__ == "__main__":
     configfile = '/home/danc/programming/python/Colorado_Oct2011_Cal-Refs.config'
-    hsfile = '/opt/msw/data/spartan_data0/1337/sef+eeg/03%31%09@11:17/1/hs_file'
     c = read(configfile)
     write(configfile,c)
     print dir(c), c.data_dap_hostname

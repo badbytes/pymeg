@@ -69,6 +69,7 @@ def dipoletransform(dipole, transformvector, transformmatrix):
         if size(dip.shape) == 1: #convert to 2D
             dip = array([dip])
         t=tile(transformvector,(len(dip),1));
+        #print 'DEBUG', dot(transformmatrix, dipole)+transformvector
         xyz = dot(transformmatrix.T, dipole.T).T+transformvector
         print 'note: coordinates returned are in the MRI convention R/L,P/A,I/S'
         print 'to use with nifti orient=0 files (I/S,P/A,I/S) we need to use flipup(xyz,1,axis=0)'
