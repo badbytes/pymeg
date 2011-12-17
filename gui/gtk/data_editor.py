@@ -191,10 +191,10 @@ class setup_gui:
         except IOError:
             pass
         #print 'color',self.builder.get_object("colorbutton1").get_color()
-        
+
         #self.builder.get_object("colorbutton1").set_color(color=gtk.gdk.Color(111))
         #print 'color',self.builder.get_object("colorbutton1").get_color()
-        
+
         if self.builder.get_object('toolbutton12').get_active() == True:
             self.win_prefs.show()
         else:
@@ -381,13 +381,13 @@ class setup_gui:
         self.back_color = (r,g,b)
         self.prefs['BackColor'] = self.back_color
         readwrite.writedata(self.prefs, os.getenv('HOME')+'/.pymeg')
-        
+
         self.numofch = int(self.builder.get_object("spinbutton1").get_value())
         self.chanind2plot = \
         self.chanind[self.curchannel:self.curchannel+self.numofch]
         self.chanlabels2plot = \
         self.chanlabels[self.curchannel:self.curchannel+self.numofch]
-        
+
         st = float(self.builder.get_object("spinbutton2").get_value())
         ed = float(self.builder.get_object("spinbutton3").get_value())
         self.space = float(self.builder.get_object("entry1").get_text())
@@ -691,6 +691,7 @@ class setup_gui:
         self.time = copy(self.t[self.tstart:self.tstop])
         self.numchannels = size(data,1)
         self.chanind = arange(self.numchannels)
+        print 'DEBUG',data
         self.scalefact = (data.min()+data.max())/2
         print 'scalefact', self.scalefact
         self.channels = chanlocs

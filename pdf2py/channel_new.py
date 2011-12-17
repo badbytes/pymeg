@@ -165,7 +165,9 @@ class index:
         x.__doc__        x.__module__     x.chan_no        x.device_data    x.name           x.sensor_no      x.units_per_bit '''
         ch_cfg = {}
         for i in range(0, len(self.cfg.channel_data)):
-            if key == 'name': ch_cfg[self.cfg.channel_data[i].name.strip('\x00')] = eval('self.cfg.channel_data[i].'+term)
+            chname = self.cfg.channel_data[i].name.tostring().strip('\x00')
+            #print 'DEBUG',(chname,key,term)
+            if key == 'name': ch_cfg[chname] = eval('self.cfg.channel_data[i].'+term)#if key == 'name': ch_cfg[self.cfg.channel_data[i].name.strip('\x00')] = eval('self.cfg.channel_data[i].'+term)
             else: ch_cfg[eval('self.cfg.channel_data[i].'+key)[0]] = eval('self.cfg.channel_data[i].'+term)
         return ch_cfg
 
@@ -227,7 +229,7 @@ class index:
                 pass
             else:
                 chnotfound.append(ch)
-        print 'Chanloc Maker:',len(chnotfound), 'MEG channels not found'
+        print 'Chanloc Maker:',len(chfound), 'MEG channels found',len(chnotfound), 'missing'
         chfound=array(chfound);
         return chanlocs248[:,chfound];
 

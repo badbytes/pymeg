@@ -34,7 +34,7 @@ class initialize():
             self.datapdf=datapdf
             self.hdr=header.read(datapdf)
             self.ext = 'pymdat'
-            self.filepath = datapdf
+            self.filepath = os.path.abspath(datapdf)
             pathlist = self.filepath.split('/')
             self.filename = pathlist.pop()
             self.run = pathlist.pop()
