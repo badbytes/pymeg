@@ -19,7 +19,7 @@
 '''
 sim=simsource.calc(ldf, xyz, qxqyqz);
 '''
-from numpy import *
+from numpy import size,transpose,linalg,shape
 from meg import closestposition
 
 def calc(lf, xyz, qxqyqz):

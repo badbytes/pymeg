@@ -58,26 +58,34 @@ def build3d(data):
 
 class loadfiles:
 
-    def __init__(self, pathtodicom, prefix):
-        '''mr = pydicom.read(pathtodicom, prefix='MR')'''
+    def __init__(self, pathtodicom, prefix=None, filelist=None):
+        '''mr = pydicom.read(pathtodicom, prefix='MR' | filelist=[list])'''
         self.pathtodicom = pathtodicom
-        self.prefix = prefix
+        if prefix == None and filelist == None:
+            print('You need to either give a file prefix or a list/array of filenames as filelist=[somelist]')
+            raise TypeError
+        if prefix != None:
+            self.prefix = prefix
+            path = os.walk(pathtodicom)
+            files = path.next()[2]
+            files.sort()
+            print(len(files),'files found matching prefix')
+            self.files = filesMR = []
+            for f in files:
+                if f.startswith(prefix) == True:
+                    filesMR.append(f)
+                    print 'found file WITH selected prefix', f
+                else:
+                    print 'found file without selected prefix', f
+        else:
+            print('Using predefined filelist of',len(filelist))
+            filelist.sort()
+            self.files = filelist
 
-        path = os.walk(pathtodicom)
-        files = path.next()[2]
-        files.sort()
-
-        self.files = filesMR = []
-        for f in files:
-            if f.startswith(prefix) == True:
-                filesMR.append(f)
-                print 'found file WITH selected prefix', f
-            else:
-                print 'found file without selected prefix', f
         try:
-            dicomfile = dicom.ReadFile(pathtodicom+'/'+files[0]) #read 1st file
+            dicomfile = dicom.ReadFile(pathtodicom+'/'+self.files[0]) #read 1st file
         except IndexError:
-            print 'you probably have the wrong prefix option. prefix="MR"'
+            print 'you probably have the wrong prefix option. prefix="MR"|filelist=[filelist]'
             print 'try again'
             return
         #self.files = filesMR

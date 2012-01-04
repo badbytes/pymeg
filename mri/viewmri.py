@@ -140,7 +140,7 @@ def display(data=None, orient='LPS', overlay=None, colormap=cm.gray, pixdim=None
     if data == None:
         try:
             fn=sys.argv[1]
-            from mri import img
+            from mri import img_nibabel as img
             data = img.read(fn)
         except AttributeError:
             print 'not passing data arg'

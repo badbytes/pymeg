@@ -17,9 +17,7 @@
 
 
 '''#returns fft power by freq
-pow,freq = fftmeg.calc(data,srate)
-#or
-fftd = fftmeg.calc(p.data.data_block,1/ p.hdr.header_data.sample_period, epochs=p.data.numofepochs)
+fftd = fftmeg.calc(p.data.data_block,srate, epochs=p.data.numofepochs)
 '''
 
 from numpy import linspace, shape, size, ceil, log2, zeros, mean, append, complex_, conjugate, imag

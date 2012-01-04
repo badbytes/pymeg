@@ -375,22 +375,15 @@ class setup_gui:
     def display(self,data=None, overlay=None, colormap=cm.gray, pixdim=None, translation=None):
         self.get_color_maps()
 
-        #pixdim = abs(sum(data._affine.T)[0:3])
-        #try:
         print os.path.splitext(data.__module__)[0]# == 'nibabel':
         print 'nibabel loaded data'
         self.filename = data.get_filename()
         self.hdr = data.get_header()
-        #pixdim = self.hdr['pixdim'][1:4]
         pixdim = abs(data._affine.sum(axis=1)[0:3])
         print 'PixDim', pixdim
         transform = data._affine[0:3,0:3];print 'orig trans',transform
-        #translation = data._affine[0:3,3]; print 'translation', translation
         data = squeeze(data.get_data())
         self.img = data
-        #except:
-        #print 'Not a nifti or analyze file, raw data'
-        #pass
 
         if translation == None:
             translation == [0,0,0]
@@ -398,18 +391,14 @@ class setup_gui:
         if pixdim == None:
             pixdim = [1.0,1.0,1.0]; #unitless
         ax1 = self.fig.add_subplot(221);#axis('off')
-        #colorbar(fig,ax=ax1)
         xlabel('Anterior (A->P 1st Dim)');#ylabel('Right (R->L 2nd Dim)')
         ax2 = self.fig.add_subplot(222);#axis('off')
         xlabel('Inferior (I->S Dim)');#ylabel('Anterior (A->P 1st Dim)')
         ax3 = self.fig.add_subplot(223);#axis('off')
         xlabel('Infererior (I->S 3rd dim)');#ylabel('Right (R->L 2nd Dim)')
-        #ax4 = self.fig.add_subplot(224);ax4.axis('off')
-        #coord = self.fig.add_subplot(224);axis('off')
         tracker = self.IndexTracker(data, ax1, ax2, ax3, colormap, pixdim, overlay, translation)#, coord)
         self.fig.canvas.mpl_connect('scroll_event', self.onscroll)
         self.fig.canvas.mpl_connect('button_press_event', self.click)
-        #ax1.imshow(data[100])
         print 'plot setup done'
 
         return tracker
@@ -426,20 +415,6 @@ if __name__ == "__main__":
     img = nibabel.load(fn)
     h = img.get_header()
 
-    #pixdim = h['pixdim'][0:3]
-    #transform = img._affine[0:3,0:3];#print 'orig trans',transform
-    #translation = img._affine[0:3,3]
-    ##a = array([[0,1,0],[1,0,0],[0,0,1]]);print 'new trans',a
-    #a = dot(eye(3),img._affine[0:3,0:3])- img._affine[0:3,0:3]
-    #print 'new transform',a
-
-    ##d = squeeze(img.get_data())
-    #r = nibabel.apply_orientation(squeeze(img.get_data()),a)#transform)#a[0:3,0:3])
-
     t = mainwindow.display(img)#, pixdim=pixdim,translation=translation)
-    #mainwindow.get_color_maps()
 
-
-    #ion()
-    #gtk.set_interactive(1)
     gtk.main()

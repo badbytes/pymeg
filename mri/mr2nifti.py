@@ -63,7 +63,7 @@ def reorient(mrdata, orientcosines, pixdim):
     pixdimnew = copy(pixdim)
     a = argmax(abs(array(orientcosines[0:3])))
     b = argmax(abs(array(orientcosines[3:6])))
-    print a,b, orientcosines
+    print(' first and second orient cos and raw orient cos values',a,b, orientcosines)
 
     qform = array([[pixdim[0],0,0,0],[0,pixdim[1],0,0],[0,0,pixdim[2],0],[0,0,0,1]], dtype=float32)
 
@@ -81,10 +81,13 @@ def reorient(mrdata, orientcosines, pixdim):
     if a+b == 1: #axial
         print 'axial orient'
         print 'NOTE: Transposing data .T because pydicom order is 3,2,1'
-        mrdata = swapaxes(mrdata.T,0,1) #swap 1st and 2nd dim to make MEG like
-        qform[0]=[0,pixdim[0],0,0];
-        qform[1]=[0,0,pixdim[1]*-1,0];
-        qform[2]=[pixdim[2],0,0,0];
+        #print 'NOTE: Swapping 1st and 2nd dim for make MEG like'
+        #mrdata = swapaxes(mrdata.T)#,0,1) #swap 1st and 2nd dim to make MEG like
+        mrdata = mrdata.T
+
+        qform[0]=[pixdim[0]*-1,0,0,0];
+        qform[1]=[0,pixdim[1],0,0];
+        qform[2]=[0,0,pixdim[2],0];
         if orientcosines[0:3][a] < 0: #Left to Right... flip
             mrdata = mrdata[:,::-1,:]
             print 'flipping 1st dim'
@@ -134,6 +137,7 @@ def start(mr, fn, method='reorient'):
         #nim.save(fnnew)
 
         nim.to_filename(fnnew)
+    return nim
 
     #return redata
 

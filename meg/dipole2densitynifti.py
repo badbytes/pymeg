@@ -31,30 +31,27 @@ and meanvalue is the value written to the MRI.
 mean(ds,axis=0)
 Out[89]: array([ 0.07216878, -0.26933757,  0.32475953,  0.26933757])
 '''
+from pdf2py import readwrite
+from meg import density
+from mri import transform
+from scipy import ndimage
+from mri import img_nibabel as img
+from numpy import float32, int16, array
+from pdf2py import readwrite
+import nibabel,os
 
-def handler(points,mr,gofscale,gof,sigma):
-    from pdf2py import readwrite
-    from meg import density
-    from mri import transform
-    from scipy import ndimage
-    #from nifti import NiftiImage
-    from mri import img_nibabel as img
-    from numpy import float32, int16, array
-    from pdf2py import readwrite
-    import nibabel,os
 
+def handler(points,mr,gofscale=None,gof=None,sigma=3):
     report = {}
     filename = mr.nifti.get_filename()
-
     #try: xfm = readwrite.readdata(os.path.splitext(filename)[0]+'.pym')
     #except: print 'Error reading coregistration info'
-    lpa = mr.lpa
-    rpa = mr.rpa
-    nas = mr.nas
-    #fids = eval(mr.description)
-    #lpa = fids[0]
-    #rpa = fids[1]
-    #nas = fids[2]
+    try:
+        lpa = mr.lpa
+        rpa = mr.rpa
+        nas = mr.nas
+    except:
+        print 'Error reading coregistration info'
     #self.points = array([[0,0,0],[10,0,0],[0,20,0]])#DEBUG-----------------
     xyz = transform.meg2mri(lpa,rpa,nas, dipole=points)
     #readwrite.writedata(xyz, os.path.dirname(mripath)+'/'+'xyz')
@@ -62,19 +59,22 @@ def handler(points,mr,gofscale,gof,sigma):
     print 'xyz in mri space', xyz
     print 'pixdim', mr.pixdim
 
-
     #do some scaling of the dips using the GOF as a weight.
     #VoxDim = mr.voxdim[::-1]
     VoxDim = mr.pixdim
     xyzscaled = (xyz/VoxDim).T
-    print xyzscaled
+    print 'xyzscaled',xyzscaled
     d = density.calc(xyz)
-    gofscale = float32(gofscale)
-    print 'gofscale',gofscale
-    s= gof-gofscale
-    sf=(1/(1-gofscale))*s
-    ds = d*sf
-
+    if gofscale != None and gof != None:
+        print 'Scaling density by gof midval of ',gofscale
+        gofscale = float32(gofscale)
+        print 'gofscale',gofscale
+        s= gof-gofscale
+        sf=(1/(1-gofscale))*s
+        ds = d*sf
+    else:
+        print 'No density scaling'
+        ds = d
 
     #apply a 1D gaussian filter
     z = density.val2img(mr.data, ds, xyzscaled)
