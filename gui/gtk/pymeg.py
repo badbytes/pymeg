@@ -133,12 +133,14 @@ class maingui():
             "on_3DMRI_activate" : self.plot3DMRIhandle,
             "on_button_press_event" : self.button_press_event ,
             "on_tftplot_activate" : self.tftplot,
+            "on_fftplot_activate" : self.fftplot,
             "on_timef_activate" : self.timef_handler,
             "on_data_editor_clicked" : self.data_editor,
             "on_menu_signal_space_filter_activate" : self.signal_space_filter,
             "on_menu_contour_plot_activate" : self.contour_plot,
             "on_menu_epoch_data_activated" : self.epoch_data,
             "on_power_spectral_density_activate" : self.power_spectral_density,
+            "on_fft_activate" : self.fft,
             "on_minimumnorm_activate" : self.minimunnorm_handler,
             "on_solution_to_image_activate" : self.sourcesolution2img_handler,
             "on_function_menu_clicked" : self.menu_tearoff,
@@ -755,6 +757,13 @@ class maingui():
         print('wid',widget.get_label())
         self.treedata[self.selecteditem].tftplot(widget.get_label())
 
+    def fftplot(self,widget): #using the fft object module fftplot to display imshow.
+        if self.checkreq() == -1:
+            print('caught error')
+            return
+        print('wid',widget.get_label())
+        self.treedata[self.selecteditem].fft_plot(widget.get_label())
+
     def about(self,widget):
         print('t')
         aboutdialog = self.builder.get_object("aboutdialog1")
@@ -1211,6 +1220,8 @@ class maingui():
                 predict['Offset Correct'] = ['data_block','srate']
                 predict['Independant Component Analysis'] = ['data_block']
                 predict['Channel Editor'] = ['labellist','chanlocs']
+                predict['FFT'] = ['data_block','srate','numofepochs','chanlocs']
+
 
             if itemtype == 'generalitem':
                 obj=self.treedata
@@ -1221,6 +1232,7 @@ class maingui():
                 predict['Plot MRI'] = ['pixdim','data']
                 predict['Contour Plot'] = ['chanlocs','labellist']
                 predict['Plot TFT'] = ['tft']
+                predict['Plot FFT'] = ['fft_result']
 
         except:
             #probably at home. no treedata to parse
@@ -1308,6 +1320,19 @@ class maingui():
         self.psd = power_spectral_density.setup_gui()
         self.psd.datahandler(res)
         #self.psd.window.show()
+
+    def fft(self,widget):
+        from meg import fftmeg
+        obj=self.treedata[self.selecteditem];
+        res = (self.setup_helper(var=['data_block','srate','numofepochs','chanlocs'],obj=obj));
+        self.fftres = fftmeg.calc(res['data_block'],res['srate'],res['numofepochs'])
+        result = parse_instance.run(self.fftres).out
+        fftresult = self.data_file_selected['fft_result'] = {}
+        self.result_helper(fftresult,result)
+        self.refreshtree()
+        from pylab import ion
+        ion()
+        self.fftres.plot_fft()
 
     def spin(self, status):
         try: print self.spinner_gui.window.get_visible()

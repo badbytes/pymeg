@@ -51,10 +51,19 @@ class calc():
         self.ipow = imag(Yi[0:NFFT/2]*2)
         self.freq = f
 
-    def plot_fft(self):
-        figure();plot(self.freq,self.pow);show()
+    #def plot_fft(self):
+        #figure();plot(self.freq,self.pow);show()
 
+    def plot_fft(self,plottype):
+        '''plot_fft('power'|'imaginary'|'complex')'''
+        if plottype == 'Power':
+            data = self.pow
+        if plottype == 'Imaginary':
+            data = self.ipow
+        if plottype == 'Complex':
+            data = self.ipow
 
+        figure();plot(self.freq,data);show()
 
 
 def nearest(array, target):

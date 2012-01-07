@@ -2,6 +2,11 @@
 <interface>
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-local-resource-path /home/danc/programming/python/pymeg/gui/gtk/images -->
+  <object class="GtkAction" id="action1">
+    <property name="label" translatable="yes">Close</property>
+    <property name="stock_id">gtk-close</property>
+    <signal name="activate" handler="gtk_widget_hide" swapped="no"/>
+  </object>
   <object class="GtkListStore" id="PlotShape">
     <columns>
       <!-- column-name gchararray1 -->
@@ -15,11 +20,6 @@
         <col id="0" translatable="yes">disks</col>
       </row>
     </data>
-  </object>
-  <object class="GtkAction" id="action1">
-    <property name="label" translatable="yes">Close</property>
-    <property name="stock_id">gtk-close</property>
-    <signal name="activate" handler="gtk_widget_hide" swapped="no"/>
   </object>
   <object class="GtkAboutDialog" id="aboutdialog1">
     <property name="can_focus">False</property>
@@ -97,6 +97,7 @@
             <child>
               <object class="GtkButton" id="button5">
                 <property name="label">gtk-close</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -165,6 +166,7 @@
             <child>
               <object class="GtkButton" id="filedialogCancel">
                 <property name="label" translatable="yes">Cancel</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -180,6 +182,7 @@
             <child>
               <object class="GtkButton" id="filedialogLoad">
                 <property name="label" translatable="yes">Load</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="has_default">True</property>
@@ -236,6 +239,7 @@
             <child>
               <object class="GtkButton" id="cancelbutton">
                 <property name="label" translatable="yes">Cancel</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -252,6 +256,7 @@
             <child>
               <object class="GtkButton" id="savebutton">
                 <property name="label" translatable="yes">Save</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -332,6 +337,7 @@
             <child>
               <object class="GtkButton" id="button4">
                 <property name="label">Cancel Save</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -382,6 +388,7 @@
             <child>
               <object class="GtkButton" id="button1">
                 <property name="label" translatable="yes">Plot</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -426,6 +433,7 @@
                 <child>
                   <object class="GtkCheckButton" id="checkbutton9">
                     <property name="label" translatable="yes">checkbutton</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="use_action_appearance">False</property>
@@ -440,6 +448,7 @@
                 <child>
                   <object class="GtkCheckButton" id="checkbutton10">
                     <property name="label" translatable="yes">checkbutton</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="use_action_appearance">False</property>
@@ -454,6 +463,7 @@
                 <child>
                   <object class="GtkCheckButton" id="checkbutton11">
                     <property name="label" translatable="yes">checkbutton</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="use_action_appearance">False</property>
@@ -468,6 +478,7 @@
                 <child>
                   <object class="GtkCheckButton" id="checkbutton12">
                     <property name="label" translatable="yes">checkbutton</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="use_action_appearance">False</property>
@@ -482,6 +493,7 @@
                 <child>
                   <object class="GtkCheckButton" id="checkbutton13">
                     <property name="label" translatable="yes">checkbutton</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="use_action_appearance">False</property>
@@ -496,6 +508,7 @@
                 <child>
                   <object class="GtkCheckButton" id="checkbutton14">
                     <property name="label" translatable="yes">checkbutton</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="use_action_appearance">False</property>
@@ -510,6 +523,7 @@
                 <child>
                   <object class="GtkCheckButton" id="checkbutton16">
                     <property name="label" translatable="yes">checkbutton</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="use_action_appearance">False</property>
@@ -524,6 +538,7 @@
                 <child>
                   <object class="GtkCheckButton" id="checkbutton15">
                     <property name="label" translatable="yes">checkbutton</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="use_action_appearance">False</property>
@@ -538,6 +553,7 @@
                 <child>
                   <object class="GtkCheckButton" id="checkbutton18">
                     <property name="label" translatable="yes">checkbutton</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="use_action_appearance">False</property>
@@ -552,6 +568,7 @@
                 <child>
                   <object class="GtkCheckButton" id="checkbutton17">
                     <property name="label" translatable="yes">checkbutton</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="use_action_appearance">False</property>
@@ -566,6 +583,7 @@
                 <child>
                   <object class="GtkCheckButton" id="checkbutton19">
                     <property name="label" translatable="yes">checkbutton</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="use_action_appearance">False</property>
@@ -580,6 +598,7 @@
                 <child>
                   <object class="GtkCheckButton" id="checkbutton20">
                     <property name="label" translatable="yes">checkbutton</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="use_action_appearance">False</property>
@@ -594,6 +613,7 @@
                 <child>
                   <object class="GtkCheckButton" id="checkbutton21">
                     <property name="label" translatable="yes">checkbutton</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="use_action_appearance">False</property>
@@ -608,6 +628,7 @@
                 <child>
                   <object class="GtkCheckButton" id="checkbutton22">
                     <property name="label" translatable="yes">checkbutton</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="use_action_appearance">False</property>
@@ -622,6 +643,7 @@
                 <child>
                   <object class="GtkCheckButton" id="checkbutton23">
                     <property name="label" translatable="yes">checkbutton</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="use_action_appearance">False</property>
@@ -636,6 +658,7 @@
                 <child>
                   <object class="GtkCheckButton" id="checkbutton24">
                     <property name="label" translatable="yes">checkbutton</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="use_action_appearance">False</property>
@@ -650,6 +673,7 @@
                 <child>
                   <object class="GtkCheckButton" id="checkbutton25">
                     <property name="label" translatable="yes">checkbutton</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="use_action_appearance">False</property>
@@ -664,6 +688,7 @@
                 <child>
                   <object class="GtkCheckButton" id="checkbutton26">
                     <property name="label" translatable="yes">checkbutton</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="use_action_appearance">False</property>
@@ -678,6 +703,7 @@
                 <child>
                   <object class="GtkCheckButton" id="checkbutton27">
                     <property name="label" translatable="yes">checkbutton</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="use_action_appearance">False</property>
@@ -692,6 +718,7 @@
                 <child>
                   <object class="GtkCheckButton" id="checkbutton28">
                     <property name="label" translatable="yes">checkbutton</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="use_action_appearance">False</property>
@@ -969,6 +996,7 @@
                 <property name="can_focus">False</property>
                 <child>
                   <object class="GtkColorButton" id="colorbutton1">
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_action_appearance">False</property>
@@ -982,6 +1010,7 @@
                 </child>
                 <child>
                   <object class="GtkColorButton" id="colorbutton2">
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_action_appearance">False</property>
@@ -995,6 +1024,7 @@
                 </child>
                 <child>
                   <object class="GtkColorButton" id="colorbutton3">
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_action_appearance">False</property>
@@ -1008,6 +1038,7 @@
                 </child>
                 <child>
                   <object class="GtkColorButton" id="colorbutton4">
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_action_appearance">False</property>
@@ -1021,6 +1052,7 @@
                 </child>
                 <child>
                   <object class="GtkColorButton" id="colorbutton5">
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_action_appearance">False</property>
@@ -1034,6 +1066,7 @@
                 </child>
                 <child>
                   <object class="GtkColorButton" id="colorbutton6">
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_action_appearance">False</property>
@@ -1047,6 +1080,7 @@
                 </child>
                 <child>
                   <object class="GtkColorButton" id="colorbutton8">
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_action_appearance">False</property>
@@ -1060,6 +1094,7 @@
                 </child>
                 <child>
                   <object class="GtkColorButton" id="colorbutton7">
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_action_appearance">False</property>
@@ -1073,6 +1108,7 @@
                 </child>
                 <child>
                   <object class="GtkColorButton" id="colorbutton9">
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_action_appearance">False</property>
@@ -1086,6 +1122,7 @@
                 </child>
                 <child>
                   <object class="GtkColorButton" id="colorbutton10">
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_action_appearance">False</property>
@@ -1099,6 +1136,7 @@
                 </child>
                 <child>
                   <object class="GtkColorButton" id="colorbutton12">
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_action_appearance">False</property>
@@ -1112,6 +1150,7 @@
                 </child>
                 <child>
                   <object class="GtkColorButton" id="colorbutton11">
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_action_appearance">False</property>
@@ -1125,6 +1164,7 @@
                 </child>
                 <child>
                   <object class="GtkColorButton" id="colorbutton13">
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_action_appearance">False</property>
@@ -1138,6 +1178,7 @@
                 </child>
                 <child>
                   <object class="GtkColorButton" id="colorbutton14">
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_action_appearance">False</property>
@@ -1151,6 +1192,7 @@
                 </child>
                 <child>
                   <object class="GtkColorButton" id="colorbutton15">
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_action_appearance">False</property>
@@ -1164,6 +1206,7 @@
                 </child>
                 <child>
                   <object class="GtkColorButton" id="colorbutton16">
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_action_appearance">False</property>
@@ -1177,6 +1220,7 @@
                 </child>
                 <child>
                   <object class="GtkColorButton" id="colorbutton17">
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_action_appearance">False</property>
@@ -1190,6 +1234,7 @@
                 </child>
                 <child>
                   <object class="GtkColorButton" id="colorbutton18">
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_action_appearance">False</property>
@@ -1203,6 +1248,7 @@
                 </child>
                 <child>
                   <object class="GtkColorButton" id="colorbutton19">
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_action_appearance">False</property>
@@ -1216,6 +1262,7 @@
                 </child>
                 <child>
                   <object class="GtkColorButton" id="colorbutton20">
+                    <property name="use_action_appearance">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_action_appearance">False</property>
@@ -1388,9 +1435,9 @@
     <child>
       <object class="GtkImageMenuItem" id="menuitem1">
         <property name="label">gtk-about</property>
+        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="use_action_appearance">False</property>
         <property name="use_underline">True</property>
         <property name="use_stock">True</property>
       </object>
@@ -1398,9 +1445,9 @@
     <child>
       <object class="GtkImageMenuItem" id="menuitem2">
         <property name="label">gtk-apply</property>
+        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="use_action_appearance">False</property>
         <property name="use_underline">True</property>
         <property name="use_stock">True</property>
       </object>
@@ -1431,6 +1478,7 @@
             <child>
               <object class="GtkButton" id="button2">
                 <property name="label" translatable="yes">Cancel</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -1446,6 +1494,7 @@
             <child>
               <object class="GtkButton" id="button3">
                 <property name="label" translatable="yes">Save</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -1485,11 +1534,11 @@
       <action-widget response="0">button3</action-widget>
     </action-widgets>
   </object>
+  <object class="GtkTextTagTable" id="texttagtable1"/>
   <object class="GtkTextBuffer" id="textbuffer1">
     <property name="tag_table">texttagtable1</property>
     <property name="text" translatable="yes">This is a test</property>
   </object>
-  <object class="GtkTextTagTable" id="texttagtable1"/>
   <object class="GtkWindow" id="windowTreeview">
     <property name="width_request">700</property>
     <property name="height_request">400</property>
@@ -1512,9 +1561,9 @@
             <property name="can_focus">False</property>
             <child>
               <object class="GtkMenuItem" id="menuitem_file">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="use_action_appearance">False</property>
                 <property name="label" translatable="yes">_File</property>
                 <property name="use_underline">True</property>
                 <child type="submenu">
@@ -1523,41 +1572,41 @@
                     <property name="can_focus">False</property>
                     <child>
                       <object class="GtkMenuItem" id="loadmeg">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Supports 4D format MEG data</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Load 4D MEG File</property>
                         <signal name="activate" handler="on_loadmeg_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="loadmri">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Support Nifti or Analyze format</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Load MRI File</property>
                         <signal name="activate" handler="on_loadmri_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="loadpythondata">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Supports pickled python data *.pym</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Load Python File</property>
                         <signal name="activate" handler="on_loadpythondata_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="loaddipolefile">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">4D format dipole files.
 Either dipole report text file or binary *lA</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Load Dipole File</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_loaddipolefile_activate" swapped="no"/>
@@ -1565,10 +1614,10 @@ Either dipole report text file or binary *lA</property>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="loadmatlab">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Supports *.mat MATLAB files.</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Load Matlab File</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_loadmatlabdata_activate" swapped="no"/>
@@ -1582,10 +1631,10 @@ Either dipole report text file or binary *lA</property>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="savefile">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Python pickled save.</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Save File</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_saveselecteditem_clicked" swapped="no"/>
@@ -1593,9 +1642,9 @@ Either dipole report text file or binary *lA</property>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="closefile">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Close File</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_closefile_clicked" swapped="no"/>
@@ -1603,12 +1652,12 @@ Either dipole report text file or binary *lA</property>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="updatefile_4D">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">This will overwrite the
  MEG file updating changes
  you've made.</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Save 4D Format</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_write_changes_activate" swapped="no"/>
@@ -1622,10 +1671,10 @@ Either dipole report text file or binary *lA</property>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="quit1">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Exit PyMEG</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Quit</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_menuQuit_activate" swapped="no"/>
@@ -1637,9 +1686,9 @@ Either dipole report text file or binary *lA</property>
             </child>
             <child>
               <object class="GtkMenuItem" id="menuitem_edit">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="use_action_appearance">False</property>
                 <property name="label" translatable="yes">_Edit</property>
                 <property name="use_underline">True</property>
                 <child type="submenu">
@@ -1648,10 +1697,10 @@ Either dipole report text file or binary *lA</property>
                     <property name="can_focus">False</property>
                     <child>
                       <object class="GtkMenuItem" id="menuitem8">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Copy item on clipboard</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Copy</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_copy_activate" swapped="no"/>
@@ -1659,10 +1708,10 @@ Either dipole report text file or binary *lA</property>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="menuitem9">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Paste item.</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Paste</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_paste_activate" swapped="no"/>
@@ -1670,10 +1719,10 @@ Either dipole report text file or binary *lA</property>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="menuitem7">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Rename item.</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Rename</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_rename_activate" swapped="no"/>
@@ -1687,10 +1736,10 @@ Either dipole report text file or binary *lA</property>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="imagemenuitem8">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Change PyMEG preferences</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Preferences</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_menuPrefs_activate" swapped="no"/>
@@ -1702,9 +1751,9 @@ Either dipole report text file or binary *lA</property>
             </child>
             <child>
               <object class="GtkMenuItem" id="menuitem_view">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="use_action_appearance">False</property>
                 <property name="label" translatable="yes">_View</property>
                 <property name="use_underline">True</property>
                 <child type="submenu">
@@ -1713,9 +1762,9 @@ Either dipole report text file or binary *lA</property>
                     <property name="can_focus">False</property>
                     <child>
                       <object class="GtkMenuItem" id="menuitem_fileproperties">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">File Info</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_file_info_activate" swapped="no"/>
@@ -1727,9 +1776,9 @@ Either dipole report text file or binary *lA</property>
             </child>
             <child>
               <object class="GtkMenuItem" id="menuitem_help">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="use_action_appearance">False</property>
                 <property name="label" translatable="yes">_Help</property>
                 <property name="use_underline">True</property>
                 <child type="submenu">
@@ -1738,10 +1787,10 @@ Either dipole report text file or binary *lA</property>
                     <property name="can_focus">False</property>
                     <child>
                       <object class="GtkMenuItem" id="imagemenuitem9">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">License and link to wiki</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">About PyMEG</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_menuAbout_activate" swapped="no"/>
@@ -1766,6 +1815,7 @@ Either dipole report text file or binary *lA</property>
             <property name="icon_size">5</property>
             <child>
               <object class="GtkToolButton" id="treebutton1">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
@@ -1781,6 +1831,7 @@ Either dipole report text file or binary *lA</property>
             </child>
             <child>
               <object class="GtkToolButton" id="treebutton2">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
@@ -1807,6 +1858,7 @@ Either dipole report text file or binary *lA</property>
             </child>
             <child>
               <object class="GtkToolButton" id="treebutton3">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
@@ -1825,6 +1877,7 @@ Either dipole report text file or binary *lA</property>
             </child>
             <child>
               <object class="GtkMenuToolButton" id="Functions">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
@@ -1839,10 +1892,10 @@ Either dipole report text file or binary *lA</property>
                     <property name="tearoff_title">Function Menu</property>
                     <child>
                       <object class="GtkMenuItem" id="epoch_data">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Requires ['data_block','srate','wintime','labellist','chanlocs']</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Epoch Data</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_menu_epoch_data_activated" swapped="no"/>
@@ -1850,47 +1903,47 @@ Either dipole report text file or binary *lA</property>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="badchanneldetect">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Bad Channel Detection</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="channelinterpolation">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Channel Interpolation</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="filter">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Requires objects ['data_block','srate']</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Filter</property>
                         <signal name="activate" handler="on_menufilter_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="offsetcorrect">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Requires ['data_block','srate']</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Offset Correct</property>
                         <signal name="activate" handler="on_menuoffset_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="dipoledensity">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Dipole Density</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_dipoledensity_activate" swapped="no"/>
@@ -1898,33 +1951,33 @@ Either dipole report text file or binary *lA</property>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="grid">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Source space location creation.
 Requires ['hs']</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Calculate Grid</property>
                         <signal name="activate" handler="on_imagemenuitem6_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="leadfield">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Forward solution at grid points.
 Requires ['channels','grid']</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Leadfield Calc</property>
                         <signal name="activate" handler="on_menuleadfield_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="timef">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">TFT on data.
 Requires ['data_block','labellist','srate','frames','numofepochs','eventtime']</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Time Freq Transform</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_timef_activate" swapped="no"/>
@@ -1932,30 +1985,42 @@ Requires ['data_block','labellist','srate','frames','numofepochs','eventtime']</
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="powerspectraldensity">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">PSD
 Requires ['data_block','srate','labellist','chanlocs']</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Power Spectral Density</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_power_spectral_density_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="sourcespaceprojection">
+                      <object class="GtkMenuItem" id="fft">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">PSD
+Requires ['data_block','srate','numofepochs','chanlocs']</property>
+                        <property name="label" translatable="yes">FFT</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_fft_activate" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="sourcespaceprojection">
                         <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
                         <property name="label" translatable="yes">__Source Space Projection</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="signalspaceprojection">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Signal Space Projection</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_menu_signal_space_filter_activate" swapped="no"/>
@@ -1963,6 +2028,7 @@ Requires ['data_block','srate','labellist','chanlocs']</property>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="minnorm">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Uses noisecov selected
@@ -1971,7 +2037,6 @@ calculate power of
 data for each grid point.
 Open Data Editor and make selections.
 Requires ['selection_event','leadfield','selection_noise','channels']</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Minimum Norm Solution</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_minimumnorm_activate" swapped="no"/>
@@ -1979,6 +2044,7 @@ Requires ['selection_event','leadfield','selection_noise','channels']</property>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="hild_solution">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Hild, K.E.; Nagarajan, S.S.
@@ -1986,16 +2052,15 @@ Source Localization of
  EEG/MEG Data by 
 Correlating Columns of ICA Solution with 
 Lead Field Matrix</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Hild Solution</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="ica">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Independant Component Analysis</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_ica_activate" swapped="no"/>
@@ -2003,18 +2068,18 @@ Lead Field Matrix</property>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="pca">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Pricipal Component Analysis</property>
                         <property name="use_underline">True</property>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="svd">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Singular Value Decomposition</property>
                         <property name="use_underline">True</property>
                       </object>
@@ -2027,11 +2092,11 @@ Lead Field Matrix</property>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="dataeditormenu">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Matplotlib data viewer
 Requires ['data_block','srate','labellist','chanlocs']</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Data Editor</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_data_editor_clicked" swapped="no"/>
@@ -2039,9 +2104,9 @@ Requires ['data_block','srate','labellist','chanlocs']</property>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="channeleditor">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Channel Editor</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_channel_editor_activated" swapped="no"/>
@@ -2055,9 +2120,9 @@ Requires ['data_block','srate','labellist','chanlocs']</property>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="coregister">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Coregister MRI</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_coregister_activate" swapped="no"/>
@@ -2065,11 +2130,11 @@ Requires ['data_block','srate','labellist','chanlocs']</property>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="solution_to_image">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Convert results to MRI map.
 Requires ['ind','data','img']</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Solution To Image</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_solution_to_image_activate" swapped="no"/>
@@ -2083,11 +2148,11 @@ Requires ['ind','data','img']</property>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="plot_contour">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">2D Contour map. 
 Requires array selection and ['chanlocs','labellist']</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Contour Plot</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_menu_contour_plot_activate" swapped="no"/>
@@ -2095,9 +2160,9 @@ Requires array selection and ['chanlocs','labellist']</property>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="Plot1">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Plot</property>
                         <property name="use_underline">True</property>
                         <child type="submenu">
@@ -2106,9 +2171,9 @@ Requires array selection and ['chanlocs','labellist']</property>
                             <property name="can_focus">False</property>
                             <child>
                               <object class="GtkMenuItem" id="2Dplot1">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">2D line plot</property>
                                 <signal name="activate" handler="on_2Dplot_clicked" swapped="no"/>
                               </object>
@@ -2119,9 +2184,9 @@ Requires array selection and ['chanlocs','labellist']</property>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="mriplot">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Plot MRI</property>
                         <property name="use_underline">True</property>
                         <child type="submenu">
@@ -2130,18 +2195,18 @@ Requires array selection and ['chanlocs','labellist']</property>
                             <property name="can_focus">False</property>
                             <child>
                               <object class="GtkMenuItem" id="2DMRI1">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">2D Plot</property>
                                 <signal name="activate" handler="on_2DMRI_activate" swapped="no"/>
                               </object>
                             </child>
                             <child>
                               <object class="GtkMenuItem" id="3DMRI1">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">3D plot</property>
                                 <property name="use_underline">True</property>
                                 <signal name="activate" handler="on_3DMRI_activate" swapped="no"/>
@@ -2153,11 +2218,11 @@ Requires array selection and ['chanlocs','labellist']</property>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="tftplot">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">TFT Power and Phase plotting
 Requires ['tft']</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Plot TFT</property>
                         <property name="use_underline">True</property>
                         <child type="submenu">
@@ -2166,9 +2231,9 @@ Requires ['tft']</property>
                             <property name="can_focus">False</property>
                             <child>
                               <object class="GtkMenuItem" id="power">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Power</property>
                                 <property name="use_underline">True</property>
                                 <signal name="activate" handler="on_tftplot_activate" swapped="no"/>
@@ -2176,9 +2241,9 @@ Requires ['tft']</property>
                             </child>
                             <child>
                               <object class="GtkMenuItem" id="logpower">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Log Power</property>
                                 <property name="use_underline">True</property>
                                 <signal name="activate" handler="on_tftplot_activate" swapped="no"/>
@@ -2186,9 +2251,9 @@ Requires ['tft']</property>
                             </child>
                             <child>
                               <object class="GtkMenuItem" id="itc">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Inter Trial Coherence</property>
                                 <property name="use_underline">True</property>
                                 <signal name="activate" handler="on_tftplot_activate" swapped="no"/>
@@ -2196,9 +2261,9 @@ Requires ['tft']</property>
                             </child>
                             <child>
                               <object class="GtkMenuItem" id="trialpower">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Trial Power</property>
                                 <property name="use_underline">True</property>
                                 <signal name="activate" handler="on_tftplot_activate" swapped="no"/>
@@ -2206,9 +2271,9 @@ Requires ['tft']</property>
                             </child>
                             <child>
                               <object class="GtkMenuItem" id="trialphase">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Trial Phase</property>
                                 <property name="use_underline">True</property>
                                 <signal name="activate" handler="on_tftplot_activate" swapped="no"/>
@@ -2216,12 +2281,59 @@ Requires ['tft']</property>
                             </child>
                             <child>
                               <object class="GtkMenuItem" id="evokedpower">
+                                <property name="use_action_appearance">False</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="use_action_appearance">False</property>
                                 <property name="label" translatable="yes">Evoked Power</property>
                                 <property name="use_underline">True</property>
                                 <signal name="activate" handler="on_tftplot_activate" swapped="no"/>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="fftplot">
+                        <property name="use_action_appearance">False</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">FFT Power and Phase plotting
+Requires ['fft_result']</property>
+                        <property name="label" translatable="yes">Plot FFT</property>
+                        <property name="use_underline">True</property>
+                        <child type="submenu">
+                          <object class="GtkMenu" id="menu5">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <child>
+                              <object class="GtkMenuItem" id="power1">
+                                <property name="use_action_appearance">False</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">Power</property>
+                                <property name="use_underline">True</property>
+                                <signal name="activate" handler="on_fftplot_activate" swapped="no"/>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkMenuItem" id="imaginary">
+                                <property name="use_action_appearance">False</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">Imaginary</property>
+                                <property name="use_underline">True</property>
+                                <signal name="activate" handler="on_fftplot_activate" swapped="no"/>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkMenuItem" id="complex">
+                                <property name="use_action_appearance">False</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">Complex</property>
+                                <property name="use_underline">True</property>
+                                <signal name="activate" handler="on_fftplot_activate" swapped="no"/>
                               </object>
                             </child>
                           </object>
@@ -2237,6 +2349,7 @@ Requires ['tft']</property>
             </child>
             <child>
               <object class="GtkToolButton" id="addto3Dplot">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
@@ -2252,6 +2365,7 @@ Requires ['tft']</property>
             </child>
             <child>
               <object class="GtkToolButton" id="data_editor">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
@@ -2267,6 +2381,7 @@ Requires ['tft']</property>
             </child>
             <child>
               <object class="GtkToolButton" id="saveselecteditem">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
@@ -2282,6 +2397,7 @@ Requires ['tft']</property>
             </child>
             <child>
               <object class="GtkToolButton" id="deleteselecteditem">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
@@ -2296,6 +2412,7 @@ Requires ['tft']</property>
             </child>
             <child>
               <object class="GtkMenuToolButton" id="ItemAction">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="use_action_appearance">False</property>
@@ -2309,9 +2426,9 @@ Requires ['tft']</property>
                     <property name="can_focus">False</property>
                     <child>
                       <object class="GtkMenuItem" id="SaveSelectedItem">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Save Selected Item</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_saveselecteditem_clicked" swapped="no"/>
@@ -2319,9 +2436,9 @@ Requires ['tft']</property>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="DeleteSeletedItem">
+                        <property name="use_action_appearance">False</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="use_action_appearance">False</property>
                         <property name="label" translatable="yes">Delete Seleted Item</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_deletedselecteditem_clicked" swapped="no"/>
@@ -2337,6 +2454,7 @@ Requires ['tft']</property>
             </child>
             <child>
               <object class="GtkToolButton" id="Add2Queue">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
