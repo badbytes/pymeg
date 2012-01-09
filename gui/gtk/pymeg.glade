@@ -2,11 +2,6 @@
 <interface>
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-local-resource-path /home/danc/programming/python/pymeg/gui/gtk/images -->
-  <object class="GtkAction" id="action1">
-    <property name="label" translatable="yes">Close</property>
-    <property name="stock_id">gtk-close</property>
-    <signal name="activate" handler="gtk_widget_hide" swapped="no"/>
-  </object>
   <object class="GtkListStore" id="PlotShape">
     <columns>
       <!-- column-name gchararray1 -->
@@ -20,6 +15,11 @@
         <col id="0" translatable="yes">disks</col>
       </row>
     </data>
+  </object>
+  <object class="GtkAction" id="action1">
+    <property name="label" translatable="yes">Close</property>
+    <property name="stock_id">gtk-close</property>
+    <signal name="activate" handler="gtk_widget_hide" swapped="no"/>
   </object>
   <object class="GtkAboutDialog" id="aboutdialog1">
     <property name="can_focus">False</property>
@@ -2312,16 +2312,6 @@ Requires ['fft_result']</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">Power</property>
-                                <property name="use_underline">True</property>
-                                <signal name="activate" handler="on_fftplot_activate" swapped="no"/>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkMenuItem" id="imaginary">
-                                <property name="use_action_appearance">False</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">Imaginary</property>
                                 <property name="use_underline">True</property>
                                 <signal name="activate" handler="on_fftplot_activate" swapped="no"/>
                               </object>

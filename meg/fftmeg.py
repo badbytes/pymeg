@@ -27,7 +27,8 @@ from pylab import figure,plot,show, array
 from time import time
 
 class calc():
-    '''fftd = fftmeg.calc(p.data.data_block,1/ p.hdr.header_data.sample_period, epochs=p.data.numofepochs)'''
+    '''fftd = fftmeg.calc(p.data.data_block,1/ p.hdr.header_data.sample_period, epochs=p.data.numofepochs)
+    fftd.fftplot('Power'|'Imaginary'|'Complex')'''
     def __init__(self,data, srate, epochs, axis=0):
         ts = time();
         pnts = size(data,0)/epochs
@@ -54,12 +55,10 @@ class calc():
     #def plot_fft(self):
         #figure();plot(self.freq,self.pow);show()
 
-    def plot_fft(self,plottype):
-        '''plot_fft('power'|'imaginary'|'complex')'''
+    def fftplot(self,plottype):
+        '''fftplot('Power'|'Imaginary'|'Complex')'''
         if plottype == 'Power':
             data = self.pow
-        if plottype == 'Imaginary':
-            data = self.ipow
         if plottype == 'Complex':
             data = self.ipow
 

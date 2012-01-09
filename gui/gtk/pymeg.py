@@ -762,7 +762,7 @@ class maingui():
             print('caught error')
             return
         print('wid',widget.get_label())
-        self.treedata[self.selecteditem].fft_plot(widget.get_label())
+        self.treedata[self.selecteditem]['fftplot'](widget.get_label())
 
     def about(self,widget):
         print('t')
@@ -1232,7 +1232,7 @@ class maingui():
                 predict['Plot MRI'] = ['pixdim','data']
                 predict['Contour Plot'] = ['chanlocs','labellist']
                 predict['Plot TFT'] = ['tft']
-                predict['Plot FFT'] = ['fft_result']
+                predict['Plot FFT'] = ['fft']
 
         except:
             #probably at home. no treedata to parse
@@ -1327,12 +1327,12 @@ class maingui():
         res = (self.setup_helper(var=['data_block','srate','numofepochs','chanlocs'],obj=obj));
         self.fftres = fftmeg.calc(res['data_block'],res['srate'],res['numofepochs'])
         result = parse_instance.run(self.fftres).out
-        fftresult = self.data_file_selected['fft_result'] = {}
+        fftresult = self.data_file_selected['fft'] = {}
         self.result_helper(fftresult,result)
         self.refreshtree()
-        from pylab import ion
-        ion()
-        self.fftres.plot_fft()
+        #from pylab import ion
+        #ion()
+        #self.fftres.plot_fft()
 
     def spin(self, status):
         try: print self.spinner_gui.window.get_visible()
