@@ -6,8 +6,11 @@ import sys
 try:
     sys.path.index('/usr/lib/python2.6')
 except ValueError:
-    from scikits.delaunay import *
-    delaunay = 'yes'
+    try:
+        from scikits.delaunay import *
+        delaunay = 'yes'
+    except:
+        delaunay = 'no'
 else: #using python 2.6
     from matplotlib.mlab import griddata
     delaunay = 'no'
@@ -75,8 +78,8 @@ class makewin():
         print widget
         widget.hide()
         return True
-        
-        
+
+
     def plot_data(self,xi,yi,zi,intx,inty):
         """provide...
             xi=grid x data
@@ -218,11 +221,11 @@ if __name__ == '__main__':
     data = random.randn(10)
     m = makewin()
     from pdf2py import pdf
-    fn = '/home/danc/data/0611/0611SEF/e,rfhp1.0Hz,n,x,baha001-1SEF,f50lp'
+    fn = '/home/danc/data/meg/0611SEF/e,rfhp1.0Hz,n,x,baha001-1SEF,f50lp'
     p = pdf.read(fn)
     p.data.setchannels('meg')
     p.data.getdata(0,p.data.pnts_in_file)
     m.display(p.data.data_block[2:30:5,:],p.data.channels.chanlocs, subplot='on')
-    import code; code.interact(local=locals())
-    
+    #import code; code.interact(local=locals())
+
     gtk.main()

@@ -1324,10 +1324,16 @@ class maingui():
     def fft(self,widget):
         from meg import fftmeg
         obj=self.treedata[self.selecteditem];
-        res = (self.setup_helper(var=['data_block','srate','numofepochs','chanlocs'],obj=obj));
+        res = (self.setup_helper(var=['data_block','srate','numofepochs','chanlocs','labellist'],obj=obj));
         self.fftres = fftmeg.calc(res['data_block'],res['srate'],res['numofepochs'])
+        self.fftres.wintime = self.fftres.freq
+        self.fftres.labellist = res['labellist']
+        self.fftres.chanlocs = res['chanlocs']
+        self.fftres.srate = res['srate']
+        self.fftres.data_block = self.fftres.ipow
         result = parse_instance.run(self.fftres).out
         fftresult = self.data_file_selected['fft'] = {}
+
         self.result_helper(fftresult,result)
         self.refreshtree()
         #from pylab import ion

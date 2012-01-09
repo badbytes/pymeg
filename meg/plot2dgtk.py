@@ -36,7 +36,7 @@ from matplotlib.backends.backend_gtkagg import FigureCanvasGTKAgg as FigureCanva
 from matplotlib.backends.backend_gtkagg import NavigationToolbar2GTKAgg as NavigationToolbar
 
 class makewin():
-    def __init__(self,data='None',xaxis='None',plottype='lines',labels=None,size=[700,500],NFFT='None', Fs='None'):
+    def __init__(self,data=None,xaxis=None,plottype='lines',labels=None,size=[700,500],NFFT=None, Fs=None):
 
         self.win = gtk.Window()
         #win.connect("destroy", lambda x: gtk.main_quit())
