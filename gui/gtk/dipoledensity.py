@@ -162,7 +162,7 @@ class density:
         self.fcd.set_uri(uridefault)
 
     def savemri(self, widget):
-        self.dipoledensityimage.save(self.fcd.get_filename())
+        self.dipoledensityimage.to_filename(self.fcd.get_filename())
         self.fcd.hide()
 
 
