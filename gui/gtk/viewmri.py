@@ -408,13 +408,10 @@ if __name__ == "__main__":
     mainwindow.window.show()
     from pdf2py import pdf
     from mri import img_nibabel
-    fn = '/home/danc/python/data/clinical/E0066/test.nii.gz'
+    #fn = '/home/danc/python/data/clinical/E0066/test.nii.gz'
+    #img = nibabel.load(fn)
+    #h = img.get_header()
 
-    #fn = '/home/danc/data/mri/standardmri/colin_1mm.img'
-    #fn = '/home/danc/python/data/standardmri/ch3.nii.gz'
-    img = nibabel.load(fn)
-    h = img.get_header()
-
-    t = mainwindow.display(img)#, pixdim=pixdim,translation=translation)
+    #t = mainwindow.display(img)#, pixdim=pixdim,translation=translation)
 
     gtk.main()

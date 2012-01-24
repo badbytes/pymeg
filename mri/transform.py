@@ -44,12 +44,12 @@ def generic(p1,p2,p3):
 
 def meg2mri(lpa,rpa,nas, dipole=None):
     'requires MRI lpa, rpa, and nas. Dipole is optional (dipole=NX3)'
-    print 'what are your units of your dipole and lpa,rpa,nas?, should be in mm. your vals are:', lpa,rpa,nas
+    print 'what are your units of your dipole and lpa,rpa,nas?, should be in mm. your vals are LPA,RPA,NAS:', lpa,rpa,nas
     origin = mean([[lpa],[rpa]],0)
     x = nas - origin;
     x = x/norm(x);
-    y = lpa - origin; #Left hand would be... y = rpa - origin;
-    print 'Right-Handed Coord System, MRI in radiological convention by default'
+    #y = lpa - origin; print 'Right-Handed Coord System, MRI in radiological convention by default'
+    y = rpa - origin; print 'Left-Handed Coord System, MRI in radiological convention by default'
     z = cross(x,y);
     z = z/norm(z);
     y = cross(x,z);
