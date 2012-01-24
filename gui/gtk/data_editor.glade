@@ -34,10 +34,10 @@
     <property name="can_focus">False</property>
     <child>
       <object class="GtkMenuItem" id="menu_contour_plot">
+        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="tooltip_text" translatable="yes">Plot selected period as topographical map.</property>
-        <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">Contour Plot</property>
         <property name="use_underline">True</property>
         <signal name="activate" handler="on_plot_contour_activate" swapped="no"/>
@@ -45,10 +45,10 @@
     </child>
     <child>
       <object class="GtkMenuItem" id="menu_offset_correct">
+        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="tooltip_text" translatable="yes">Create offset correction on selection.</property>
-        <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">Offset Correct</property>
         <property name="use_underline">True</property>
         <signal name="activate" handler="on_menu_offset_correct_clicked" swapped="no"/>
@@ -56,10 +56,10 @@
     </child>
     <child>
       <object class="GtkMenuItem" id="save_noise">
+        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="tooltip_text" translatable="yes">Use selected as noise period</property>
-        <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">Save As Noise</property>
         <property name="use_underline">True</property>
         <signal name="activate" handler="on_menu_save_noise_activate" swapped="no"/>
@@ -67,10 +67,10 @@
     </child>
     <child>
       <object class="GtkMenuItem" id="save_event">
+        <property name="use_action_appearance">False</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="tooltip_text" translatable="yes">Save as event period.</property>
-        <property name="use_action_appearance">False</property>
         <property name="label" translatable="yes">Save As Event</property>
         <property name="use_underline">True</property>
         <signal name="activate" handler="on_menu_save_event_activate" swapped="no"/>
@@ -103,6 +103,7 @@
             <signal name="key-press-event" handler="on_key_press_event" swapped="no"/>
             <child>
               <object class="GtkToolButton" id="toolbutton10">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_text" translatable="yes">File Load</property>
@@ -119,6 +120,7 @@
             </child>
             <child>
               <object class="GtkToolButton" id="toolbutton1">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_text" translatable="yes">Zoom In</property>
@@ -135,6 +137,7 @@
             </child>
             <child>
               <object class="GtkToolButton" id="toolbutton2">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_text" translatable="yes">Zoom Out</property>
@@ -151,6 +154,7 @@
             </child>
             <child>
               <object class="GtkToolButton" id="toolbutton3">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_text" translatable="yes">Page Up</property>
@@ -167,6 +171,7 @@
             </child>
             <child>
               <object class="GtkToolButton" id="toolbutton4">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_text" translatable="yes">Page Down</property>
@@ -183,6 +188,7 @@
             </child>
             <child>
               <object class="GtkToolButton" id="toolbutton5">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_text" translatable="yes">Move Backward</property>
@@ -199,6 +205,7 @@
             </child>
             <child>
               <object class="GtkToolButton" id="toolbutton6">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_text" translatable="yes">Move Forward</property>
@@ -215,6 +222,7 @@
             </child>
             <child>
               <object class="GtkToolButton" id="toolbutton7">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_text" translatable="yes">Reload File</property>
@@ -241,6 +249,7 @@
             </child>
             <child>
               <object class="GtkToolButton" id="toolbutton9">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_text" translatable="yes">Clear Selections</property>
@@ -257,6 +266,7 @@
             </child>
             <child>
               <object class="GtkToggleToolButton" id="toolbutton12">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_text" translatable="yes">Open Preference Window</property>
@@ -273,6 +283,7 @@
             </child>
             <child>
               <object class="GtkToolButton" id="toolbutton11">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="tooltip_text" translatable="yes">Save Data</property>
@@ -371,14 +382,12 @@ Scroll mouse for spacing.</property>
     </child>
   </object>
   <object class="GtkWindow" id="window_prefs">
-    <property name="width_request">400</property>
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">Selector Tool</property>
     <property name="icon">highlight.png</property>
     <signal name="delete-event" handler="gtk_widget_hide" swapped="no"/>
     <child>
       <object class="GtkNotebook" id="notebook1">
-        <property name="width_request">200</property>
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <property name="scrollable">True</property>
@@ -405,7 +414,7 @@ Scroll mouse for spacing.</property>
               <object class="GtkLabel" id="label5">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Time window (start, end):</property>
+                <property name="label" translatable="yes">X axis (start, end):</property>
               </object>
               <packing>
                 <property name="top_attach">1</property>
@@ -436,6 +445,19 @@ Scroll mouse for spacing.</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
+                  <object class="GtkLabel" id="label10">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">sec</property>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">False</property>
+                    <property name="pack_type">end</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
                   <object class="GtkSpinButton" id="spinbutton3">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
@@ -447,9 +469,9 @@ Scroll mouse for spacing.</property>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
-                    <property name="padding">13</property>
+                    <property name="padding">12</property>
                     <property name="pack_type">end</property>
-                    <property name="position">0</property>
+                    <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
@@ -463,7 +485,8 @@ Scroll mouse for spacing.</property>
                   <packing>
                     <property name="expand">True</property>
                     <property name="fill">True</property>
-                    <property name="position">1</property>
+                    <property name="pack_type">end</property>
+                    <property name="position">2</property>
                   </packing>
                 </child>
               </object>
@@ -479,6 +502,7 @@ Scroll mouse for spacing.</property>
             <child>
               <object class="GtkButton" id="button7">
                 <property name="label" translatable="yes">Apply</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -559,6 +583,7 @@ Scroll mouse for spacing.</property>
             </child>
             <child>
               <object class="GtkColorButton" id="colorbutton1">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -585,6 +610,7 @@ Scroll mouse for spacing.</property>
             </child>
             <child>
               <object class="GtkColorButton" id="colorbutton2">
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -604,7 +630,7 @@ Scroll mouse for spacing.</property>
           <object class="GtkLabel" id="label1">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Display Params</property>
+            <property name="label" translatable="yes">Display</property>
           </object>
           <packing>
             <property name="tab_fill">False</property>
@@ -653,6 +679,7 @@ Scroll mouse for spacing.</property>
                 <child>
                   <object class="GtkCheckButton" id="checkbutton1">
                     <property name="label" translatable="yes">meg</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
@@ -669,6 +696,7 @@ Scroll mouse for spacing.</property>
                 <child>
                   <object class="GtkCheckButton" id="checkbutton2">
                     <property name="label" translatable="yes">trigger</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
@@ -685,6 +713,7 @@ Scroll mouse for spacing.</property>
                 <child>
                   <object class="GtkCheckButton" id="checkbutton3">
                     <property name="label" translatable="yes">reference</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
@@ -701,6 +730,7 @@ Scroll mouse for spacing.</property>
                 <child>
                   <object class="GtkCheckButton" id="checkbutton4">
                     <property name="label" translatable="yes">eeg</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
@@ -717,6 +747,7 @@ Scroll mouse for spacing.</property>
                 <child>
                   <object class="GtkCheckButton" id="checkbutton5">
                     <property name="label" translatable="yes">derived</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
@@ -733,6 +764,7 @@ Scroll mouse for spacing.</property>
                 <child>
                   <object class="GtkCheckButton" id="checkbutton6">
                     <property name="label" translatable="yes">external</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
@@ -749,6 +781,7 @@ Scroll mouse for spacing.</property>
                 <child>
                   <object class="GtkButton" id="button2">
                     <property name="label" translatable="yes">Select All</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
@@ -764,6 +797,7 @@ Scroll mouse for spacing.</property>
                 <child>
                   <object class="GtkButton" id="button9">
                     <property name="label" translatable="yes">De-Select All</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
@@ -790,6 +824,7 @@ Scroll mouse for spacing.</property>
                 <child>
                   <object class="GtkButton" id="button1">
                     <property name="label">gtk-apply</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
@@ -839,7 +874,7 @@ Scroll mouse for spacing.</property>
           <object class="GtkLabel" id="label2">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Channel Selection</property>
+            <property name="label" translatable="yes">Channels</property>
           </object>
           <packing>
             <property name="position">1</property>
@@ -881,6 +916,7 @@ Scroll mouse for spacing.</property>
                 <child>
                   <object class="GtkButton" id="button4">
                     <property name="label" translatable="yes">Contour Plot</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
@@ -896,6 +932,7 @@ Scroll mouse for spacing.</property>
                 <child>
                   <object class="GtkButton" id="button5">
                     <property name="label" translatable="yes">View Data</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="sensitive">False</property>
                     <property name="can_focus">True</property>
@@ -911,6 +948,7 @@ Scroll mouse for spacing.</property>
                 <child>
                   <object class="GtkButton" id="button6">
                     <property name="label" translatable="yes">Offset Correct</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
@@ -939,6 +977,7 @@ Scroll mouse for spacing.</property>
                   <object class="GtkButton" id="button8">
                     <property name="label" translatable="yes"> Epoch On User
 Selected Events</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
@@ -955,6 +994,7 @@ Selected Events</property>
                   <object class="GtkButton" id="button10">
                     <property name="label" translatable="yes">Store Event
  with Data</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
@@ -970,6 +1010,7 @@ Selected Events</property>
                 <child>
                   <object class="GtkButton" id="button3">
                     <property name="label" translatable="yes">Delete</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
@@ -999,7 +1040,7 @@ Selected Events</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="has_focus">True</property>
-            <property name="label" translatable="yes">Data Selections</property>
+            <property name="label" translatable="yes">Events</property>
           </object>
           <packing>
             <property name="position">2</property>

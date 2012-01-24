@@ -1308,7 +1308,7 @@ class maingui():
 
         try:
             self.de = data_editor.setup_gui()
-            self.de.data_handler(widget, input_dict=res, callback=data_editor_callback)
+            self.de.data_handler(widget, input_dict=res, callback=data_editor_callback, datatype=self.selecteditem)
             self.de.window.show()
         except RuntimeError:
             self.errordialog("Can't do that Dave");

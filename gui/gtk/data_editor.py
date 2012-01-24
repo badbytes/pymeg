@@ -168,6 +168,7 @@ class setup_gui:
         self.builder.get_object("spinbutton2").set_range(self.t[0],self.t[-1])
         self.builder.get_object("spinbutton2").set_value(self.t[0])
         self.builder.get_object("spinbutton3").set_range(self.t[0],self.t[-1])
+
         #if self.t[-1] - self.t[0] > 1: #alot of time, save time in plotting and set low
         if len(self.t) > 1000:
             self.builder.get_object("spinbutton3").set_value(self.t[1000])
@@ -179,6 +180,15 @@ class setup_gui:
         #self.builder.get_object("spinbutton5").set_value(self.scalefact)
         self.builder.get_object("entry1").set_text(str(self.space))
         self.builder.get_object("entry2").set_text(str(self.scalefact))
+
+        #UNITS
+
+        if self.datatype == 'fft':
+            units = 'Hz'
+        else:
+            units = 'sec'
+        self.builder.get_object("label10").set_text(units)
+        print('DEBUG',units,self.datatype)
 
     def preferences_open(self,widget):
         self.win_prefs = self.builder.get_object("window_prefs")
@@ -651,7 +661,7 @@ class setup_gui:
         self.data_handler(widget, input_dict)
 
 
-    def data_handler(self, widget, input_dict, callback=None):
+    def data_handler(self, widget, input_dict, callback=None,datatype=None):
         '''
         datahandler(data,srate,wintime,chanlabels,chanlocs)
         -
@@ -671,6 +681,7 @@ class setup_gui:
         wintime = input_dict['wintime']
         chanlabels = input_dict['labellist']
         chanlocs = input_dict['chanlocs']
+        self.datatype = datatype
 
         print type(data),srate,type(wintime),type(chanlabels),type(chanlocs)
         print len(chanlabels),size(data,1),len(wintime),size(data,0),\
