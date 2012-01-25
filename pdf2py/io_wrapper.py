@@ -24,6 +24,8 @@ from numpy import fromfile#, tofile
 def fread(fid, numofelements, dtype, null=None, endianness=None):
     if endianness == 1:
         result = fromfile(fid, dtype, count=numofelements).byteswap()
+    else:
+        result = fromfile(fid, dtype, count=numofelements)
     return result
 
 #fwrite(fid, 1, pyconfig.data_sys_type, 'H', 1);
@@ -31,5 +33,7 @@ def fread(fid, numofelements, dtype, null=None, endianness=None):
 def fwrite(fid, numofelements, data, dtype, endianness=None):
     if endianness == 1:
         data.byteswap().tofile(fid)
+    else:
+        data.tofile(fid)
 
     #z.byteswap().tofile('test')
