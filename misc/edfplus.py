@@ -107,6 +107,7 @@ class BaseEDFReader:
     for nsamp in self.header['n_samples_per_record']:
       samples = self.file.read(nsamp * 2)
       if len(samples) != nsamp * 2:
+        print 'EOD'
         raise EDFEndOfData
       result.append(samples)
     return result
@@ -143,10 +144,13 @@ class BaseEDFReader:
     '''
     Record generator.
     '''
+    cnt = 0
     try:
       while True:
+        cnt = cnt +1
         yield self.read_record()
     except EDFEndOfData:
+      print cnt
       pass
 
 

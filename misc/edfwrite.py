@@ -16,19 +16,28 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
-from pdf2py import io_wrapper
-fread = io_wrapper.fread
+#from pdf2py import io_wrapper
+#fread = io_wrapper.fread
+#fwrite = io_wrapper.fwrite
 
-def write_edf_header(header, fname):
-    h = header
-    fid = open(fname, 'r')
+from numpy import *
+
+EVENT_CHANNEL = 'EDF Annotations'
+
+def filewrite(filename):
+    pass
+
+def write_edf_header(fname,nchannels,data):
+    #h = header
+    fid = open(fname, 'w')
 
     fid.write('0       ');
 
     # recording info)
     ind = fid.tell()
-    fid.write(h['local_subject_id']);fid.seek(ind+80,0)
-    fid.write(h['local_recording_id']);fid.seek(ind+80+80,0)
+    chlabels = ['a','b','c','d','e','f','g','h','i','j','k']
+    fid.write('PATIENT ID');fid.seek(80-len('PATIENT ID'),1)#fid.seek(ind+80,0)
+    fid.write('Startdate 10-DEC-2009 X X test_generator');fid.seek(80-len('Startdate 10-DEC-2009 X X test_generator'),1)
 
     # parse timestamp
 
@@ -39,10 +48,16 @@ def write_edf_header(header, fname):
     #h['date_time'] = str(datetime.datetime(year + 2000, month, day,
     #hour, minute, sec))
 
+    #!!NEED TO ADD ANNOTATIONS ChLabel
+    EVENT_CHANNEL = 'EDF Annotations'
+    print 'CL',chlabels
+    #channel_labels = chlabels
+    channel_labels = chlabels.append(EVENT_CHANNEL)
+    print 'CL',chlabels
     # misc
     #header_nbytes = int(f.read(8))
     ind = fid.tell()
-    fid.write(str(header_nbytes)); fid.seek(8+ind,0)
+    ##fid.write(str(header_nbytes)); fid.seek(8+ind,0)
     #subtype = f.read(44)[:5]
     #h['EDF+'] = subtype in ['EDF+C', 'EDF+D']
     #h['contiguous'] = subtype != 'EDF+D'
@@ -50,12 +65,14 @@ def write_edf_header(header, fname):
     fid.seek(39)
     #h['n_records'] = int(f.read(8))
     print 'byte index', fid.tell()
-    fid.write(str(numofsecondsinfile)) #Even though this is called n_records, it appers
+    numofsecondsinfile = 600
+    fid.write(str(numofsecondsinfile)) #n_records...Even though this is called n_records, it appers
     #to be the time in seconds in the file. 8bytes
     #h['record_length'] = float(f.read(8))  # in seconds
-    fid.write('1')  # THIS also is weird, and not the length of file in seconds
+    fid.write('1')  # record_length...THIS also is weird, and not the length of file in seconds
     #nchannels = h['n_channels'] = int(f.read(4))
-    fid.write(str(numberofchannels+1)) #dont know what the extra channel is for
+    numberofchannels = 11
+    fid.write(str(numberofchannels+1)) #Extra Channel is Annotations
 
     # read channel info
     '''channels = range(h['n_channels'])
@@ -69,24 +86,44 @@ def write_edf_header(header, fname):
     h['prefiltering'] = [f.read(80).strip() for n in channels]
     '''
     #write channel labels
-    for i in chan_labels:
+    print 'CL',chlabels
+    for i in chlabels:
         ind = fid.tell()
         fid.write(i)
         fid.seek(16+ind,0)
-    fid.seek(80,1) #skip 80bytes for transducer crap
-    for i in arange(len(chan_labels)):
-        fid.write('uV');fid.seek(8,1)
-    fid.write('  ');fid.seek(8,1) #write units for the empty channel
-    fid.write(str(min_data_val));fid.seek(16-len(min_data_val))
-    
+    #fid.write('EDF Annotations ');
+    [fid.seek(80,1) for i in chlabels]#transducer_type skip 80bytes for transducer crap
+    [fid.write('uV      ') for i in chlabels]  #units
+    for i in data:
+        array(float(min(i))).tofile(fid) #Physical min
+    array(-1.0).tofile(fid) #annotation min
+    for i in data:
+        array(float(max(i))).tofile(fid) #Physical max
+    array(1.0).tofile(fid) #annotation max
+    for i in data:
+        array(float(min(i))).tofile(fid) #Digital min
+    array(-1.0).tofile(fid) #annotation min
+    for i in data:
+        array(float(max(i))).tofile(fid) #Digital max
+    array(1.0).tofile(fid) #annotation max
+
+    [fid.seek(80,1) for i in chlabels] #prefiltering
 
     #h['n_samples_per_record'] = [int(f.read(8)) for n in channels]
-    fid.write(samplerate) #appears to be sample rate but called \
-    #n_samples_per_record.
-    f.read(32 * nchannels)  # reserved
+    n_samples_per_record = [200,200,200,200,200,200,200,200,200,200,200,51]
+    [array(n).tofile(fid) for n in n_samples_per_record]#appears to be sample rate but called n_samples_per_record.
+    fid.seek(32 * nchannels)  # reserved
 
-    assert f.tell() == header_nbytes
-    return h
+    #assert f.tell() == header_nbytes
+    #return h
+    fid.close()
+
+    #(200*11*600+(600*51))*2 +++ 3328
+def write_data(fid):
+    redata = data.reshape(size(data,0),size(data,1)/n_records,n_records) #CH,Epoch,Samples
+    for i in arange(n_records): #For each second
+        for j in redata: #For each channel
+            j[:,i].write(fid)
 '''def edf_header(f):
   h = {}
   assert f.tell() == 0  # check file position
@@ -126,7 +163,7 @@ def write_edf_header(header, fname):
 
   assert f.tell() == header_nbytes
   return h
-'''
+
 HEADER RECORD
 8 ascii : version of this data format (0)
 80 ascii : local patient identification
@@ -156,7 +193,7 @@ nr of samples[2] * integer : second signal
 ..
 nr of samples[ns] * integer : last signal
 
-'''
+
 clear()
 name = xgetfile('*.*')                          // name of file
 printf ("File selected : %s",name);             // file selected
