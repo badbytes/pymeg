@@ -21,16 +21,18 @@
 #fwrite = io_wrapper.fwrite
 
 from numpy import *
+import os
 
 EVENT_CHANNEL = 'EDF Annotations'
-
-def filewrite(filename):
-    pass
 
 def write_edf_header(fname,nchannels,data):
     #h = header
     fid = open(fname, 'w')
-
+    hdrbytes = 3328
+    s = chararray(hdrbytes)
+    s[:] = ' '
+    s.tofile(fid)
+    fid.seek(0)
     fid.write('0       ');
 
     # recording info)
@@ -45,6 +47,8 @@ def write_edf_header(fname,nchannels,data):
     #(hour, minute, sec)= [int(x) for x in re.findall('(\d+)', f.read(8))]
     #h['date_time']
     fid.write('10.12.0912.44.02')
+    fid.write(str(hdrbytes))
+
     #h['date_time'] = str(datetime.datetime(year + 2000, month, day,
     #hour, minute, sec))
 
@@ -61,17 +65,21 @@ def write_edf_header(fname,nchannels,data):
     #subtype = f.read(44)[:5]
     #h['EDF+'] = subtype in ['EDF+C', 'EDF+D']
     #h['contiguous'] = subtype != 'EDF+D'
+    fid.seek(192)
     fid.write('EDF+C')#############################I THINK THIS MEANS CONTIN
-    fid.seek(39)
+    #fid.seek(39)
+    fid.seek(236,0)
     #h['n_records'] = int(f.read(8))
     print 'byte index', fid.tell()
     numofsecondsinfile = 600
     fid.write(str(numofsecondsinfile)) #n_records...Even though this is called n_records, it appers
     #to be the time in seconds in the file. 8bytes
     #h['record_length'] = float(f.read(8))  # in seconds
+    fid.seek(244)
     fid.write('1')  # record_length...THIS also is weird, and not the length of file in seconds
     #nchannels = h['n_channels'] = int(f.read(4))
     numberofchannels = 11
+    fid.seek(252)
     fid.write(str(numberofchannels+1)) #Extra Channel is Annotations
 
     # read channel info
@@ -87,31 +95,42 @@ def write_edf_header(fname,nchannels,data):
     '''
     #write channel labels
     print 'CL',chlabels
+    fid.seek(256)
     for i in chlabels:
         ind = fid.tell()
         fid.write(i)
         fid.seek(16+ind,0)
     #fid.write('EDF Annotations ');
     [fid.seek(80,1) for i in chlabels]#transducer_type skip 80bytes for transducer crap
-    [fid.write('uV      ') for i in chlabels]  #units
+    [fid.write('uV      ') for i in chlabels[:-1]]  #units
+    fid.seek(8,1)
+    #data[:] = float(1.2222222222)
     for i in data:
-        array(float(min(i))).tofile(fid) #Physical min
-    array(-1.0).tofile(fid) #annotation min
+        array(str(float(min(i)))[:8]).tofile(fid) #Physical min
+    #fid.write('XX      ') #annotation min
+    fid.write('-1      ') #annotation min
     for i in data:
-        array(float(max(i))).tofile(fid) #Physical max
-    array(1.0).tofile(fid) #annotation max
+        array(str(float(max(i)))[:8]).tofile(fid) #Physical max
+    #fid.write('XX      ') #annotation min
+    fid.write('1       ') #annotation max
     for i in data:
-        array(float(min(i))).tofile(fid) #Digital min
-    array(-1.0).tofile(fid) #annotation min
+        array(str(float(min(i)))[:8]).tofile(fid) #Digital min
+    array(str(float(min(i)))[:8]).tofile(fid) #annotation min
+    #fid.write('XX      ') #annotation min
     for i in data:
-        array(float(max(i))).tofile(fid) #Digital max
-    array(1.0).tofile(fid) #annotation max
+        array(str(float(max(i)))[:8]).tofile(fid) #Digital max
+    array(str(float(max(i)))[:8]).tofile(fid)
+    #fid.write('XX      ') #annotation min
 
     [fid.seek(80,1) for i in chlabels] #prefiltering
 
     #h['n_samples_per_record'] = [int(f.read(8)) for n in channels]
     n_samples_per_record = [200,200,200,200,200,200,200,200,200,200,200,51]
-    [array(n).tofile(fid) for n in n_samples_per_record]#appears to be sample rate but called n_samples_per_record.
+    for n in n_samples_per_record:
+        align(n,8,fid)
+        #array(str(n)).tofile(fid)
+
+    #[array(str(n)).tofile(fid) for n in n_samples_per_record]#appears to be sample rate but called n_samples_per_record.
     fid.seek(32 * nchannels)  # reserved
 
     #assert f.tell() == header_nbytes
@@ -119,11 +138,29 @@ def write_edf_header(fname,nchannels,data):
     fid.close()
 
     #(200*11*600+(600*51))*2 +++ 3328
-def write_data(fid):
+
+def align(val,fieldsize,fid): #string to write and size of field to skip
+    curind = fid.tell()
+    print val
+    array(str(float(val))).tofile(fid)
+    v = str(float(val))
+    print 'V',v,'x ',curind,'y',fieldsize
+    fid.seek(curind+fieldsize)
+
+def write_data(fid,data,n_records):
+    fid.seek(os.SEEK_END)
     redata = data.reshape(size(data,0),size(data,1)/n_records,n_records) #CH,Epoch,Samples
     for i in arange(n_records): #For each second
         for j in redata: #For each channel
-            j[:,i].write(fid)
+            j[:,i].tofile(fid)
+
+    #fromstring(d[5],'<i2').astype(float)
+
+def write_to_file(fname,nchan,data):
+    write_edf_header(fname,nchan,data)
+    write_data(fid,data,n_records):
+
+
 '''def edf_header(f):
   h = {}
   assert f.tell() == 0  # check file position

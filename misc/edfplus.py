@@ -104,8 +104,13 @@ class BaseEDFReader:
     bytes.
     '''
     result = []
+    self.cnt = 0
     for nsamp in self.header['n_samples_per_record']:
+      #print 'RAW START', self.file.tell()
       samples = self.file.read(nsamp * 2)
+      #self.cnt = self.cnt + 1
+      #if self.cnt > 10:
+        #return
       if len(samples) != nsamp * 2:
         print 'EOD'
         raise EDFEndOfData
@@ -132,7 +137,7 @@ class BaseEDFReader:
         dig = np.fromstring(samples, '<i2').astype(float)
         phys = (dig - dig_min[i]) * gain[i] + phys_min[i]
         signals.append(phys)
-
+    #return raw_record
     return time, signals, events
 
 
@@ -203,7 +208,8 @@ def load_edf(edffile):
     if l != EVENT_CHANNEL])
   assert nsamp.size == 1, 'Multiple sample rates not supported!'
   sample_rate = float(nsamp[0]) / h['record_length']
-
+  x = reader.read_raw_record()
+  return x
   rectime, X, annotations = zip(*reader.records())
   X = np.hstack(X)
   annotations = reduce(operator.add, annotations)
