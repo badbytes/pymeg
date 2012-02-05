@@ -105,19 +105,24 @@ def write_edf_header(fname,nchannels,data):
     [fid.write('uV      ') for i in chlabels[:-1]]  #units
     fid.seek(8,1)
     #data[:] = float(1.2222222222)
+    pmin = [];pmax = [];dmin=[];dmax=[]
     for i in data:
+        pmin.append(float(min(i)))
         array(str(float(min(i)))[:8]).tofile(fid) #Physical min
     #fid.write('XX      ') #annotation min
     fid.write('-1      ') #annotation min
     for i in data:
+        pmax.append(float(min(i)))
         array(str(float(max(i)))[:8]).tofile(fid) #Physical max
     #fid.write('XX      ') #annotation min
     fid.write('1       ') #annotation max
     for i in data:
+        dmin.append(float(min(i)))
         array(str(float(min(i)))[:8]).tofile(fid) #Digital min
     array(str(float(min(i)))[:8]).tofile(fid) #annotation min
     #fid.write('XX      ') #annotation min
     for i in data:
+        dmax.append(float(max(i)))
         array(str(float(max(i)))[:8]).tofile(fid) #Digital max
     array(str(float(max(i)))[:8]).tofile(fid)
     #fid.write('XX      ') #annotation min
@@ -135,7 +140,20 @@ def write_edf_header(fname,nchannels,data):
 
     #assert f.tell() == header_nbytes
     #return h
-    fid.close()
+    #fid.close()
+
+    # calculate ranges for rescaling
+    dig_min = array([dmin])
+    phys_min = array([pmin])
+    phys_range = array([pmax]) - array([pmin])
+    dig_range = array([dmax]) - array([dmin])
+    #assert all(phys_range > 0)
+    #assert all(dig_range > 0)
+    gain = phys_range / dig_range
+
+    range_scale = {'dmin':dig_min,'pmin':phys_min,'prange':phys_range,'drange':dig_range,'gain':gain}
+    n_records = numofsecondsinfile
+    return fid, n_records, data, range_scale
 
     #(200*11*600+(600*51))*2 +++ 3328
 
@@ -147,18 +165,36 @@ def align(val,fieldsize,fid): #string to write and size of field to skip
     print 'V',v,'x ',curind,'y',fieldsize
     fid.seek(curind+fieldsize)
 
-def write_data(fid,data,n_records):
+def write_data(fid,data,n_records,range_scale):
     fid.seek(os.SEEK_END)
-    redata = data.reshape(size(data,0),size(data,1)/n_records,n_records) #CH,Epoch,Samples
-    for i in arange(n_records): #For each second
-        for j in redata: #For each channel
-            j[:,i].tofile(fid)
+    scaleddata = (data + range_scale['dmin'].T) / range_scale['gain'].T - range_scale['pmin'].T
+    redata = scaleddata.reshape(size(scaleddata,0),size(scaleddata,1)/n_records,n_records) #CH,Epoch,Samples
+    print redata.shape, 'SHAPE',n_records
+    return
+    for chan in chlabels: #For each channel
+        for nsamp in arange(n_records): #For each second
+
+            for k in arange
+            #scaledj = (redata[:,i]+range_scale['dmin'][j]) / range_scale['gain'][j] - range_scale['pmin']
+            redata[j,.tofile(fid)
+
+    #for (i, samples) in enumerate(raw_record):
+      #if h['label'][i] == EVENT_CHANNEL:
+        #ann = tal(samples)
+        #time = ann[0][0]
+        #events.extend(ann[1:])
+      #else:
+        ## 2-byte little-endian integers
+        #dig = np.fromstring(samples, '<i2').astype(float)
+        #phys = (dig - dig_min[i]) * gain[i] + phys_min[i]
+        #signals.append(phys)
 
     #fromstring(d[5],'<i2').astype(float)
 
 def write_to_file(fname,nchan,data):
-    write_edf_header(fname,nchan,data)
-    write_data(fid,data,n_records):
+    '''test_'''
+    fid, n_records, data, range_scale = write_edf_header(fname,nchan,data)
+    write_data(fid,data,n_records, range_scale)
 
 
 '''def edf_header(f):

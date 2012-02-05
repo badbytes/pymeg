@@ -108,9 +108,6 @@ class BaseEDFReader:
     for nsamp in self.header['n_samples_per_record']:
       #print 'RAW START', self.file.tell()
       samples = self.file.read(nsamp * 2)
-      #self.cnt = self.cnt + 1
-      #if self.cnt > 10:
-        #return
       if len(samples) != nsamp * 2:
         print 'EOD'
         raise EDFEndOfData
@@ -130,6 +127,7 @@ class BaseEDFReader:
     for (i, samples) in enumerate(raw_record):
       if h['label'][i] == EVENT_CHANNEL:
         ann = tal(samples)
+        print ann,samples
         time = ann[0][0]
         events.extend(ann[1:])
       else:
@@ -155,7 +153,7 @@ class BaseEDFReader:
         cnt = cnt +1
         yield self.read_record()
     except EDFEndOfData:
-      print cnt
+      print cnt - 1
       pass
 
 
@@ -208,8 +206,8 @@ def load_edf(edffile):
     if l != EVENT_CHANNEL])
   assert nsamp.size == 1, 'Multiple sample rates not supported!'
   sample_rate = float(nsamp[0]) / h['record_length']
-  x = reader.read_raw_record()
-  return x
+  #x = reader.read_raw_record()
+  #return x
   rectime, X, annotations = zip(*reader.records())
   X = np.hstack(X)
   annotations = reduce(operator.add, annotations)
