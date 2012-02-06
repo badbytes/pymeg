@@ -17,6 +17,8 @@ log = logging.getLogger(__name__)
 
 class EDFEndOfData: pass
 
+logger = logging.getLogger('2')
+logger.addHandler(logging.FileHandler('/tmp/logger.read',mode='w'))
 
 def tal(tal_str):
   '''Return a list with (onset, duration, annotation) tuples for an EDF+ TAL
@@ -84,7 +86,7 @@ def edf_header(f):
 class BaseEDFReader:
   def __init__(self, file):
     self.file = file
-
+    self.cnt = 0
 
   def read_header(self):
     self.header = h = edf_header(self.file)
@@ -104,9 +106,13 @@ class BaseEDFReader:
     bytes.
     '''
     result = []
-    self.cnt = 0
+
     for nsamp in self.header['n_samples_per_record']:
-      #print 'RAW START', self.file.tell()
+      print 'RAW START', self.file.tell(), nsamp
+      logger.warning([self.file.tell(), nsamp])
+      self.cnt = self.cnt + 1
+      if self.cnt == 20:
+          pass #raise EDFEndOfData
       samples = self.file.read(nsamp * 2)
       if len(samples) != nsamp * 2:
         print 'EOD'
@@ -121,13 +127,14 @@ class BaseEDFReader:
     '''
     h = self.header
     dig_min, phys_min, gain = self.dig_min, self.phys_min, self.gain
+    #print 'GAIN', gain
     time = float('nan')
     signals = []
     events = []
     for (i, samples) in enumerate(raw_record):
       if h['label'][i] == EVENT_CHANNEL:
         ann = tal(samples)
-        print ann,samples
+        #print ann,samples;
         time = ann[0][0]
         events.extend(ann[1:])
       else:

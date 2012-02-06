@@ -21,7 +21,11 @@
 #fwrite = io_wrapper.fwrite
 
 from numpy import *
-import os
+import os, logging
+
+logger = logging.getLogger('1')
+logger.addHandler(logging.FileHandler('/tmp/logger.write',mode='w'))
+
 
 EVENT_CHANNEL = 'EDF Annotations'
 
@@ -106,19 +110,22 @@ def write_edf_header(fname,nchannels,data):
     #data[:] = float(1.2222222222)
     pmin = [];pmax = [];dmin=[];dmax=[]
     for i in data:
-        pmin.append(float(min(i)))
+        #pmin.append(float(min(i)))
+        pmin.append(-1000.)
         #array(str(float(min(i)))[:8]).tofile(fid) #Physical min
         array(['-1000.00']).tofile(fid)
     #fid.write('XX      ') #annotation min
     fid.write('-1      ') #annotation min
     for i in data:
-        pmax.append(float(min(i)))
+        #pmax.append(float(min(i)))
+        pmax.append(1000.)
         #array(str(float(max(i)))[:8]).tofile(fid) #Physical max
         array(['1000.000']).tofile(fid)
     #fid.write('XX      ') #annotation min
     fid.write('1       ') #annotation max
     for i in data:
-        dmin.append(float(min(i)))
+        #dmin.append(float(min(i)))
+        dmin.append(-32767.)
         array(['-32768  ']).tofile(fid) #Digital max
     array(['-32768  ']).tofile(fid) #Digital max
     #array(str(float(min(i)))[:8]).tofile(fid) #Digital min
@@ -127,7 +134,8 @@ def write_edf_header(fname,nchannels,data):
     #array([-32767.]).tofile(fid) #annotation min
     #fid.write('XX      ') #annotation min
     for i in data:
-        dmax.append(float(max(i)))
+        #dmax.append(float(max(i)))
+        dmax.append(32767.)
         #array(str(float(max(i)))[:8]).tofile(fid) #Digital max
         array(['32767   ']).tofile(fid) #Digital max
         #array([ 32767.,  32767.,  32767.,  32767.,  32767.,  32767.,  32767.\
@@ -175,22 +183,39 @@ def align(val,fieldsize,fid): #string to write and size of field to skip
     print 'V',v,'x ',curind,'y',fieldsize
     fid.seek(curind+fieldsize)
 
+
+
 def write_data(fid,data,n_records,range_scale, n_samples_per_record, chlabels):
-    #fid.seek(os.SEEK_END)
+    fid.seek(0,2)
     scaleddata = (data + range_scale['dmin'].T) / range_scale['gain'].T - range_scale['pmin'].T
-    redata = scaleddata.reshape(size(scaleddata,0),size(scaleddata,1)/n_records,n_records) #CH,Epoch,Samples
-    print redata.shape, 'SHAPE',n_records, n_samples_per_record, chlabels
+    redata = scaleddata.reshape(size(scaleddata,0),size(scaleddata,1)/n_records,n_records)
+    #return data,range_scale #CH,Epoch,Samples
+    print redata.shape, 'SHAPE',n_records, n_samples_per_record, chlabels, fid.tell()
     #redata[0,:,1].tofile(fid);return
+    ind = 0
+
     for samp in arange(n_records): #For each epoch
+        string_zeros = ''
         #for nsamp in n_samples_per_record: #arange(n_records): #For each sample in epoch
+        zlength = 51 - 1 - len(str(ind)) - 2 #annotation is length of 51 minus space for '+' minus 2 'x14' seperators, minus the length of the sample 'ind'
+        for i in arange(zlength):
+            string_zeros = string_zeros+'\x00'
         for chan in chlabels: #For each channel
             #scaledj = (redata[:,i]+range_scale['dmin'][j]) / range_scale['gain'][j] - range_scale['pmin']
             cnum = chlabels.index(chan)
-            print cnum, samp, chan
+            nsamp = n_samples_per_record[chlabels.index(chan)]
+            logger.warning([fid.tell(),nsamp])
+            #print cnum, samp, chan
+
             if chan == EVENT_CHANNEL:
-                fid.seek(n_samples_per_record[cnum],1)
+                ann = '+'+str(ind)+'\x14\x14'+string_zeros #\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+                fid.write(ann)
+                ind = ind+1
+                #fid.seek(n_samples_per_record[cnum],1)
+
             else:
-                redata[cnum,:,samp].tofile(fid)
+                #z.astype(int16).tostring()
+                redata[cnum,:,samp].astype(int16).tofile(fid)
     fid.close()
 
 
@@ -210,8 +235,11 @@ def write_data(fid,data,n_records,range_scale, n_samples_per_record, chlabels):
 def write_to_file(fname,nchan,data):
     '''test_'''
     fid, n_records, data, range_scale, n_samples_per_record, chlabels = write_edf_header(fname,nchan,data)
-
     write_data(fid,data,n_records, range_scale, n_samples_per_record, chlabels)
+    #return r,x
+
+#'+0\x14\x14\x00+0.0000\x14RECORD START\x14\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+#'+4\x14\x14\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 
 
 '''def edf_header(f):
