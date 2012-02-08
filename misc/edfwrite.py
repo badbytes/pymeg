@@ -28,11 +28,27 @@ logger.addHandler(logging.FileHandler('/tmp/logger.write',mode='w'))
 
 
 EVENT_CHANNEL = 'EDF Annotations'
+#edfwrite.write_to_file('/tmp/test.edf', 17,d,numr.tolist(),1,eeglabs)
+#l = ['FP1','F7','T3','T5','01','F3','C3','P3','FZ','CZ','PZ','FP2','F4','C4','P4','02','F8','T4','T6']
+#p = pdf.read(f[0]);p.data.setchannellabels(eeglabs);p.data.getdata(0,15000)
+#edfwrite.write_to_file('/tmp/test.edf',19,d.T,numr.tolist(),30,l)
 
-def write_edf_header(fname,nchannels,data):
+#edfwrite.write_to_file('/tmp/test.edf',19,d.T,numr.tolist(),150,l)
+
+def write_edf_header(fname,nchannels,data,n_samples_per_record,n_records,chlabels):
+    '''n_samples_per_record = [200,200,200,200,200,200,200,200,200,200,200,51]
+    chlabels = ['a','b','c','d','e','f','g','h','i','j','k']
+    n_records = 600
+    '''
     #h = header
     fid = open(fname, 'w')
-    hdrbytes = 3328
+    #hdrbytes = 3328
+    numch = len(chlabels)+1; print 'NumofCh',numch
+    edfformat = {'version': 8, 'patid':80, 'recid':80,'date':8,'time':8,'numbytes':8, \
+    'res':44,'n_records':8,'rec_dur':8,'num_rec':4,'labels':numch*16, \
+    'trasducer':numch*80, 'units':numch*8,'pmin':numch*8, 'pmax':numch*8, \
+    'dmin':numch*8, 'dmax':numch*8,'prefilt':numch*80,'num_samp': numch*8, 'reserved': numch*32}
+    hdrbytes = sum(edfformat.values())
     s = chararray(hdrbytes)
     s[:] = ' '
     s.tofile(fid)
@@ -41,7 +57,7 @@ def write_edf_header(fname,nchannels,data):
 
     # recording info)
     ind = fid.tell()
-    chlabels = ['a','b','c','d','e','f','g','h','i','j','k']
+    #chlabels = ['a','b','c','d','e','f','g','h','i','j','k']
     fid.write('X X X X');fid.seek(80-len('X X X X'),1)#fid.seek(ind+80,0)
     fid.write('Startdate 10-DEC-2009 X X test_generator');fid.seek(80-len('Startdate 10-DEC-2009 X X test_generator'),1)
 
@@ -60,7 +76,8 @@ def write_edf_header(fname,nchannels,data):
     EVENT_CHANNEL = 'EDF Annotations'
     print 'CL',chlabels
     #channel_labels = chlabels
-    channel_labels = chlabels.append(EVENT_CHANNEL)
+    chlabels.append(EVENT_CHANNEL)
+    n_samples_per_record.append(51)
     print 'CL',chlabels
     # misc
     #header_nbytes = int(f.read(8))
@@ -75,16 +92,19 @@ def write_edf_header(fname,nchannels,data):
     fid.seek(236,0)
     #h['n_records'] = int(f.read(8))
     print 'byte index', fid.tell()
-    numofsecondsinfile = 600
-    fid.write(str(numofsecondsinfile)) #n_records...Even though this is called n_records, it appers
+    #n_records = 600
+    fid.write(str(n_records)) #n_records...Even though this is called n_records, it appers
     #to be the time in seconds in the file. 8bytes
     #h['record_length'] = float(f.read(8))  # in seconds
     fid.seek(244)
-    fid.write('1')  # record_length...THIS also is weird, and not the length of file in seconds
+
+    ###############---------------FIX-------------------------################3
+
+    fid.write('0.344068') #This is numsamplesindata / srate / n_records  # record_length...THIS also is weird, and not the length of file in seconds
     #nchannels = h['n_channels'] = int(f.read(4))
-    numberofchannels = 11
+    #numberofchannels = len(chlabels)#11
     fid.seek(252)
-    fid.write(str(numberofchannels+1)) #Extra Channel is Annotations
+    fid.write(str(numch)) #Extra Channel is Annotations
 
     # read channel info
     '''channels = range(h['n_channels'])
@@ -147,15 +167,16 @@ def write_edf_header(fname,nchannels,data):
     [fid.seek(80,1) for i in chlabels] #prefiltering
 
     #h['n_samples_per_record'] = [int(f.read(8)) for n in channels]
-    n_samples_per_record = [200,200,200,200,200,200,200,200,200,200,200,51]
+    #n_samples_per_record = [200,200,200,200,200,200,200,200,200,200,200,51]
     for n in n_samples_per_record:
         align(int(n),8,fid)
         #array(str(n)).tofile(fid)
+    print 'DEBUG END OF HEADER',fid.tell()
 
     #[array(str(n)).tofile(fid) for n in n_samples_per_record]#appears to be sample rate but called n_samples_per_record.
-    fid.seek(32 * nchannels)  # reserved
-
-    #assert f.tell() == header_nbytes
+    fid.seek(32 * nchannels,1)  # reserved
+    print 'DEBUG END OF HEADER',fid.tell()
+    header_nbytes = fid.tell()# == header_nbytes
     #return h
     #fid.close()
 
@@ -170,7 +191,7 @@ def write_edf_header(fname,nchannels,data):
 
     range_scale = {'dmin':dig_min,'pmin':phys_min,'prange':phys_range,'drange':dig_range,'gain':gain}
     print 'RANGE',range_scale
-    n_records = numofsecondsinfile
+    #n_records = n_records
     return fid, n_records, data, range_scale, n_samples_per_record, chlabels
 
     #(200*11*600+(600*51))*2 +++ 3328
@@ -186,36 +207,43 @@ def align(val,fieldsize,fid): #string to write and size of field to skip
 
 
 def write_data(fid,data,n_records,range_scale, n_samples_per_record, chlabels):
-    fid.seek(0,2)
-    scaleddata = (data + range_scale['dmin'].T) / range_scale['gain'].T - range_scale['pmin'].T
-    redata = scaleddata.reshape(size(scaleddata,0),size(scaleddata,1)/n_records,n_records)
+    fid.seek(0,2);
+    print 'DATA START',fid.tell()
+    scaleddata = data# + range_scale['dmin'].T) / range_scale['gain'].T - range_scale['pmin'].T
+    redata = squeeze(scaleddata.reshape(size(scaleddata,0),size(scaleddata,1)/n_records,n_records, order='F'))
     #return data,range_scale #CH,Epoch,Samples
     print redata.shape, 'SHAPE',n_records, n_samples_per_record, chlabels, fid.tell()
     #redata[0,:,1].tofile(fid);return
     ind = 0
-
     for samp in arange(n_records): #For each epoch
         string_zeros = ''
         #for nsamp in n_samples_per_record: #arange(n_records): #For each sample in epoch
-        zlength = 51 - 1 - len(str(ind)) - 2 #annotation is length of 51 minus space for '+' minus 2 'x14' seperators, minus the length of the sample 'ind'
+        zlength = 102 - 1 - len(str(ind)) - 2 #annotation is length of 51 minus space for '+' minus 2 'x14' seperators, minus the length of the sample 'ind'
         for i in arange(zlength):
             string_zeros = string_zeros+'\x00'
         for chan in chlabels: #For each channel
             #scaledj = (redata[:,i]+range_scale['dmin'][j]) / range_scale['gain'][j] - range_scale['pmin']
             cnum = chlabels.index(chan)
+            #print 'CHAN',chan,n_samples_per_record
             nsamp = n_samples_per_record[chlabels.index(chan)]
-            logger.warning([fid.tell(),nsamp])
+            #logger.warning([fid.tell(),nsamp])
             #print cnum, samp, chan
+
 
             if chan == EVENT_CHANNEL:
                 ann = '+'+str(ind)+'\x14\x14'+string_zeros #\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
                 fid.write(ann)
+                #print 'ANN', len(ann)
                 ind = ind+1
                 #fid.seek(n_samples_per_record[cnum],1)
+
 
             else:
                 #z.astype(int16).tostring()
                 redata[cnum,:,samp].astype(int16).tofile(fid)
+                #redata[cnum,samp].astype(int16).tofile(fid)
+                #print 'debug',redata[cnum,:,samp]
+                #fid.close();return
     fid.close()
 
 
@@ -232,9 +260,9 @@ def write_data(fid,data,n_records,range_scale, n_samples_per_record, chlabels):
 
     #fromstring(d[5],'<i2').astype(float)
 
-def write_to_file(fname,nchan,data):
+def write_to_file(fname,nchannels,data,n_samples_per_record,n_records,chlabels):
     '''test_'''
-    fid, n_records, data, range_scale, n_samples_per_record, chlabels = write_edf_header(fname,nchan,data)
+    fid, n_records, data, range_scale, n_samples_per_record, chlabels = write_edf_header(fname,nchannels,data,n_samples_per_record,n_records,chlabels)
     write_data(fid,data,n_records, range_scale, n_samples_per_record, chlabels)
     #return r,x
 

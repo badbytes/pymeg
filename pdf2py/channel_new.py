@@ -91,6 +91,7 @@ class index:
 
         if type != None:
             self.labellist, self.indexlist = self.getchindexfromtype(type)
+            print 'debug', self.labellist, self.indexlist
         if labels != None:
             self.indexlist, self.labellist = self.getchindexfromlabelsinhdr(labels)
         if type == 'derived':
@@ -181,6 +182,7 @@ class index:
 
     def getchindexfromlabelsinhdr(self,labellist):
         '''channels should be in a list'''
+        '''ex. eeglabs = ['FP1','F7','T3','T5','O1','F3','C3','P3','FZ','CZ','PZ','FP2','F4','C4','P4','O2','F8','T4','T6']'''
         ch_hdr = self.chbuilder_hdr('chan_label', 'index')
         self.ch_hdr = ch_hdr;
         indexlist = []; labellistnew = []
@@ -188,6 +190,7 @@ class index:
             try:
                 indexlist.append(ch_hdr[i][0])
                 labellistnew.append(i)
+                print 'looking for label',i
             except KeyError:
                 print 'KeyError';pass
         return indexlist, labellistnew
