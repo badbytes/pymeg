@@ -216,10 +216,10 @@ class loadfiles:
 
 
 class write:
-    def __init__(self, dicom_instance, seqID, data, savename=None, studydate='', studytime=''):
+    def __init__(self, dicom_instance, seqID, data, savename=None, studydate='', studytime='', task=''):
 
         headernew = {'Manufacturer':'4D', 'InstitutionName':'UCdenver', 'ReferringPhysiciansName':'NA', 'StationName':'', \
-         'StudyDescription':'MEG', 'SeriesDescription':'Density', \
+         'StudyDescription':'MEG', 'SeriesDescription':task+'Density', \
         'OperatorsName':'DC', 'ManufacturersModelName':'BTI', 'SoftwareVersions':'', 'ProtocolName':'',\
         'StudyDate':studydate, 'SeriesDate':studydate,  'AcquisitionDate':studydate , 'ContentDate':studydate, \
         'StudyTime':studytime,'SeriesTime':studytime,'AcquisitionTime':studytime, 'ContentTime':studytime, 'Modality':'MEG', \
@@ -242,46 +242,61 @@ class write:
         filesindir.sort()
 
 
-        filelist = dicom_instance.dicomdict[seqID]
-        fnlist = dicom_instance.dicomdict[seqID].tolist()
+        #filelist = dicom_instance.dicomdict[seqID]
+        dicomlist = dicom_instance.dicomdict[seqID].tolist()
+        #self.fnlist = fnlist = dicomlist.tolist() #dicom_instance.dicomdict[seqID].tolist()
+        ind = 0
+        for f in dicomlist: #filelist:
+            #self.fnlist = fnlist
+            #self.f = f
+            #return
+            #print filesindir,f
+            #return
+            #try:
+                #ind = filesindir.index(f)
+                ##print ind
+            #except ValueError:
+                #pass #not in file list...skip
+                #print 'cant find file, skipping', f
+                #return
+            #else:
+            print 'writing image', f.SOPInstanceUID, savename
+            dicomfile = f
+            #dicomfile = dicom.ReadFile(dicom_instance.pathtodicom+'/'+filesindir[ind])
+            if dicomfile.BitsAllocated == 16:
+                data = int16(data)
+            if dicomfile.BitsAllocated == 8:
+                data = int8(data)
 
-        for f in filelist:
-            self.fnlist = fnlist
-            self.f = f
-            return
-
-            try:
-                ind = filesindir.index(f)
-                #print ind
-            except ValueError:
-                pass #not in file list...skip
-                print 'cant find file, skipping', f
-            else:
-                print 'writing image', f, savename
-                dicomfile = dicom.ReadFile(dicom_instance.pathtodicom+'/'+filesindir[ind])
-                if dicomfile.BitsAllocated == 16:
-                    data = int16(data)
-                if dicomfile.BitsAllocated == 8:
-                    data = int8(data)
-
-                #modify header
-                for h in headernew:
-                    setattr(dicomfile,h,headernew[h])
-                    SIUlast = dicomfile.SeriesInstanceUID.split('.')[-1]
-                    SIUlen = len(SIUlast)
-                    dicomfile.SeriesInstanceUID=dicomfile.SeriesInstanceUID[:-int(SIUlen):]+str(int(SIUlast)+1000+UIDrand)
+            #modify header
+            for h in headernew:
+                setattr(dicomfile,h,headernew[h])
+                SIUlast = dicomfile.SeriesInstanceUID.split('.')[-1]
+                SIUlen = len(SIUlast)
+                dicomfile.SeriesInstanceUID=dicomfile.SeriesInstanceUID[:-int(SIUlen):]+str(int(SIUlast)+1000+UIDrand)
+                try:
                     MSUlast = dicomfile.MediaStorageSOPInstanceUID.split('.')[-1]
                     MSUlen = len(MSUlast)
                     dicomfile.MediaStorageSOPInstanceUID=dicomfile.MediaStorageSOPInstanceUID[:-int(MSUlen):]+str(int(MSUlast)+1000+UIDrand)
-                    SOPlast = dicomfile.SOPInstanceUID.split('.')[-1]
-                    SOPlen = len(SOPlast)
-                    dicomfile.SOPInstanceUID=dicomfile.SOPInstanceUID[:-int(SOPlen):]+str(int(SOPlast)+1000+UIDrand)
+                except:
+                    pass
+                SOPlast = dicomfile.SOPInstanceUID.split('.')[-1]
+                SOPlen = len(SOPlast)
+                dicomfile.SOPInstanceUID=dicomfile.SOPInstanceUID[:-int(SOPlen):]+str(int(SOPlast)+1000+UIDrand)
 
-                print dicomfile.MediaStorageSOPInstanceUID, dicomfile.SOPInstanceUID
-                print 'dataslice', fnlist.index(f) #dicom_instance.fndict[seqID].index(f)
-                dicomfile.PixelData = data[:,:,fnlist.index(f)].tostring()#data[fnlist.index(f),:,:].tostring()
-                fnamestripped = os.path.splitext(f)[0]
-                dicomfile.SaveAs(dicom_instance.pathtodicom+fnamestripped+'_'+savename+'.dcm')
+            print dicomfile.SOPInstanceUID
+            print 'dataslice', f.SliceLocation #fnlist.index(f) #dicom_instance.fndict[seqID].index(f)
+            #dicomfile.PixelData = data[:,:,fnlist.index(f)].tostring()#data[fnlist.index(f),:,:].tostring()
+            #print data.shape;return#[:,:,ind].max()
+            data[data < 0] = 0 #only use positive vals
+            print 'DataMinMax', data[:,:,ind].min(), data[:,:,ind].max()
+            #if ind == 60:
+                #dicomfile.PixelData = data[:,:,20].T.tostring()
+            #else:
+            dicomfile.PixelData = data[:,:,ind].T.tostring()
+            #fnamestripped = os.path.splitext(f)[0]
+            dicomfile.SaveAs(savename+str(dicomfile.SOPInstanceUID)+'.dcm')
+            ind = ind +1
 
 
 """Routines for viewing DICOM image data

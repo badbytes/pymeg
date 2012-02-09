@@ -21,11 +21,13 @@
 #fwrite = io_wrapper.fwrite
 
 from numpy import *
-import os, logging
+import os, logging, datetime
 
 logger = logging.getLogger('1')
 logger.addHandler(logging.FileHandler('/tmp/logger.write',mode='w'))
 
+class DataChannelMismatch:
+    pass #print 'Data and Channel numbers dont match'
 
 EVENT_CHANNEL = 'EDF Annotations'
 #edfwrite.write_to_file('/tmp/test.edf', 17,d,numr.tolist(),1,eeglabs)
@@ -35,158 +37,132 @@ EVENT_CHANNEL = 'EDF Annotations'
 
 #edfwrite.write_to_file('/tmp/test.edf',19,d.T,numr.tolist(),150,l)
 
-def write_edf_header(fname,nchannels,data,n_samples_per_record,n_records,chlabels):
+def write_edf_header(fname,data,n_samples_per_record,n_records,chlabels,srate,date_time,patient_id,patient_name,record_length):
     '''n_samples_per_record = [200,200,200,200,200,200,200,200,200,200,200,51]
     chlabels = ['a','b','c','d','e','f','g','h','i','j','k']
-    n_records = 600
+    n_records = 600 #number of samples per epoch. Must be more than one epoch, so reshape to 3D data as necessary
+    srate = samples per sec
+    datetime = dd.mm.yy.hh.mm.ss
+    patient_name = D_C
+    record_length is the time in sec for length of epoch
     '''
     #h = header
     fid = open(fname, 'w')
-    #hdrbytes = 3328
-    numch = len(chlabels)+1; print 'NumofCh',numch
+    nchannels = len(chlabels)
+
+    #make data Channel X Time
+    print 'CHlabels', chlabels
+    if len(chlabels) == size(data,0):
+        pass
+    elif len(chlabels) == size(data,1):
+        data = data.T
+        #print 'numch:',len(chlabels),'sizeofdata:',shape(data)
+    else:
+        print 'Data and Channels dont match', 'numch:',len(chlabels),'sizeofdata:',shape(data)
+        raise DataChannelMismatch
+
+    #data = data[:,floor(sqrt(data.shape))[1]] #round down for easy reshaping
+
+    numch = len(chlabels)+1; #Add a Annotation channel
+    print 'NumofCh',numch
     edfformat = {'version': 8, 'patid':80, 'recid':80,'date':8,'time':8,'numbytes':8, \
     'res':44,'n_records':8,'rec_dur':8,'num_rec':4,'labels':numch*16, \
     'trasducer':numch*80, 'units':numch*8,'pmin':numch*8, 'pmax':numch*8, \
     'dmin':numch*8, 'dmax':numch*8,'prefilt':numch*80,'num_samp': numch*8, 'reserved': numch*32}
     hdrbytes = sum(edfformat.values())
+
+    # not sure if necessary, but create whitespace for header
     s = chararray(hdrbytes)
     s[:] = ' '
     s.tofile(fid)
-    fid.seek(0)
-    fid.write('0       ');
 
-    # recording info)
+    fid.seek(0) #Jump to start of file
+
+    fid.write('0       '); #Data Version
     ind = fid.tell()
-    #chlabels = ['a','b','c','d','e','f','g','h','i','j','k']
-    fid.write('X X X X');fid.seek(80-len('X X X X'),1)#fid.seek(ind+80,0)
-    fid.write('Startdate 10-DEC-2009 X X test_generator');fid.seek(80-len('Startdate 10-DEC-2009 X X test_generator'),1)
+
+    #patient/recording info
+    patientinfo = str(patient_id+' X X '+patient_name) #PatientID, Sex, DOB, Last_First name
+    align(patientinfo,80,fid) #fid.write(patientinfo); #PatientID, Sex, DOB, Last_First name
+    #fid.seek(80-len(patientinfo),1)#fid.seek(ind+80,0)
+
+    year = int('20'+date_time[6:8])
+    month = int(date_time[0:2])
+    day = int(date_time[3:5])
+    hour = int(date_time[8:10])
+    minute = int(date_time[11:13])
+    second = int(date_time[14:16])
+    dt = datetime.datetime(year,month,day,hour,minute,second)
+    monthabb = dt.strftime('%B')[0:3].upper()
+    scaninfo = str('Startdate '+date_time[3:5]+'-'+monthabb+'-'+str(year)+' X X Neuroimaging_UCD') #'Startdate 10-DEC-2009 X X test_generator'
+    align(scaninfo,80,fid) #fid.write(scaninfo);fid.seek(80-len(scaninfo),1)
 
     # parse timestamp
-
-    #(day, month, year) = [int(x) for x in re.findall('(\d+)', f.read(8))]
-    #(hour, minute, sec)= [int(x) for x in re.findall('(\d+)', f.read(8))]
-    #h['date_time']
-    fid.write('10.12.0912.44.02')
+    fid.write(date_time) #'10.12.0912.44.02')
     fid.write(str(hdrbytes))
-
-    #h['date_time'] = str(datetime.datetime(year + 2000, month, day,
-    #hour, minute, sec))
 
     #!!NEED TO ADD ANNOTATIONS ChLabel
     EVENT_CHANNEL = 'EDF Annotations'
     print 'CL',chlabels
-    #channel_labels = chlabels
     chlabels.append(EVENT_CHANNEL)
     n_samples_per_record.append(51)
     print 'CL',chlabels
-    # misc
-    #header_nbytes = int(f.read(8))
     ind = fid.tell()
-    ##fid.write(str(header_nbytes)); fid.seek(8+ind,0)
-    #subtype = f.read(44)[:5]
-    #h['EDF+'] = subtype in ['EDF+C', 'EDF+D']
-    #h['contiguous'] = subtype != 'EDF+D'
     fid.seek(192)
     fid.write('EDF+C')#############################I THINK THIS MEANS CONTIN
-    #fid.seek(39)
+
     fid.seek(236,0)
-    #h['n_records'] = int(f.read(8))
     print 'byte index', fid.tell()
-    #n_records = 600
-    fid.write(str(n_records)) #n_records...Even though this is called n_records, it appers
-    #to be the time in seconds in the file. 8bytes
-    #h['record_length'] = float(f.read(8))  # in seconds
+    fid.write(str(int(n_records))) #
     fid.seek(244)
 
-    ###############---------------FIX-------------------------################3
-
-    fid.write('0.344068') #This is numsamplesindata / srate / n_records  # record_length...THIS also is weird, and not the length of file in seconds
-    #nchannels = h['n_channels'] = int(f.read(4))
-    #numberofchannels = len(chlabels)#11
+    fid.write(str(record_length)[:8])#'0.344068') #This is numsamplesindata / srate / n_records  # record_length
     fid.seek(252)
     fid.write(str(numch)) #Extra Channel is Annotations
-
-    # read channel info
-    '''channels = range(h['n_channels'])
-    h['label'] = [f.read(16).strip() for n in channels]
-    h['transducer_type'] = [f.read(80).strip() for n in channels]
-    h['units'] = [f.read(8).strip() for n in channels]
-    h['physical_min'] = np.asarray([float(f.read(8)) for n in channels])
-    h['physical_max'] = np.asarray([float(f.read(8)) for n in channels])
-    h['digital_min'] = np.asarray([float(f.read(8)) for n in channels])
-    h['digital_max'] = np.asarray([float(f.read(8)) for n in channels])
-    h['prefiltering'] = [f.read(80).strip() for n in channels]
-    '''
     #write channel labels
     fid.seek(256)
     for i in chlabels:
         ind = fid.tell()
         fid.write(i)
         fid.seek(16+ind,0)
-    #fid.write('EDF Annotations ');
-    [fid.seek(80,1) for i in chlabels]#transducer_type skip 80bytes for transducer crap
+    [fid.seek(80,1) for i in chlabels]#transducer_type
     [fid.write('uV      ') for i in chlabels[:-1]]  #units
     fid.seek(8,1)
-    #data[:] = float(1.2222222222)
+
+    #Max and Mins
     pmin = [];pmax = [];dmin=[];dmax=[]
     for i in data:
-        #pmin.append(float(min(i)))
         pmin.append(-1000.)
-        #array(str(float(min(i)))[:8]).tofile(fid) #Physical min
         array(['-1000.00']).tofile(fid)
-    #fid.write('XX      ') #annotation min
     fid.write('-1      ') #annotation min
     for i in data:
-        #pmax.append(float(min(i)))
         pmax.append(1000.)
-        #array(str(float(max(i)))[:8]).tofile(fid) #Physical max
         array(['1000.000']).tofile(fid)
-    #fid.write('XX      ') #annotation min
     fid.write('1       ') #annotation max
     for i in data:
-        #dmin.append(float(min(i)))
         dmin.append(-32767.)
         array(['-32768  ']).tofile(fid) #Digital max
     array(['-32768  ']).tofile(fid) #Digital max
-    #array(str(float(min(i)))[:8]).tofile(fid) #Digital min
-    #array([ -32767.,  -32767.,  -32767.,  -32767.,  -32767.,  -32767.,  -32767.\
-    #,-32767.,  -32767.,  -32767.,  -32767.,  -32767.]).tofile(fid)
-    #array([-32767.]).tofile(fid) #annotation min
-    #fid.write('XX      ') #annotation min
     for i in data:
-        #dmax.append(float(max(i)))
         dmax.append(32767.)
-        #array(str(float(max(i)))[:8]).tofile(fid) #Digital max
         array(['32767   ']).tofile(fid) #Digital max
-        #array([ 32767.,  32767.,  32767.,  32767.,  32767.,  32767.,  32767.\
-        #,32767.,  32767.,  32767.,  32767.,  32767.]).tofile(fid)
     array(['32767   ']).tofile(fid) #Digital max    #array([32767.]).tofile(fid) #annotation min
-    #array(str(float(max(i)))[:8]).tofile(fid)
-    #fid.write('XX      ') #annotation min
 
     [fid.seek(80,1) for i in chlabels] #prefiltering
-
-    #h['n_samples_per_record'] = [int(f.read(8)) for n in channels]
-    #n_samples_per_record = [200,200,200,200,200,200,200,200,200,200,200,51]
     for n in n_samples_per_record:
         align(int(n),8,fid)
-        #array(str(n)).tofile(fid)
     print 'DEBUG END OF HEADER',fid.tell()
 
     #[array(str(n)).tofile(fid) for n in n_samples_per_record]#appears to be sample rate but called n_samples_per_record.
     fid.seek(32 * nchannels,1)  # reserved
     print 'DEBUG END OF HEADER',fid.tell()
     header_nbytes = fid.tell()# == header_nbytes
-    #return h
-    #fid.close()
 
     # calculate ranges for rescaling
     dig_min = array([dmin])
     phys_min = array([pmin])
     phys_range = array([pmax]) - array([pmin])
     dig_range = array([dmax]) - array([dmin])
-    #assert all(phys_range > 0)
-    #assert all(dig_range > 0)
     gain = phys_range / dig_range
 
     range_scale = {'dmin':dig_min,'pmin':phys_min,'prange':phys_range,'drange':dig_range,'gain':gain}
@@ -200,161 +176,40 @@ def align(val,fieldsize,fid): #string to write and size of field to skip
     curind = fid.tell()
     print val
     array(str(val)).tofile(fid)
-    v = str(float(val))
-    print 'V',v,'x ',curind,'y',fieldsize
+    #v = str(float(val))
+    #print 'V',v,'x ',curind,'y',fieldsize
     fid.seek(curind+fieldsize)
-
-
 
 def write_data(fid,data,n_records,range_scale, n_samples_per_record, chlabels):
     fid.seek(0,2);
-    print 'DATA START',fid.tell()
+    print 'DATA START',fid.tell(), shape(data),n_records
     scaleddata = data# + range_scale['dmin'].T) / range_scale['gain'].T - range_scale['pmin'].T
     redata = squeeze(scaleddata.reshape(size(scaleddata,0),size(scaleddata,1)/n_records,n_records, order='F'))
-    #return data,range_scale #CH,Epoch,Samples
     print redata.shape, 'SHAPE',n_records, n_samples_per_record, chlabels, fid.tell()
-    #redata[0,:,1].tofile(fid);return
     ind = 0
     for samp in arange(n_records): #For each epoch
         string_zeros = ''
-        #for nsamp in n_samples_per_record: #arange(n_records): #For each sample in epoch
         zlength = 102 - 1 - len(str(ind)) - 2 #annotation is length of 51 minus space for '+' minus 2 'x14' seperators, minus the length of the sample 'ind'
         for i in arange(zlength):
             string_zeros = string_zeros+'\x00'
         for chan in chlabels: #For each channel
-            #scaledj = (redata[:,i]+range_scale['dmin'][j]) / range_scale['gain'][j] - range_scale['pmin']
             cnum = chlabels.index(chan)
-            #print 'CHAN',chan,n_samples_per_record
             nsamp = n_samples_per_record[chlabels.index(chan)]
-            #logger.warning([fid.tell(),nsamp])
-            #print cnum, samp, chan
-
-
             if chan == EVENT_CHANNEL:
                 ann = '+'+str(ind)+'\x14\x14'+string_zeros #\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
                 fid.write(ann)
-                #print 'ANN', len(ann)
                 ind = ind+1
-                #fid.seek(n_samples_per_record[cnum],1)
-
-
             else:
-                #z.astype(int16).tostring()
                 redata[cnum,:,samp].astype(int16).tofile(fid)
                 #redata[cnum,samp].astype(int16).tofile(fid)
-                #print 'debug',redata[cnum,:,samp]
-                #fid.close();return
     fid.close()
 
-
-    #for (i, samples) in enumerate(raw_record):
-      #if h['label'][i] == EVENT_CHANNEL:
-        #ann = tal(samples)
-        #time = ann[0][0]
-        #events.extend(ann[1:])
-      #else:
-        ## 2-byte little-endian integers
-        #dig = np.fromstring(samples, '<i2').astype(float)
-        #phys = (dig - dig_min[i]) * gain[i] + phys_min[i]
-        #signals.append(phys)
-
-    #fromstring(d[5],'<i2').astype(float)
-
-def write_to_file(fname,nchannels,data,n_samples_per_record,n_records,chlabels):
-    '''test_'''
-    fid, n_records, data, range_scale, n_samples_per_record, chlabels = write_edf_header(fname,nchannels,data,n_samples_per_record,n_records,chlabels)
+def write_to_file(fname,data,n_samples_per_record,n_records,chlabels,record_length,srate,datetime,patient_id,patient_name):
+    #edf_filename,data,numr.tolist(),n_records,chlabels, record_length
+    fid, n_records, data, range_scale, n_samples_per_record, chlabels = write_edf_header(fname,data,n_samples_per_record,n_records,chlabels,srate,datetime,patient_id,patient_name,record_length)
     write_data(fid,data,n_records, range_scale, n_samples_per_record, chlabels)
     #return r,x
 
 #'+0\x14\x14\x00+0.0000\x14RECORD START\x14\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 #'+4\x14\x14\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 
-
-'''def edf_header(f):
-  h = {}
-  assert f.tell() == 0  # check file position
-  assert f.read(8) == '0       '
-
-  # recording info)
-  h['local_subject_id'] = f.read(80).strip()
-  h['local_recording_id'] = f.read(80).strip()
-
-  # parse timestamp
-  (day, month, year) = [int(x) for x in re.findall('(\d+)', f.read(8))]
-  (hour, minute, sec)= [int(x) for x in re.findall('(\d+)', f.read(8))]
-  h['date_time'] = str(datetime.datetime(year + 2000, month, day,
-    hour, minute, sec))
-
-  # misc
-  header_nbytes = int(f.read(8))
-  subtype = f.read(44)[:5]
-  h['EDF+'] = subtype in ['EDF+C', 'EDF+D']
-  h['contiguous'] = subtype != 'EDF+D'
-  h['n_records'] = int(f.read(8))
-  h['record_length'] = float(f.read(8))  # in seconds
-  nchannels = h['n_channels'] = int(f.read(4))
-
-  # read channel info
-  channels = range(h['n_channels'])
-  h['label'] = [f.read(16).strip() for n in channels]
-  h['transducer_type'] = [f.read(80).strip() for n in channels]
-  h['units'] = [f.read(8).strip() for n in channels]
-  h['physical_min'] = np.asarray([float(f.read(8)) for n in channels])
-  h['physical_max'] = np.asarray([float(f.read(8)) for n in channels])
-  h['digital_min'] = np.asarray([float(f.read(8)) for n in channels])
-  h['digital_max'] = np.asarray([float(f.read(8)) for n in channels])
-  h['prefiltering'] = [f.read(80).strip() for n in channels]
-  h['n_samples_per_record'] = [int(f.read(8)) for n in channels]
-  f.read(32 * nchannels)  # reserved
-
-  assert f.tell() == header_nbytes
-  return h
-
-HEADER RECORD
-8 ascii : version of this data format (0)
-80 ascii : local patient identification
-80 ascii : local recording identification
-8 ascii : startdate of recording (dd.mm.yy)
-8 ascii : starttime of recording (hh.mm.ss)
-8 ascii : number of bytes in header record
-44 ascii : reserved
-8 ascii : number of data records (-1 if unknown)
-8 ascii : duration of a data record, in seconds
-4 ascii : number of signals (ns) in data record
-ns * 16 ascii : ns * label (e.g. EEG FpzCz or Body temp)
-ns * 80 ascii : ns * transducer type (e.g. AgAgCl electrode)
-ns * 8 ascii : ns * physical dimension (e.g. uV or degreeC)
-ns * 8 ascii : ns * physical minimum (e.g. -500 or 34)
-ns * 8 ascii : ns * physical maximum (e.g. 500 or 40)
-ns * 8 ascii : ns * digital minimum (e.g. -2048)
-ns * 8 ascii : ns * digital maximum (e.g. 2047)
-ns * 80 ascii : ns * prefiltering (e.g. HP:0.1Hz LP:75Hz)
-ns * 8 ascii : ns * nr of samples in each data record
-ns * 32 ascii : ns * reserved
-
-DATA RECORD
-nr of samples[1] * integer : first signal in the data record
-nr of samples[2] * integer : second signal
-..
-..
-nr of samples[ns] * integer : last signal
-
-
-clear()
-name = xgetfile('*.*')                          // name of file
-printf ("File selected : %s",name);             // file selected
-fid = mopen (name,'rb');                        // opens file
-mseek(0,fid,'end');                             // goes to the end
-totalbytes = mtell(fid);                        // reads bytes
-mseek(0,fid)                                    // goes beginning
-header = mgetstr (256, fid);                    // reads header
-version = part (header, 1:8);                   // version
-patientid = part (header, 9:88);                // patient ident.
-recordid = part (header, 89:166);               // record ident.
-startdate = part (header, 169:176);             // date
-starttime = part (header, 177:184);             // time
-nbytesheader = eval (part (header, 185:192));   // bytes of header
-reserved = part (header , 193:236);             // reserved field
-ndatarecords = eval ( part (header, 237:244));  // data records
-duration = eval ( part (header, 245:252));      // duration
-nsignals = eval ( part (header, 253:256));      // number of sign.'''
