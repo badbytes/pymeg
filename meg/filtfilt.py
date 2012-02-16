@@ -93,7 +93,8 @@ def filtfilt(b,a,data):
     return fi
 
 def calc(data, srate, Wn=[55.0,65.0], order=2, band='low'):
-    '''filtfilt.calc(X, 1000 ,Wn=[55.0,65.0],order=2, band="low"'''
+    '''filtfilt.calc(X, 1000 ,Wn=[55.0,65.0],order=2, band="low"
+    band =="low"|"high"|"stop"'''
     if size(Wn) == 2:
         if band != 'stop':
             if band != 'notch':

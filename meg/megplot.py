@@ -18,7 +18,7 @@ from pylab import plot,show,text,axis,grid,yticks
     #show()
 
 
-def display(data):
+def display(data,labels=None,fontsize=10,leftshift=-12):
     '''shape of data should be Times X Channels'''
     dmin=numpy.min(data)
     dmax=numpy.max(data)
@@ -28,7 +28,10 @@ def display(data):
     for i in range(0,numpy.size(data,1)):
         plot(data[:,i]+inc)
         inc=step+inc
-        text(-12,inc-step/2,i)
+        if labels == None:
+            text(-12,inc-step/2,i)
+        else:
+            text(-12,inc-step/2,labels[i],fontsize=fontsize)
 
 
 
