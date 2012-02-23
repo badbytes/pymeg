@@ -86,15 +86,18 @@ def reorient(mrdata, orientcosines, pixdim):
         mrdata = mrdata.T
 
         qform[0]=[pixdim[0]*-1,0,0,0];
-        qform[1]=[0,pixdim[1],0,0];
+        qform[1]=[0,pixdim[1]*-1,0,0];
         qform[2]=[0,0,pixdim[2],0];
         if orientcosines[0:3][a] < 0: #Left to Right... flip
-            mrdata = mrdata[:,::-1,:]
+            mrdata = mrdata[::-1,:,:]
             print 'flipping 1st dim'
             qform[0]=qform[0]*-1
-        if orientcosines[3:6][b] < 0: #Post to Anterior... flip
-            mrdata = mrdata[:,:,::-1]
+        if orientcosines[3:6][b] > 0: #Post to Anterior... flip
+            mrdata = mrdata[:,::-1,:]
             print 'flipping 2nd dim'
+            qform[1]=qform[1]*-1
+
+        #mrdata = mrdata.T
 
     if a+b == 2: #coronal
         #exchange 2nd and 3rd dimensions

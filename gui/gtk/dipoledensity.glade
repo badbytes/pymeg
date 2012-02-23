@@ -125,6 +125,7 @@
                 <child>
                   <object class="GtkRadioButton" id="radiobutton_selected">
                     <property name="label" translatable="yes">Use Selected Item</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
@@ -144,6 +145,7 @@
                 <child>
                   <object class="GtkRadioButton" id="radiobutton_manual">
                     <property name="label" translatable="yes">Manual Entry</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
@@ -165,6 +167,7 @@
                 <child>
                   <object class="GtkRadioButton" id="radiobutton_fileopen">
                     <property name="label" translatable="yes">Load Dipole File</property>
+                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="has_default">True</property>
@@ -213,7 +216,7 @@
                     <property name="sensitive">False</property>
                     <property name="can_focus">True</property>
                     <property name="invisible_char">●</property>
-                    <property name="text" translatable="yes">[[0.,0.,40.],[0.,0.,0.]]</property>
+                    <property name="text" translatable="yes">[[0.,0.,40.],[0.,0.,0.],[0.,40,.0],[0,40,0]]</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -290,6 +293,7 @@
         <child>
           <object class="GtkButton" id="startdensity">
             <property name="label" translatable="yes">Compute Density Map</property>
+            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="sensitive">False</property>
             <property name="can_focus">True</property>
@@ -346,6 +350,7 @@
             <child>
               <object class="GtkButton" id="button2">
                 <property name="label" translatable="yes">Cancel</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -361,6 +366,7 @@
             <child>
               <object class="GtkButton" id="button1">
                 <property name="label" translatable="yes">Save</property>
+                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>

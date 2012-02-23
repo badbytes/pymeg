@@ -33,6 +33,7 @@ EVENT_CHANNEL = 'EDF Annotations'
 #edfwrite.write_to_file('/tmp/test.edf', 17,d,numr.tolist(),1,eeglabs)
 #l = ['FP1','F7','T3','T5','01','F3','C3','P3','FZ','CZ','PZ','FP2','F4','C4','P4','02','F8','T4','T6']
 #p = pdf.read(f[0]);p.data.setchannellabels(eeglabs);p.data.getdata(0,15000)
+#numr = [200,200,200,200,200,200,200,200,200,200,200,51]
 #edfwrite.write_to_file('/tmp/test.edf',19,d.T,numr.tolist(),30,l)
 
 #edfwrite.write_to_file('/tmp/test.edf',19,d.T,numr.tolist(),150,l)
@@ -85,20 +86,31 @@ def write_edf_header(fname,data,n_samples_per_record,n_records,chlabels,srate,da
     patientinfo = str(patient_id+' X X '+patient_name) #PatientID, Sex, DOB, Last_First name
     align(patientinfo,80,fid) #fid.write(patientinfo); #PatientID, Sex, DOB, Last_First name
     #fid.seek(80-len(patientinfo),1)#fid.seek(ind+80,0)
+    date_time = date_time.replace('%','.');
+    date_time = date_time.replace('@','.')
+    print('DateTime',date_time)
+    syear = ('20'+date_time.split('.')[2])
+    smonth = (date_time.split('.')[1])
+    sday = (date_time.split('.')[0])
+    shour = (date_time.split('.')[3])
+    sminute = (date_time.split('.')[4])
+    ssecond = (date_time.split('.')[5])
 
-    year = int('20'+date_time[6:8])
-    month = int(date_time[0:2])
-    day = int(date_time[3:5])
-    hour = int(date_time[8:10])
-    minute = int(date_time[11:13])
-    second = int(date_time[14:16])
+
+    year = int('20'+date_time.split('.')[2])
+    month = int(date_time.split('.')[1]);print('Month',month)
+    day = int(date_time.split('.')[0])
+    hour = int(date_time.split('.')[3])
+    minute = int(date_time.split('.')[4])
+    second = int(date_time.split('.')[5])
     dt = datetime.datetime(year,month,day,hour,minute,second)
     monthabb = dt.strftime('%B')[0:3].upper()
-    scaninfo = str('Startdate '+date_time[3:5]+'-'+monthabb+'-'+str(year)+' X X Neuroimaging_UCD') #'Startdate 10-DEC-2009 X X test_generator'
+    scaninfo = str('Startdate '+sday+'-'+monthabb+'-'+str(year)+' X X Neuroimaging_UCD') #'Startdate 10-DEC-2009 X X test_generator'
     align(scaninfo,80,fid) #fid.write(scaninfo);fid.seek(80-len(scaninfo),1)
 
     # parse timestamp
-    fid.write(date_time) #'10.12.0912.44.02')
+    datestr = str(sday+'.'+smonth+'.'+syear[2::]+shour+'.'+sminute+'.'+ssecond)
+    fid.write(datestr)#date_time) #'10.12.0912.44.02')
     fid.write(str(hdrbytes))
 
     #!!NEED TO ADD ANNOTATIONS ChLabel
@@ -200,6 +212,7 @@ def write_data(fid,data,n_records,range_scale, n_samples_per_record, chlabels):
                 fid.write(ann)
                 ind = ind+1
             else:
+                #print('DataMax',redata.max())
                 redata[cnum,:,samp].astype(int16).tofile(fid)
                 #redata[cnum,samp].astype(int16).tofile(fid)
     fid.close()

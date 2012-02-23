@@ -44,6 +44,6 @@ def convert(pdfinstance, patient_name, edf_filename):
     numr = tile(n_records,len(chlabels))
     record_length = frames / srate / n_records
 
-
+    redata = redata*(1000/redata.max())
     edfwrite.write_to_file(edf_filename,redata,numr.tolist(),n_records,chlabels, record_length,srate, dt,patientid,patient_name)
     #return fname,data,n_samples_per_record,n_records,chlabels,srate,datetime,patient_name
