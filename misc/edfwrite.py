@@ -21,7 +21,7 @@
 #fwrite = io_wrapper.fwrite
 
 from numpy import *
-import os, logging, datetime
+import os, logging, datetime, time
 
 logger = logging.getLogger('1')
 logger.addHandler(logging.FileHandler('/tmp/logger.write',mode='w'))
@@ -31,7 +31,7 @@ class DataChannelMismatch:
 
 EVENT_CHANNEL = 'EDF Annotations'
 #edfwrite.write_to_file('/tmp/test.edf', 17,d,numr.tolist(),1,eeglabs)
-#l = ['FP1','F7','T3','T5','01','F3','C3','P3','FZ','CZ','PZ','FP2','F4','C4','P4','02','F8','T4','T6']
+#l = ['FP1','F7','T3','T5','01','F3','C3','P3','FZ','CZ','PZ','FP2','F4','C4','P4','02','F8','T4','T6','HEOG','VEOG','EKG']
 #p = pdf.read(f[0]);p.data.setchannellabels(eeglabs);p.data.getdata(0,15000)
 #numr = [200,200,200,200,200,200,200,200,200,200,200,51]
 #edfwrite.write_to_file('/tmp/test.edf',19,d.T,numr.tolist(),30,l)
@@ -86,25 +86,30 @@ def write_edf_header(fname,data,n_samples_per_record,n_records,chlabels,srate,da
     patientinfo = str(patient_id+' X X '+patient_name) #PatientID, Sex, DOB, Last_First name
     align(patientinfo,80,fid) #fid.write(patientinfo); #PatientID, Sex, DOB, Last_First name
     #fid.seek(80-len(patientinfo),1)#fid.seek(ind+80,0)
-    date_time = date_time.replace('%','.');
-    date_time = date_time.replace('@','.')
-    print('DateTime',date_time)
-    syear = ('20'+date_time.split('.')[2])
-    smonth = (date_time.split('.')[1])
-    sday = (date_time.split('.')[0])
-    shour = (date_time.split('.')[3])
-    sminute = (date_time.split('.')[4])
-    ssecond = (date_time.split('.')[5])
+    #date_time = date_time.replace('%','.');
+    #date_time = date_time.replace('@','.')
+    #print('DateTime',date_time)
+    #syear = ('20'+date_time.split('.')[2])
+    #smonth = (date_time.split('.')[1])
+    #sday = (date_time.split('.')[0])
+    #shour = (date_time.split('.')[3])
+    #sminute = (date_time.split('.')[4])
+    #ssecond = (date_time.split('.')[5])
+    syear = (date_time.split(' ')[4])
+    smonth = str("%02d" % (time.strptime(date_time.split(' ')[1],'%b')[1]))
+    sday = (date_time.split(' ')[2])
+    shour = (date_time.split(' ')[3][0:2])
+    sminute = (date_time.split(' ')[3][3:5])
+    ssecond = (date_time.split(' ')[3][6:8])
 
-
-    year = int('20'+date_time.split('.')[2])
-    month = int(date_time.split('.')[1]);print('Month',month)
-    day = int(date_time.split('.')[0])
-    hour = int(date_time.split('.')[3])
-    minute = int(date_time.split('.')[4])
-    second = int(date_time.split('.')[5])
+    year = int(syear)
+    month = int(smonth);print('Month',month)
+    day = int(sday)
+    hour = int(shour)
+    minute = int(smonth)
+    second = int(ssecond)
     dt = datetime.datetime(year,month,day,hour,minute,second)
-    monthabb = dt.strftime('%B')[0:3].upper()
+    monthabb = date_time.split(' ')[1].upper()#dt.strftime('%B')[0:3].upper()
     scaninfo = str('Startdate '+sday+'-'+monthabb+'-'+str(year)+' X X Neuroimaging_UCD') #'Startdate 10-DEC-2009 X X test_generator'
     align(scaninfo,80,fid) #fid.write(scaninfo);fid.seek(80-len(scaninfo),1)
 

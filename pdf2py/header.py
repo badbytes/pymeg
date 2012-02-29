@@ -49,10 +49,10 @@ class read:
             pass
 
 class write:
-    def __init__(self, datapdf):
-        hdr = datapdf.data.hdr
+    def __init__(self, datapdf, filepath):
+        hdr = datapdf.data.hdr#.header_offset,
         print 'ch', hdr.header_data.total_chans
-        fid=open(datapdf.data.writepath, "r+")
+        fid=open(filepath, "r+")
         fid.seek(0, os.SEEK_END);
         header_offset = array([fid.tell()])
         header_data.write(fid, hdr.header_data); #read first section of header
@@ -60,5 +60,5 @@ class write:
         [channel_ref_data.write(fid, hdr.channel_ref_data[j]) for j in range(0, hdr.header_data.total_chans[0])]
         [event_data.write(fid, hdr.event_data[j]) for j in range(0, hdr.header_data.total_fixed_events[0])]
         [proc_data.write(fid, hdr.proc_data[j]) for j in range(0, hdr.header_data.total_processes[0])]
-        fwrite(fid, 1, header_offset, 'q', 1); #first last byte of the header
+        fwrite(fid, header_offset, 1); #first last byte of the header
         fid.close

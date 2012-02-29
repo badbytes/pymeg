@@ -52,15 +52,15 @@ class read():#(compute):
 
 
 class write_file():
-     def __init__(self, datapdf, data2write, pdffilename):
-        print('writing pdffilename')
-        py2pdf.writeascdata(array([[1],[1]]), pdffilename, array(['A1']), '/tmp/tmppdf.asc', datapdf.data.filepath, datapdf, '1', '1.0')#write fake temp file
-        datapdf.data.writepath = datapdf.data.filedir+pdffilename
+     def __init__(self, datapdf, data2write, filename):
+        print('writing filename')
+        py2pdf.writeascdata(array([[1],[1]]), filename, array(['A1']), '/tmp/tmppdf.asc', datapdf.data.filepath, datapdf, '1', '1.0')#write fake temp file
+        datapdf.data.writepath = datapdf.data.filedir+filename
         if os.path.isfile(datapdf.data.filepath)==True:
             print('writing pdf', os.path.abspath(datapdf.data.writepath))
-            data.write(datapdf, data2write)
-            print('writing pdf header', os.path.abspath(datapdf.data.writepath))
-            header.write(datapdf); #writing header
+            data.write(datapdf, data2write, filename)
+            print('writing pdf header', os.path.abspath(datapdf.data.filedir+filename))
+            header.write(datapdf, datapdf.data.filedir+filename); #writing header
 
 class write_changes():
     def __init__(self, dataobj, data2write):

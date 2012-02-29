@@ -25,6 +25,7 @@ from numpy import reshape, shape, float32, array, arange, size, single, append, 
 from pdf2py import align, header, config, channel_new #channel
 import os
 from meg import functions
+from misc import pdf2edf as write_edf
 
 class initialize():
     def __init__(self, datapdf):
@@ -160,14 +161,15 @@ class read(initialize):
 
 ##------------------------------------------------------------------------------------------
 class write:
-    def __init__(self, datapdf, data2write):
+    def __init__(self, datapdf, data2write, filename):
         #import shutil
         #from numpy import int16
-        self.fid = open(datapdf.data.filepath, 'w')
+        self.fid = open(datapdf.data.filedir+'/'+filename, 'w')
         self.fid.seek(0*datapdf.data.time_slice_size, os.SEEK_SET)
 
         if datapdf.data.format == 1:
             data = (data2write) * datapdf.data.scalefact
+            print 'dataprecision is scaled'
         if datapdf.data.format == 3:
             data = single(data2write)#*2
             print 'dataprecision is single'#, datapdf.data.dataprecision
@@ -177,11 +179,13 @@ class write:
         if len(data2write.shape) == 2:
             numofpnts2write = data2write.shape[0]*data2write.shape[1]
             reindexed_data = data.flatten()
+            print 'reshaped and flattened'
         elif len(data2write.shape) == 1:
             numofpnts2write = data2write.shape[0]
             reindexed_data = data
-        print numofpnts2write, reindexed_data.shape
-        fwrite(self.fid, numofpnts2write, reindexed_data, datapdf.data.dataprecision, 1);
+            print 'data ordered fine'
+        print numofpnts2write, reindexed_data.shape, self.fid
+        fwrite(self.fid, reindexed_data, 1);
 
         self.fid.close()
 

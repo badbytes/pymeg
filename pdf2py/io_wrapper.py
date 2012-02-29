@@ -30,10 +30,14 @@ def fread(fid, numofelements, dtype, null=None, endianness=None):
 
 #fwrite(fid, 1, pyconfig.data_sys_type, 'H', 1);
 
-def fwrite(fid, numofelements, data, dtype, endianness=None):
+def fwrite(fid, data, endianness=None):
     if endianness == 1:
         data.byteswap().tofile(fid)
-    else:
+        print 'ByteSwap'
+    elif endianness == None:
         data.tofile(fid)
+        print 'NonByteSwap'
+    else:
+        print 'Something wrong, no data writing'
 
     #z.byteswap().tofile('test')

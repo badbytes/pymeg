@@ -26,7 +26,8 @@
 from misc import edfwrite
 import copy
 from numpy import floor,sqrt,tile
-def convert(pdfinstance, patient_name, edf_filename):
+import time
+def convert(pdfinstance, patient_name, edfpath):
     p = pdfinstance
     srate = p.data.srate
     patientid = p.data.pid
@@ -34,16 +35,19 @@ def convert(pdfinstance, patient_name, edf_filename):
     frames = p.data.frames
     chlabels = copy.deepcopy(p.data.channels.labellist)
     scan = p.data.scan
-    date_time = p.data.session
+    #date_time = p.data.session
+    dt = time.ctime(p.hdr.proc_data[0].timestamp)
     data = p.data.data_block
     n_samples_per_record = floor(sqrt(p.data.frames))
     n_records = n_samples_per_record
     redata = data[0:n_samples_per_record*n_samples_per_record].T
-    dt = date_time.replace('@_','').replace(':','@').replace('-','').replace('@','.')+'.00'
-    dt = dt[3:6]+dt[0:2]+dt[5:]
+    #dt = date_time.replace('@_','').replace(':','@').replace('-','').replace('@','.').replace('%','.')+'.00'
+    #dt = dt[3:6]+dt[0:2]+dt[5:]
     numr = tile(n_records,len(chlabels))
     record_length = frames / srate / n_records
-
+    session = p.data.session.replace('%','').replace('@','').replace(':','')
+    edf_filename = edfpath+'/'+p.data.pid+'_'+p.data.scan+'_'+session.strip('%')+'_'+p.data.run+'.edf'
+    print 'SaveName:', edf_filename
     redata = redata*(1000/redata.max())
     edfwrite.write_to_file(edf_filename,redata,numr.tolist(),n_records,chlabels, record_length,srate, dt,patientid,patient_name)
     #return fname,data,n_samples_per_record,n_records,chlabels,srate,datetime,patient_name
