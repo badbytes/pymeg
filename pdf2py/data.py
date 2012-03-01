@@ -95,6 +95,7 @@ class read(initialize):
                 for c in range(0, self.hdr.header_data.total_chans):
                     scalefact = self.cfg.channel_data[cfgchlist.index(self.hdr.channel_ref_data[c].chan_no)].units_per_bit
                     self.scalefact = append(self.scalefact, scalefact)
+
                 data_blockreshape = data_blockreshape*scalefact
 
             else:
@@ -124,7 +125,8 @@ class read(initialize):
         self.numofchannels = size(self.data_block,1)
         self.srate = 1/self.hdr.header_data.sample_period[0]
         self.frames = self.data_block.shape[0] / self.numofepochs
-        print 'DATA DEBUG', shape(self.data_block)
+        print 'DATA DEBUG: data shape = ', shape(self.data_block)
+
     def setchannels(self, chtype):
         '''chtype = = type of channel (meg | eeg | ref | trig | ext | derived | utility | shorted)'''
         self.setchanneltype(chtype)
@@ -168,7 +170,7 @@ class write:
         self.fid.seek(0*datapdf.data.time_slice_size, os.SEEK_SET)
 
         if datapdf.data.format == 1:
-            data = (data2write) * datapdf.data.scalefact
+            data = (data2write) / datapdf.data.scalefact
             print 'dataprecision is scaled'
         if datapdf.data.format == 3:
             data = single(data2write)#*2
@@ -195,7 +197,7 @@ class write_changes:
         ex.
 
         fn = '/home/danc/data/meg/0611piez/e,rfhp1.0Hz,ra.mod'
-        p = pdf.read(fn)
+        p = pdf.read(fn)-6.43239350673e-11
         p.data.setchannellabels(['A1','A100'])
         p.data.setchannels('meg')
         p.data.getdata(0,p.data.pnts_in_file)
@@ -208,7 +210,7 @@ class write_changes:
         self.fid.seek(0,os.SEEK_SET)
 
         if dataobj.format == 1:
-            data = (data2write) * dataobj.scalefact
+            data = (data2write) / dataobj.scalefact
         if dataobj.format == 3:
             data = single(data2write)#*2
             print 'dataprecision is single'#, dataobj.dataprecision
@@ -218,11 +220,11 @@ class write_changes:
 
         bitsperchan = dataobj.time_slice_size/dataobj.total_chans
         for c in arange(len(dataobj.channels.indexlist)): #for each channel
-            #print 'ch',c
+            print 'channel written:',c
             seekpnt = bitsperchan * (dataobj.channels.indexlist[c])
             for s in arange(dataobj.pnts_in_file): #for each time point.
                 self.fid.seek(seekpnt + (dataobj.time_slice_size * s), os.SEEK_SET)
-                fwrite(self.fid, 1, data2write[s,c], dataobj.dataprecision, endianness=1)
+                fwrite(self.fid, data2write[s,c], endianness=1)
         print 'saving changes to file complete.'
 
         self.fid.close()

@@ -64,7 +64,7 @@ class write_file():
 
 class write_changes():
     def __init__(self, dataobj, data2write):
-        print('writing changes to:', dataobj.filename)
+        print('writing changes to:', dataobj.filepath)
         if os.path.isfile(dataobj.filepath)==True:
             data.write_changes(dataobj, data2write)
             #print('writing pdf header')
