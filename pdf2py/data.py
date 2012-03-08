@@ -125,7 +125,7 @@ class read(initialize):
         self.numofchannels = size(self.data_block,1)
         self.srate = 1/self.hdr.header_data.sample_period[0]
         self.frames = self.data_block.shape[0] / self.numofepochs
-        print 'DATA DEBUG: data shape = ', shape(self.data_block)
+        #print 'DATA DEBUG: data shape = ', shape(self.data_block)
 
     def setchannels(self, chtype):
         '''chtype = = type of channel (meg | eeg | ref | trig | ext | derived | utility | shorted)'''
@@ -155,10 +155,30 @@ class read(initialize):
         from meg import analyze
         self.analyze = analyze
 
-    def deletechannel(self,index):
+    def set_deletechannel(self,index):
         self.data_block = delete(self.data_block,index,axis=1)
         self.channel.deletechannel(index)
         self.numofchannels = self.numofchannels - len(index)
+
+    def display_contour(self, start=None, end=None):
+        from meg import megcontour
+        megcontour.display(self.data_block[start:end],self.channels.chanlocs)
+
+    def set_offsetcorrect(self, start=0, end=-1):
+        from meg import offset
+        self.data_block = offset.correct(self.data_block, start, end)
+
+    def get_leadfields(self, grid):
+        from meg import leadfield_parallel
+        self.leadfields = leadfield_parallel.calc(self.channels,grid)
+
+    def display_plotmeg(self):
+        from meg import megplot
+        megplot.display(self.data_block)
+
+
+
+
 
 
 ##------------------------------------------------------------------------------------------

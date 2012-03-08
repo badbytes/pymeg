@@ -23,7 +23,7 @@ pos=R point
 pos= channel location vector
 ori=signal channel orientation
 
-ex. x=leadfield.calclf(channelinstance, grid) ....
+ex. x=leadfield.calc(channelinstance, grid) ....
     will return the leadfield sum from both upper and lower coils
 
     grid is N X 3 array. Make sure to reshape it if Ndim=1 to by 1X3
@@ -93,7 +93,7 @@ class calc:
                 return
             grid = grid.transpose()
             print 'reshaping grid'
-        
+
         global y; y = float(len(grid))/float(cpu_count())
         global pbar; pbar = pb.ProgressBar().start()
         #Parallel Compute Leadfields
@@ -122,7 +122,7 @@ def code(grid):#=None, pos=None, ori=None, cent=None):
 
     #danc changed hdr read to convert to mm upfront.
     #pos=pos*1000 #convert channel pos from meters to mm
-    
+
     #pbar = pb.ProgressBar().start()
     #sys.stdout.flush()
     if (float(x)/float(y))*100 < 100:
@@ -131,7 +131,7 @@ def code(grid):#=None, pos=None, ori=None, cent=None):
         #if (float(x)/float(y))*100 > 10:
             #pass
     #print (float(x)/float(y))*100, '%complete'
-    
+
     R = grid - cos
     nchans = len(chupos)
     ncoils = 2
@@ -176,7 +176,7 @@ if __name__ == '__main__':
     from numpy import *
     from gui.gtk import progressbar
     MT = progressbar.MainThread()
-    
+
     def leadfieldthread():
         fn = '/home/danc/python/data/0611/0611SEF/e,rfhp1.0Hz,n,x,baha001-1SEF,f50lp'
         from pdf2py import pdf
@@ -185,7 +185,7 @@ if __name__ == '__main__':
         grid=random.randn(3,10)
         lft = calc(p.data.channels,grid)
         print type(lft.leadfield), shape(lft.leadfield)
-        
-    
-    
+
+
+
     MT.main(leadfieldthread)#,progresstype='fraction')

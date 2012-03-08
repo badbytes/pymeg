@@ -19,7 +19,7 @@
 '''
 sim=simsource.calc(ldf, xyz, qxqyqz);
 '''
-from numpy import size,transpose,linalg,shape
+from numpy import size,transpose,linalg,shape,array,append,dot,squeeze
 from meg import closestposition
 
 def calc(lf, xyz, qxqyqz):
@@ -31,21 +31,23 @@ def calc(lf, xyz, qxqyqz):
         xyz=array([xyz])
         #return xyz
 
-
-
     if len(qxqyqz.shape) == 1: #1D to 2D vector
         print '1D to 2D reshape of qxqyqz'
         qxqyqz=array([qxqyqz])
         #return qxqyqz
 
-
     sim = array([])
-    for i in range(0, size(xyz,0)):
-        #for j in range(0, size(qxqyqz,0)):
-        minpos = closestposition.run(lf.grid, xyz[i,:]);
-        qn = transpose(qxqyqz[i,:]);
-        L = lf.leadfield[minpos,:,:];
-        Li = linalg.pinv(L);print shape(Li),shape(qn)
-        sim = append(sim,dot((L),dot(qn,10)));
-    return sim.reshape(i+1,size(L,0))
-    #return squeeze(sim.reshape(i+1, size(qxqyqz,0),size(L,0)))
+    #for i in range(0, size(xyz,0)):
+        ##for j in range(0, size(qxqyqz,0)):
+        #minpos = closestposition.run(lf.grid, xyz[i,:]);
+        #print minpos
+        #qn = transpose(qxqyqz[i,:]);
+        #L = lf.leadfield[minpos,:,:];
+        #Li = linalg.pinv(L);print shape(Li),shape(qn)
+        #sim = append(sim,dot((L),dot(qn,10)));
+    #return sim.reshape(i+1,size(L,0))
+    L = lf.leadfield
+    qn = transpose(qxqyqz);
+    Li = linalg.pinv(lf.leadfield);print shape(L),shape(qn)
+    sim = append(sim,dot((L),dot(qn,10)));
+    return sim #squeeze(sim.reshape(i+1, size(qxqyqz,0),size(L,0)))

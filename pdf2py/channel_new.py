@@ -91,7 +91,7 @@ class index:
 
         if type != None:
             self.labellist, self.indexlist = self.getchindexfromtype(type)
-            print 'debug', self.labellist, self.indexlist
+            #print 'debug', self.labellist, self.indexlist
         if labels != None:
             self.indexlist, self.labellist = self.getchindexfromlabelsinhdr(labels)
         if type == 'derived':
@@ -190,9 +190,9 @@ class index:
             try:
                 indexlist.append(ch_hdr[i][0])
                 labellistnew.append(i)
-                print 'looking for label',i
+                #print 'looking for label',i
             except KeyError:
-                print 'KeyError';pass
+                print i, 'missing';pass
         return indexlist, labellistnew
 
     def getchindexfromtype(self,type):
@@ -207,7 +207,6 @@ class index:
                 for j in device_type:
                     if ch_cfg[i] == j:
                         typelist.append(i)
-
 
         sortedlabels = sorted(typelist)
         indexlist, labellist = self.getchindexfromlabelsinhdr(sortedlabels)

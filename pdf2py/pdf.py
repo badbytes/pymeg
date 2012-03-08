@@ -23,7 +23,7 @@
 from pdf2py import config, header, headshape, data
 #from pdf2py.pdf_functions import compute
 import os
-from meg import py2pdf
+from meg import py2pdf, analyze
 from numpy import array
 
 class read():#(compute):
@@ -48,6 +48,7 @@ class read():#(compute):
             #self.results = self.__class__
 
         else: print('no file found')
+        self.compute = analyze
 
 
 
