@@ -162,7 +162,7 @@ class loadimage():
         self.getcorrelationfit(weights)
 
     def savefile(self,filepath):
-        self.nifti.to_filename(filepath+'test.nii.gz')
+        self.nifti.to_filename(filepath+'.nii.gz')
 
 
 #### OLD STUFF BELOW. LEFT FOR COMPATIBILITY.

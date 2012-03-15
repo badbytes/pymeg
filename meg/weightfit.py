@@ -169,10 +169,10 @@ class bestfit(calc):
         numhspts = size(p.hs.hs_point,0)
         d = zeros([numhspts])
         for j in range(0, numhspts): #distance from 0,0,40 mm to all hs points
-            d[j] = euclid.distarray([0,0,40],p.hs.hs_point[j]*1000)
+            d[j] = euclid.dist([0,0,40],p.hs.hs_point[j]*1000)
         self.d = d
 
-        self.n = euclid.distarray([0,0,40],p.hs.index_nasion*1000)
+        self.n = euclid.dist([0,0,40],p.hs.index_nasion*1000)
 
         numofgrids = ng = 6 #d.max()
         startgridspacing = gs = float((self.n.max()/ng)*2) #mm

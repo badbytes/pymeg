@@ -34,6 +34,7 @@ class density:
         self.builder = gtk.Builder()
         self.builder.add_from_file(os.path.splitext(__file__)[0]+".glade")
         self.window = self.builder.get_object("dipoledensitywindow")
+        self.confirmoverwrite(None)
 
         dic = {
             "on_filechooserbutton1_file_set" : self.fileset,
@@ -45,6 +46,8 @@ class density:
             "on_button1_clicked" : self.savemri,
             "on_button2_clicked" : self.cancel,
             "on_toggled" : self.item_select,
+            "on_confirm-overwrite" : self.confirmoverwrite,
+            "on_response" : self.response_test,
 
             }
 
@@ -138,6 +141,7 @@ class density:
                 lA.dips[:,1:4] = lA.dips[:,1:4]/100 #xyz in meters (this is the units in the 4D,lA file)
 
             points = lA.dips[:,1:4]*1000 # units in mm
+            time = lA.dips[:,0]/1000 #in sec
 
             gof_ind = lA.labels.index('GoF')
             gof = lA.dips[:,gof_ind]
@@ -146,24 +150,50 @@ class density:
         self.dipoledensityimage = dipole2densitynifti.handler(points,mr,gofscale,gof,sigma)
 
         self.fcd = self.builder.get_object("filechooserdialog1")
-        self.fcd.show()
+
         self.fcd.set_current_name('*dd.nii.gz')
+        self.fcd.set_do_overwrite_confirmation(True)
         filter = gtk.FileFilter()
         filter.set_name("Nifti files")
         filter.add_pattern("*nii.gz")
         filter.add_pattern("*nii")
         self.fcd.add_filter(filter)
+        self.fcd.show()
 
         #uridefault = self.fcd.set_uri(self.fcd.get_current_folder_uri())
+        newname = self.mrfilename.replace('nii.gz','dd.nii.gz')
         self.fcd.set_uri('file://'+self.mrfilename)
-
+        print 'debug',self.mrfilename
         uridefault = self.fcd.get_current_folder_uri()
         print 'uri', uridefault
-        self.fcd.set_uri(uridefault)
+        #self.fcd.set_uri(uridefault)
 
     def savemri(self, widget):
-        self.dipoledensityimage.to_filename(self.fcd.get_filename())
-        self.fcd.hide()
+        print 'debugsave',self.fcd.get_filename()
+        if os.path.isfile(self.fcd.get_filename()):
+            self.confirmoverwrite(None)
+
+        else:
+            self.fcd.hide()
+            self.dipoledensityimage.to_filename(self.fcd.get_filename())
+
+    def confirmoverwrite(self,widget):
+        print 'confirming'
+        self.x = self.builder.get_object("messagedialog1")
+        self.x.show()
+
+    def response_test(self,widget,null):
+        pass
+        print 'response',widget,'test',null
+        #print self.x.response()
+        print widget.get_events()
+        widget.close()
+        if null == -6:
+            print 'quit'
+        else:
+            print 'overwriting'
+
+
 
 
 if __name__ == "__main__":

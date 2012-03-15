@@ -94,9 +94,10 @@ def handler(points,mr,gofscale=None,gof=None,sigma=3):
     overlay = nibabel.Nifti1Image(scaledf,mr.nifti.get_affine(),mr.nifti.get_header())
     #overlay = NiftiImage(int16(scaledf))
     #overlay.setDescription(mr.description)
-    filename = os.path.splitext(mr.nifti.get_filename())[0]
-    overlay.to_filename(filename+'dd.nii.gz')
-    print 'Density Image Saved', filename+'dd.nii.gz'
+    #filename = os.path.splitext(mr.nifti.get_filename())[0]
+    #filename = mr.nifti.get_filename().strip('.nii.gz')#[0]
+    #overlay.to_filename(filename+'dd.nii.gz')
+    #print 'Density Image Saved', filename+'dd.nii.gz'
     #overlay.setFilename(mr.filename+'dd')
     #overlay.setQForm(mr.getQForm())
 
